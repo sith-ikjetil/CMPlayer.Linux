@@ -154,9 +154,10 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     /// returns: Bool. True if path is directory. False otherwise.
     ///
     func isDirectory(path: String) -> Bool {
-        var isDirectory: ObjCBool = true
-        FileManager().fileExists(atPath: path, isDirectory: &isDirectory)
-        return isDirectory.boolValue
+        if FileManager().fileExists(atPath: path) {
+            return true;
+        }
+        return false;
     }// isDirectory
     
     ///

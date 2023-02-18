@@ -10,7 +10,7 @@
 // import
 //
 import Foundation
-//import termios
+import Termios
 
 ///
 /// Represents console color.
@@ -128,17 +128,16 @@ internal class Console {
     /// Turns console echo off.
     ///
     static func echoOff() -> Void {
-        /*let c: cc_t = 0
-        let cct = (c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c)
-        var oldt: termios = termios.termios(c_iflag: 0, c_oflag: 0, c_cflag: 0, c_lflag: 0, c_cc: cct, c_ispeed: 0, c_ospeed: 0)
-        
-        tcgetattr(STDIN_FILENO, &oldt) // 1473
-        var newt = oldt
-        
-        newt.c_lflag = newt.c_lflag & ~UInt(ECHO) //1217  // Reset ICANON and Echo off
-        newt.c_lflag = newt.c_lflag & ~UInt(ICANON) //1217  // Reset ICANON and Echo off
-        tcsetattr( STDIN_FILENO, TCSANOW, &newt)
-    */}
+        do {
+            let oldt = try Termios.fetch(fd: STDIN_FILENO)
+            var newt = oldt;
+            newt.localFlags.formSymmetricDifference([.echo, .canonical])
+            try newt.update(fd: STDIN_FILENO)
+        }
+        catch {
+            exit(-1);
+        }
+    }
     
     ///
     /// Turns console echo on.
