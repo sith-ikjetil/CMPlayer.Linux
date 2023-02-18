@@ -43,7 +43,7 @@ internal class Player {
         
         //PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Started.")
         
-        /*Console.initialize()
+        Console.initialize()
         
         if PlayerPreferences.musicRootPath.count == 0 {
             let wnd: SetupWindow = SetupWindow()
@@ -61,7 +61,7 @@ internal class Player {
         if PlayerPreferences.autoplayOnStartup && g_playlist.count > 0 {
             self.play(player: 1, playlistIndex: 0)
         }
-        */
+        
         Console.clearScreenCurrentTheme()
     }
     

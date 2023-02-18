@@ -159,47 +159,47 @@ internal class PlayerLibrary {
             
             let xnSongNo: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
             xnSongNo.name = "songNo"
-            xnSongNo.setStringValue(String(s.songNo), resolvingEntities: true)
+            xnSongNo.setStringValue(String(s.songNo), resolvingEntities: false)
             xeSong.addAttribute(xnSongNo)
             
             let xnArtist: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
             xnArtist.name = "artist"
-            xnArtist.setStringValue(s.fullArtist, resolvingEntities: true)
+            xnArtist.setStringValue(s.fullArtist, resolvingEntities: false)
             xeSong.addAttribute(xnArtist)
             
             let xnAlbumName: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
             xnAlbumName.name = "albumName"
-            xnAlbumName.setStringValue(s.fullAlbumName, resolvingEntities: true)
+            xnAlbumName.setStringValue(s.fullAlbumName, resolvingEntities: false)
             xeSong.addAttribute(xnAlbumName)
             
             let xnTitle: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
             xnTitle.name = "title"
-            xnTitle.setStringValue(s.fullTitle, resolvingEntities: true)
+            xnTitle.setStringValue(s.fullTitle, resolvingEntities: false)
             xeSong.addAttribute(xnTitle)
             
             let xnDuration: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
             xnDuration.name = "duration"
-            xnDuration.setStringValue(String(s.duration), resolvingEntities: true)
+            xnDuration.setStringValue(String(s.duration), resolvingEntities: false)
             xeSong.addAttribute(xnDuration)
             
             let xnUrl: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
             xnUrl.name = "url"
-            xnUrl.setStringValue(s.fileURL?.path ?? "", resolvingEntities: true)
+            xnUrl.setStringValue(s.fileURL?.path ?? "", resolvingEntities: false)
             xeSong.addAttribute(xnUrl)
             
             let xnGenre: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
             xnGenre.name = "genre"
-            xnGenre.setStringValue(s.fullGenre, resolvingEntities: true)
+            xnGenre.setStringValue(s.fullGenre, resolvingEntities: false)
             xeSong.addAttribute(xnGenre)
             
             let xnRecordingYear: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
             xnRecordingYear.name = "recordingYear"
-            xnRecordingYear.setStringValue(String(s.recodingYear), resolvingEntities: true)
+            xnRecordingYear.setStringValue(String(s.recodingYear), resolvingEntities: false)
             xeSong.addAttribute(xnRecordingYear)
             
             let xnTrackNo: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
             xnTrackNo.name = "trackNo"
-            xnTrackNo.setStringValue(String(s.trackNo), resolvingEntities: true)
+            xnTrackNo.setStringValue(String(s.trackNo), resolvingEntities: false)
             xeSong.addAttribute(xnTrackNo)
         }
    

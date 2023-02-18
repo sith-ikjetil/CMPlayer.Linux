@@ -131,7 +131,7 @@ internal class Console {
         do {
             let oldt = try Termios.fetch(fd: STDIN_FILENO)
             var newt = oldt;
-            newt.localFlags.formSymmetricDifference([.echo, .canonical])
+            newt.localFlags.subtract([.echo, .canonical])
             try newt.update(fd: STDIN_FILENO)
         }
         catch {
@@ -143,17 +143,16 @@ internal class Console {
     /// Turns console echo on.
     ///
     static func echoOn() -> Void {
-      /*  let c: cc_t = 0
-        let cct = (c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c)
-        var oldt: termios = termios(c_iflag: 0, c_oflag: 0, c_cflag: 0, c_lflag: 0, c_cc: cct, c_ispeed: 0, c_ospeed: 0)
-        
-        tcgetattr(STDIN_FILENO, &oldt) // 1473
-        var newt = oldt
-        
-        newt.c_lflag = newt.c_lflag | UInt(ECHO) //1217  // Reset ICANON and Echo on
-        newt.c_lflag = newt.c_lflag | UInt(ICANON) //1217  // Reset ICANON and Echo on
-        tcsetattr( STDIN_FILENO, TCSANOW, &newt)
-    */}
+        do {
+            let oldt = try Termios.fetch(fd: STDIN_FILENO)
+            var newt = oldt;
+            newt.localFlags.formSymmetricDifference([.echo, .canonical])
+            try newt.update(fd: STDIN_FILENO)
+        }
+        catch {
+            exit(-1);
+        }
+    }
     
     ///
     /// Applies color to text string.
@@ -192,7 +191,7 @@ internal class Console {
     ///
     static func gotoXY(_ x: Int, _ y: Int) -> Void
     {
-        print("\u{001B}[(\(y);\(x))H", terminator: "")
+        print("\u{001B}[\(y);\(x)H", terminator: "")
     }
     
     ///
@@ -211,7 +210,7 @@ internal class Console {
     ///
     static func printXY(_ x: Int,_ y: Int,_ text: String,_ maxLength: Int,_ padding: PrintPaddingTextAlign,_ paddingChar: Character, _ bgColor: ConsoleColor, _ modifierBg: ConsoleColorModifier, _ colorText: ConsoleColor,_ modifierText: ConsoleColorModifier) -> Void {
         let nmsg = text.convertStringToLengthPaddedString(maxLength, padding, paddingChar)
-        print("\u{001B}[(\(y);\(x))H\(Console.applyTextColor(colorBg: bgColor, modifierBg: modifierBg, colorText: colorText, modifierText: modifierText, text: nmsg))", terminator: "")
+        print("\u{001B}[\(y);\(x)H\(Console.applyTextColor(colorBg: bgColor, modifierBg: modifierBg, colorText: colorText, modifierText: modifierText, text: nmsg))", terminator: "")
     }
     
     ///

@@ -24,8 +24,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     private var currentCommand: String = ""
     private var commands: [PlayerCommand] = []
     private var commandReturnValue: Bool = false
-    private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.macos.1", attributes: .concurrent)
-    private let concurrentQueue2 = DispatchQueue(label: "cqueue.cmplayer.macos.2", attributes: .concurrent)
+    private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.linux.1", attributes: .concurrent)
+    private let concurrentQueue2 = DispatchQueue(label: "cqueue.cmplayer.linux.2", attributes: .concurrent)
     private var isShowingTopWindow = false
     private var addendumText: String = ""
     private var updateFileName: String = ""
@@ -330,7 +330,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         //
         // Count down and render songs
         //
-        /*concurrentQueue1.async {
+        concurrentQueue1.async {
             while !self.quit {
                 
                 if !self.isShowingTopWindow {
@@ -342,7 +342,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 
                 //g_lock.lock()
                 if g_playlist.count > 0 {
-                    if g_player.audioPlayerActive == 1 {
+                    /*if g_player.audioPlayerActive == 1 {
                         var time: Double = 0.0
                         if let a = g_player.audio1 {
                             time = a.currentTime.magnitude
@@ -369,18 +369,19 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                             g_player.skip(crossfade: PlayerPreferences.crossfadeSongs)
                         }
                     }
+                    */
                 }
                 //g_lock.unlock()
                 
                 let second: Double = 1_000_000
                 usleep(useconds_t(0.050 * second))
             }
-        }*/
+        }
         
         //
         // Count down and render songs
         //
-        /*concurrentQueue2.async {
+        concurrentQueue2.async {
             while !self.quit {
                 let second: Double = 1_000_000
                 usleep(useconds_t(0.150 * second))
@@ -394,7 +395,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     self.showCursor = false
                 }
             }
-        }*/
+        }
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
@@ -442,7 +443,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             }
             
             self.currentCommand.append(ch)
-        
+            
             self.renderCommandLine()
             self.renderStatusLine()
             
