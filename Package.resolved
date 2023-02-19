@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "errno",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Ponyboy47/ErrNo.git",
+      "state" : {
+        "revision" : "178566b112afe6bef3770678f1bbab6e5c626993",
+        "version" : "0.5.2"
+      }
+    },
+    {
+      "identity" : "termios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ponyboy47/Termios.git",
+      "state" : {
+        "revision" : "220485037f5a5932dfaf1aaba621cb53ce26a44c",
+        "version" : "0.1.1"
+      }
+    }
+  ],
+  "version" : 2
+}
