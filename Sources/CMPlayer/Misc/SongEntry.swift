@@ -129,7 +129,7 @@ internal class SongEntry {
     ///
     init(path: URL?, songNo: Int) throws
     {
-        /*guard path != nil else {
+        guard path != nil else {
             //PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path:,songNo:)", text: "path == nil")
             throw SongEntryError.PathIsNil
         }
@@ -147,6 +147,7 @@ internal class SongEntry {
         self.songNo = songNo
         self.fileURL = path!
         
+        /*
         autoreleasepool {
             let playerItem = AVPlayerItem(url: self.fileURL!)
             
@@ -184,10 +185,10 @@ internal class SongEntry {
             }
         }*/
         
-        guard duration > 0 else {
+        /*guard duration > 0 else {
             //PlayerLog.ApplicationLog?.logWarning(title: "[SongEntry].init(path:songNo:)", text: "Duration was 0. File: \(path!.path)")
             throw SongEntryError.DurationIsZero
-        }
+        }*/
         
         //
         // Add to genre
