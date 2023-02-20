@@ -460,7 +460,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// returns: Bool true if application should exit. False otherwise.
     ///
     func processCommand(command: String) -> Bool {
-        //PlayerLog.ApplicationLog?.logInformation(title: "[MainWindow].processCommand(command:)", text: "Command: \(command)")
+        PlayerLog.ApplicationLog?.logInformation(title: "[MainWindow].processCommand(command:)", text: "Command: \(command)")
         
         let parts = command.components(separatedBy: " ")
         
@@ -473,7 +473,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }
                     
         if !isHandled {
-            //PlayerLog.ApplicationLog?.logInformation(title: "[MainWindow].processCommand(command:)", text: "Command NOT Reckognized: \(command)")
+            PlayerLog.ApplicationLog?.logInformation(title: "[MainWindow].processCommand(command:)", text: "Command NOT Reckognized: \(command)")
         }
         
         return self.commandReturnValue
@@ -1190,7 +1190,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             (data, response, error) -> Void in
            
             if error != nil {
-                //PlayerLog.ApplicationLog?.logWarning(title: "MainWindow::onCommandUpdate", text: "session.dataTask failed. With error: \(error!)")
+                PlayerLog.ApplicationLog?.logWarning(title: "MainWindow::onCommandUpdate", text: "session.dataTask failed. With error: \(error!)")
                 self.addendumText = "Error contacting server!"
                 return
             }
@@ -1256,7 +1256,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             data, response, error -> Void in
             
             if error != nil {
-                //PlayerLog.ApplicationLog?.logError(title: "MainWindow::onPerformUpdate", text: "session.dataTask failed. With error: \(error!)")
+                PlayerLog.ApplicationLog?.logError(title: "MainWindow::onPerformUpdate", text: "session.dataTask failed. With error: \(error!)")
                 self.addendumText = "Error downloading file!"
                 return
             }
@@ -1288,19 +1288,19 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                         
                         let _ = NSWorkspace.shared.openFile(toFilename.path)
                         
-                        //PlayerLog.ApplicationLog?.logInformation(title: "MainWindow::onPerformUpdate", text: "Update Completed to: \(self.updateFileName)")
+                        PlayerLog.ApplicationLog?.logInformation(title: "MainWindow::onPerformUpdate", text: "Update Completed to: \(self.updateFileName)")
                         
                         exit(0)
                     }
                     catch {
                         let msg = "Error Updating CMPlayer: \(error)"
-                        //PlayerLog.ApplicationLog?.logInformation(title: "MainWindow::onPerformUpdate", text: msg)
+                        PlayerLog.ApplicationLog?.logInformation(title: "MainWindow::onPerformUpdate", text: msg)
                         self.addendumText = msg
                     }
                 }
                 catch {
                     let msg = "Error writing file '\(self.updateFileName)': \(error)"
-                    //PlayerLog.ApplicationLog?.logInformation(title: "MainWindow::onPerformUpdate", text: msg)
+                    PlayerLog.ApplicationLog?.logInformation(title: "MainWindow::onPerformUpdate", text: msg)
                     self.addendumText = msg
                 }
             }

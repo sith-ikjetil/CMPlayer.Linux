@@ -39,9 +39,9 @@ internal class Player {
     func initialize() -> Void {
         PlayerDirectories.ensureDirectoriesExistence()
         PlayerPreferences.ensureLoadPreferences()
-        //PlayerLog.ApplicationLog = PlayerLog(autoSave: false, loadOldLog: (PlayerPreferences.logApplicationStartLoadType == LogApplicationStartLoadType.DoNotLoadOldLog))
+        PlayerLog.ApplicationLog = PlayerLog(autoSave: false, loadOldLog: (PlayerPreferences.logApplicationStartLoadType == LogApplicationStartLoadType.DoNotLoadOldLog))
         
-        //PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Started.")
+        PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Started.")
         
         Console.initialize()
         
@@ -76,7 +76,7 @@ internal class Player {
             return
         }
         
-        //PlayerLog.ApplicationLog?.logInformation(title: "[Player].play", text: "Playing index \(playlistIndex), file \(g_playlist[playlistIndex].fileURL?.path ?? "--unknown")")
+        PlayerLog.ApplicationLog?.logInformation(title: "[Player].play", text: "Playing index \(playlistIndex), file \(g_playlist[playlistIndex].fileURL?.path ?? "--unknown")")
         
         self.audioPlayerActive = player
         if player == 1 {
@@ -91,7 +91,7 @@ internal class Player {
                 }
                 catch {
                     let msg = "EXIT_CODE_ERROR_PLAYING_FILE\nError playing player \(player) on index \(playlistIndex).\n\(error)"
-                    //PlayerLog.ApplicationLog?.logError(title: "[Player].play", text: msg)
+                    PlayerLog.ApplicationLog?.logError(title: "[Player].play", text: msg)
                     
                     let wnd: ErrorWindow = ErrorWindow()
                     wnd.message = msg
@@ -111,7 +111,7 @@ internal class Player {
                 }
                 catch {
                     let msg = "EXIT_CODE_ERROR_PLAYING_FILE\nError playing player \(player) on index \(playlistIndex).\n\(error)"
-                    //PlayerLog.ApplicationLog?.logError(title: "[Player].play", text: msg)
+                    PlayerLog.ApplicationLog?.logError(title: "[Player].play", text: msg)
                     
                     let wnd: ErrorWindow = ErrorWindow()
                     wnd.message = msg
@@ -132,7 +132,7 @@ internal class Player {
                 }
                 catch {
                     let msg = "EXIT_CODE_ERROR_PLAYING_FILE\nError playing player \(player) on index \(playlistIndex).\n\(error)"
-                    //PlayerLog.ApplicationLog?.logError(title: "[Player].play", text: msg)
+                    PlayerLog.ApplicationLog?.logError(title: "[Player].play", text: msg)
                     
                     let wnd: ErrorWindow = ErrorWindow()
                     wnd.message = msg
@@ -152,7 +152,7 @@ internal class Player {
                 }
                 catch {
                     let msg = "EXIT_CODE_ERROR_PLAYING_FILE\nError playing player \(player) on index \(playlistIndex).\n\(error)"
-                    //PlayerLog.ApplicationLog?.logError(title: "[Player].play", text: msg)
+                    PlayerLog.ApplicationLog?.logError(title: "[Player].play", text: msg)
                     
                     let wnd: ErrorWindow = ErrorWindow()
                     wnd.message = msg
@@ -305,7 +305,7 @@ internal class Player {
     func run() -> Int32 {
         g_mainWindow = MainWindow()
         g_mainWindow?.showWindow()
-        ////PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Exited Normally.")
+        PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Exited Normally.")
         return g_mainWindow?.exitValue ?? 0
     }
 }// Player
