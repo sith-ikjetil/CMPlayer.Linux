@@ -1,0 +1,3 @@
+module Cmpg123 {
+    header "mpg123.h"
+}
