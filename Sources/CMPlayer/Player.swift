@@ -9,9 +9,7 @@
 //
 // import.
 //
-//import Foundation
-//import AVFoundation
-//import CoreMedia
+import Cmpg123
 
 //
 // Represents CMPlayer Player.
@@ -63,6 +61,8 @@ internal class Player {
         }
         
         Console.clearScreenCurrentTheme()
+
+        mpg123_init();
     }
     
     ///

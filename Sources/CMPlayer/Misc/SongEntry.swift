@@ -11,7 +11,7 @@
 //
 import Foundation
 import FoundationNetworking
-//import AVFoundation
+import Cmpg123
 
 ///
 /// Represents CMPlayer SongEntry
@@ -146,6 +146,25 @@ internal class SongEntry {
         
         self.songNo = songNo
         self.fileURL = path!
+
+        /*if self.fileURL.lowercased().hasSuffix(".mp3") {
+            var mh: mpg123_handle = mpg123_new(nil, nil);
+            if (mpg123_open(mh, self.fileURL) == MPG123_OK) {
+                mpg123_scan(mh);
+                var v1: mpg123_id3v1?;
+                var v2: mpg123_id3v2?;
+                let meta = mpg123_meta_check(mh);
+                if (meta & MPG123_ID3 && mpg123_id3(mh, &v1, &v2) == MPG123_OK) {
+                    if (v1 != nil) {
+                        this.genre = "GENRE";
+                    }
+                    if (v2 != nil) {
+                        this.genre = "GENRE2";
+                    }
+                }
+                mpg123_close(mh);
+            }
+        }*/
         
         /*
         autoreleasepool {
