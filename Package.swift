@@ -1,9 +1,9 @@
 // swift-tools-version: 5.7.3
 import PackageDescription
-    let pkgConfig = "libmpg123"
+    let pkgConfig = "libmpg123" // pkconfig <name>.pc file
     
     let provider: [SystemPackageProvider] = [ 
-        .apt(["libmpg123-0"])
+        .apt(["mpg123-0"])   // provider <name> for -lmpg123-0
     ]   
 
     let package = Package(
