@@ -1,4 +1,4 @@
-module Cmpg123 [system] {
+module Cmpg123 [system] [extern_c] {
     header "/usr/include/mpg123.h"
     link "/usr/lib/x86_64-linux-gnu/mpg123"
     export *
