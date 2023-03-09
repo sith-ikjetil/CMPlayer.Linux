@@ -13,7 +13,7 @@ import PackageDescription
         ],
         dependencies: [
             .package(url: "https://github.com/ponyboy47/Termios.git", from: "0.1.1"),
-            /*.package(url: "Sources/Cmpg123", from: "0.0.1"),*/       
+            //.package(url: "Sources/Cmpg123"),
         ],        
         targets: [    
             .systemLibrary(
