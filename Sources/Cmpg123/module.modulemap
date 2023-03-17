@@ -1,5 +1,5 @@
 module Cmpg123 [system] [extern_c] {
-    header "/usr/include/mpg123.h"
-    link "mpg123-0"
+    header "mpg123.h"
+    link "mpg123"
     export *
 }
