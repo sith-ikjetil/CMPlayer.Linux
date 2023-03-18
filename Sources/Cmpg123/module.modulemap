@@ -1,5 +1,6 @@
-module Cmpg123 [system] [extern_c] {
+module Cmpg123 [system] {
     header "mpg123.h"
-    link "mpg123"
+    link "libmpg123"
     export *
 }
+

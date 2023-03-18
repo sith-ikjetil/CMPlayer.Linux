@@ -6,7 +6,7 @@ import PackageDescription
     
     let provider: [SystemPackageProvider] = [ 
         // provider <name> for -l<name> = -lmpg123-0
-        .apt(["mpg123-0", "mpg123-dev"]),   
+        .apt(["libmpg123", "libmpg123-dev"]),   
     ]   
 
     let package = Package(
@@ -16,7 +16,7 @@ import PackageDescription
         ],
         targets: [    
             .systemLibrary(
-                name: "Cmpg123", 
+                name: "Cmpg123",                 
                 pkgConfig: pkgConfig, 
                 providers: provider),
         ]

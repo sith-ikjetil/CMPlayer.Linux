@@ -3,7 +3,7 @@ import PackageDescription
     let pkgConfig = "libmpg123" // pkconfig <name>.pc file
     
     let provider: [SystemPackageProvider] = [ 
-        .apt(["libmpg123-0"])   // provider <name> for -l<name>, -lmpg123-0
+        .apt(["libmpg123"])   // provider <name> for -l<name>, -lmpg123-0
     ]   
 
     let package = Package(
@@ -13,7 +13,7 @@ import PackageDescription
         ],
         dependencies: [
             .package(url: "https://github.com/ponyboy47/Termios.git", from: "0.1.1"),
-            //.package(url: "Sources/Cmpg123"),
+          //  .package(url: "Sources/Cmpg123", from: "0.0.2"),
         ],        
         targets: [    
             .systemLibrary(
@@ -23,7 +23,6 @@ import PackageDescription
                 providers: provider),
             .executableTarget(
                 name: "CMPlayer", 
-                dependencies: ["Termios", "Cmpg123"])
-            
+                dependencies: ["Termios", "Cmpg123"])   
         ]
     )
