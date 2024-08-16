@@ -9,7 +9,8 @@
 //
 // import.
 //
-//import Cmpg123
+import Foundation
+import Cmpg123
 
 //
 // Represents CMPlayer Player.
