@@ -5,7 +5,8 @@ import PackageDescription
         defaultLocalization: "en",        
         products: [
             .executable(name: "CMPlayer", targets: ["CMPlayer"]),
-            .library(name: "Cmpg123", type: .dynamic, targets: ["Cmpg123"])
+            .library(name: "Cmpg123", type: .dynamic, targets: ["Cmpg123"]),
+            .library(name: "Cao", type: .dynamic, targets: ["Cao"]),
         ],    
         dependencies: [
             .package(url: "https://github.com/ponyboy47/Termios.git", from: "0.1.1"),
@@ -15,7 +16,8 @@ import PackageDescription
                 name: "CMPlayer",
                 dependencies: [    
                     "Termios",                
-                    "Cmpg123"
+                    "Cmpg123",
+                    "Cao"
                 ]
             ),
             .target(
@@ -23,10 +25,21 @@ import PackageDescription
                 dependencies: [],
                 cSettings: [
                     .headerSearchPath("include"),                    
-                    .define("MY_C_LIBRARY", to: "1")
+                    .define("MY_MPG123_LIBRARY", to: "1")
                 ],
                 linkerSettings: [
-                    .linkedLibrary("/usr/lib64/libmpg123.so")
+                    .linkedLibrary("/usr/lib64/libmpg123.so"),                    
+                ]
+            ),
+            .target(
+                name: "Cao",
+                dependencies: [],
+                cSettings: [
+                    .headerSearchPath("include"),                    
+                    .define("MY_AO_LIBRARY", to: "1")
+                ],
+                linkerSettings: [
+                    .linkedLibrary("/usr/lib64/libao.so"),                    
                 ]
             ),
         ]        

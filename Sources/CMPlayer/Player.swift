@@ -63,8 +63,7 @@ internal class Player {
         
         Console.clearScreenCurrentTheme()
 
-        //mpg123_init();
-        //let age : Int32 = Cmpg123.getKjetil();
+        mpg123_init();   
     }
     
     ///
