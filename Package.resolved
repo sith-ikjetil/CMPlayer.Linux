@@ -1,4 +1,5 @@
 {
+  "originHash" : "54c422b6e6ee05e7feafaf3c3d4f05fed6d7834255e8b33030da60cc679643fd",
   "pins" : [
     {
       "identity" : "errno",
@@ -19,5 +20,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

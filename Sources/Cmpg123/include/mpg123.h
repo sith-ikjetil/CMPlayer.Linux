@@ -6,10 +6,6 @@
 	see COPYING and AUTHORS files in distribution or http://mpg123.org
 */
 
-extern "C" {
-	int getKjetil();
-}
-
 #ifndef MPG123_LIB_H
 #define MPG123_LIB_H
 

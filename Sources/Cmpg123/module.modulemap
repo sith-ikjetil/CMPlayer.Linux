@@ -1,5 +1,5 @@
 module Cmpg123 [system] {
-    header "mpg123.h"
+    header "include/mpg123.h"
     link "libmpg123"
     export *
 }

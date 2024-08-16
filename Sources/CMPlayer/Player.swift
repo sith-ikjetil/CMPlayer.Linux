@@ -9,7 +9,7 @@
 //
 // import.
 //
-import Cmpg123
+//import Cmpg123
 
 //
 // Represents CMPlayer Player.
@@ -63,7 +63,7 @@ internal class Player {
         Console.clearScreenCurrentTheme()
 
         //mpg123_init();
-        let age : Int32 = Cmpg123.getKjetil();
+        //let age : Int32 = Cmpg123.getKjetil();
     }
     
     ///
