@@ -28,7 +28,7 @@ import PackageDescription
                     .define("MY_MPG123_LIBRARY", to: "1")
                 ],
                 linkerSettings: [
-                    .linkedLibrary("/usr/lib64/libmpg123.so"),                    
+                    .linkedLibrary("mpg123"),                    
                 ]
             ),
             .target(
@@ -39,7 +39,7 @@ import PackageDescription
                     .define("MY_AO_LIBRARY", to: "1")
                 ],
                 linkerSettings: [
-                    .linkedLibrary("/usr/lib64/libao.so"),                    
+                    .linkedLibrary("ao"),                    
                 ]
             ),
         ]        
