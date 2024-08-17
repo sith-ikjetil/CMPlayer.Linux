@@ -147,61 +147,59 @@ internal class SongEntry {
         self.songNo = songNo
         self.fileURL = path!
 
-        if self.fileURL!.path.lowercased().hasSuffix(".mp3") {
+        //
+        // Only support .mp3 for now.
+        //        
+        if path!.path.lowercased().hasSuffix(".mp3") {
             //print("URL: \(self.fileURL!.path)")
             guard let handle = mpg123_new(nil, nil) else {
-                print("")
-                print("mpg123_new failed!")
-                throw SongEntryError.InvalidSongEntryType
+                PlayerLog.ApplicationLog?.logWarning(title: "[SongEntry].init(path:songNo:)", text: "mpg123_new failed")
+                throw SongEntryError.MpgSoundLibrary
             }
 
-            //print("")
-            //print("mpg123_new")
-            defer {
-                //print("mpg123_close")
+            defer {                
                 mpg123_close(handle);
             }
-
-            //print("mpg123_open")
+            
             guard mpg123_open(handle, self.fileURL!.path) == 0 else {
-                print("")
-                print("mpg123_new failed!")
-                throw SongEntryError.InvalidSongEntryType
-            }            
+                PlayerLog.ApplicationLog?.logWarning(title: "[SongEntry].init(path:songNo:)", text: "mpg123_open failed for URL: \(path!.path)")
+                throw SongEntryError.MpgSoundLibrary
+            }      
+
+            //
+            // find duration
+            //              
+            var length: off_t = 0
+            length = mpg123_length(handle)
+            if length <= 0 {
+                PlayerLog.ApplicationLog?.logWarning(title: "[SongEntry].init(path:songNo:)", text: "mpg123_length failed with value: \(length)")
+                throw SongEntryError.MpgSoundLibrary
+            }
+            
+            // Get the rate and channels to calculate duration
+            var rate: CLong = 0
+            var channels: Int32 = 0
+            var encoding: Int32 = 0
+            mpg123_getformat(handle, &rate, &channels, &encoding)
+            
+            // Calculate duration in seconds
+            let duration = Double(length) / Double(rate)
+            self.duration = UInt64(duration * 1000)
+
+            guard duration > 0 else {
+                PlayerLog.ApplicationLog?.logWarning(title: "[SongEntry].init(path:songNo:)", text: "Duration was 0. File: \(path!.path)")
+                throw SongEntryError.DurationIsZero
+            }
 
             //print("mpg123_metacheck")
             let metaCheck = mpg123_meta_check(handle)
             if metaCheck & MPG123_ID3 != 0 {
                 var id3v1: UnsafeMutablePointer<mpg123_id3v1>? = nil
-                //var id3v2: UnsafeMutablePointer<mpg123_id3v2>? = nil
-                
-                //print("mpg123_id3")
-                if mpg123_id3(handle, &id3v1, nil/*&id3v2*/) == 0 {
-                    /*if let id3v2 = id3v2?.pointee {
-                        print("id3v2")                        
-                        // ID3v2 Metadata
-                        if let titlePtr = id3v2.title {
-                            let title = String(cString: titlePtr.pointee.p)
-                            print("Title: \(title)")
-                        }
-                        if let artistPtr = id3v2.artist {
-                            let artist = String(cString: artistPtr.pointee.p)
-                            print("Artist: \(artist)")
-                        }
-                        if let albumPtr = id3v2.album {
-                            let album = String(cString: albumPtr.pointee.p)
-                            print("Album: \(album)")
-                        }
-                        if let yearPtr = id3v2.year {
-                            let year = String(cString: yearPtr.pointee.p)
-                            print("Year: \(year)")
-                        }
-                        if let commentPtr = id3v2.comment {
-                            let comment = String(cString: commentPtr.pointee.p)
-                            print("Comment: \(comment)")
-                        }
-                        //print("Genre: \(id3v2.genre)")
-                    } else */ if let id3v1 = id3v1?.pointee {
+                var id3v2: UnsafeMutablePointer<mpg123_id3v2>? = nil                                
+                if mpg123_id3(handle, &id3v1, &id3v2) == 0 {                    
+                    var bMetadataFound: Bool = false
+                    
+                    if let id3v1 = id3v1?.pointee {
                         //print("id3v1")
                         // ID3v1 Metadata
                         let title = String(cString: withUnsafePointer(to: id3v1.title) {
@@ -226,58 +224,52 @@ internal class SongEntry {
                         self.albumName = album
                         self.recordingYear = Int(year) ?? -1
                         self.genre = convertId3V1GenreIndexToName(index: genre)
-                    } else {
-                            throw SongEntryError.MetadataNotFound
+
+                        bMetadataFound = true
+                    }
+
+                    if let id3v2 = id3v2?.pointee {                       
+                        // ID3v2 Metadata
+                        if let titlePtr = id3v2.title {
+                            let title = String(cString: titlePtr.pointee.p)
+                            self.title = title
+                            bMetadataFound = true
+                        }
+                        if let artistPtr = id3v2.artist {
+                            let artist = String(cString: artistPtr.pointee.p)
+                            self.artist = artist
+                            bMetadataFound = true
+                        }
+                        if let albumPtr = id3v2.album {
+                            let album = String(cString: albumPtr.pointee.p)
+                            self.albumName = album
+                            bMetadataFound = true
+                        }
+                        if let yearPtr = id3v2.year {
+                            let year = String(cString: yearPtr.pointee.p)
+                            self.recordingYear = Int(year) ?? -1
+                            bMetadataFound = true
+                        }
+                        //if let commentPtr = id3v2.comment {
+                        //    let comment = String(cString: commentPtr.pointee.p)
+                            //print("Comment: \(comment)")
+                        //}
+                        if let genrePtr = id3v2.genre {
+                            let genre = String(cString: genrePtr.pointee.p)
+                            self.genre = genre
+                            bMetadataFound = true
+                        }
+                    }
+                    
+                    if !bMetadataFound {
+                        throw SongEntryError.MetadataNotFound
                     }
                 }// mpg123_id3
             }// mpg123_meta_check                        
         }// is .mp3
         else {
             throw SongEntryError.InvalidSongEntryType
-        }
-        //exit(1);
-        /*
-        autoreleasepool {
-            let playerItem = AVPlayerItem(url: self.fileURL!)
-            
-            let audioAsset = AVURLAsset(url: self.fileURL!, options: nil)
-            self.duration = UInt64(CMTimeGetSeconds(audioAsset.duration) * Float64(1000))
-            
-            let metadataList = playerItem.asset.metadata
-            
-            for item in metadataList {
-                if let keyValue = item.commonKey?.rawValue {
-                    if keyValue == "title" {
-                        self.title = item.stringValue!
-                    }
-                    else if keyValue == "artist" {
-                        self.artist = item.stringValue!
-                    }
-                }
-            }
-            
-            if let npath = NSURL(string: path!.absoluteString) {
-                if let metadata = MDItemCreateWithURL(kCFAllocatorDefault, npath) {
-                    if let ge = MDItemCopyAttribute(metadata,kMDItemMusicalGenre) as? String {
-                        self.genre = ge.lowercased()
-                    }
-                    if let an = MDItemCopyAttribute(metadata,kMDItemAlbum) as? String {
-                        self.albumName = an.trimmingCharacters(in: .whitespacesAndNewlines)
-                    }
-                    if let geYear = MDItemCopyAttribute(metadata,kMDItemRecordingYear) as? Int {
-                        self.recordingYear = geYear
-                    }
-                    if let trackNo = MDItemCopyAttribute(metadata,kMDItemAudioTrackNumber) as? Int {
-                        self.trackNo = trackNo
-                    }
-                }
-            }
-        }*/
-        
-        /*guard duration > 0 else {
-            PlayerLog.ApplicationLog?.logWarning(title: "[SongEntry].init(path:songNo:)", text: "Duration was 0. File: \(path!.path)")
-            throw SongEntryError.DurationIsZero
-        }*/
+        }                        
         
         //
         // Add to genre

@@ -40,7 +40,7 @@ internal enum SongEntryError : Error {
     case PathNotInMusicRootPath
     case PathInExclusionPath
     case InvalidSongEntryType
-    case LibraryMpg123
+    case MpgSoundLibrary
     case MetadataNotFound
 }
 
@@ -662,4 +662,37 @@ internal func convertId3V1GenreIndexToName(index: UInt8) -> String {
         case 125: return "Dance Hall"
         default: return "Unknown"
     }
+}
+
+// Function to redirect stderr to /dev/null
+func redirect_stderr() -> Int32 {
+    let dev_null = open("/dev/null", O_WRONLY)
+    if dev_null == -1 {
+        perror("open")
+        return -1
+    }
+    
+    // Duplicate the stderr file descriptor to preserve it
+    let stderr_copy = dup(fileno(stderr))
+    if stderr_copy == -1 {
+        perror("dup")
+        return -1
+    }
+    
+    // Redirect stderr to /dev/null
+    if dup2(dev_null, fileno(stderr)) == -1 {
+        perror("dup2")
+        return -1
+    }
+    
+    close(dev_null)
+
+    return stderr_copy
+}
+
+// Function to restore stderr from the backup
+func restore_stderr(_ stderr_copy: Int32) {
+    fflush(stderr) // Flush any remaining output
+    dup2(stderr_copy, fileno(stderr)) // Restore stderr
+    close(stderr_copy) // Close the backup
 }

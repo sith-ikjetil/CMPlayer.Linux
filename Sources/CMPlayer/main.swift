@@ -51,9 +51,23 @@ guard mpg123_init() == 0 else {
     exit(1)
 }
 
-g_player.initialize()
-exit(g_player.run())
+// redirect stderr
+// we do this to remove process_comment messages
+let stderr_old = redirect_stderr()
+if stderr_old != -1 {
+    // initialize CMPlayer.Linux
+    g_player.initialize()        
+    let exitCode = g_player.run()
+    
+    // restore stderr
+    restore_stderr(stderr_old)
 
+    // exit with exit code
+    exit(exitCode)
+} else {
+    print("Failed to redirect stderr")
+    exit(1)
+}
 
 /*
 //
