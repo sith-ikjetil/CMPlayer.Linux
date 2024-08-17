@@ -84,7 +84,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
                     let resultYear = Int(years[0]) ?? -1
                     if resultYear >= 0 && resultYear <= currentYear {
                         for s in g_searchResult {
-                            if s.recodingYear == resultYear {
+                            if s.recordingYear == resultYear {
                                 self.searchResult.append(s)
                                 self.stats[index] += 1
                             }
@@ -105,7 +105,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
                             }
                             for y in from...to {
                                 for s in g_searchResult {
-                                    if s.recodingYear == y {
+                                    if s.recordingYear == y {
                                         self.searchResult.append(s)
                                         self.stats[index] += 1
                                     }

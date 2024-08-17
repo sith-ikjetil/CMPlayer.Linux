@@ -11,7 +11,7 @@
 //
 import Foundation
 import FoundationNetworking
-//import Cmpg123
+import Cmpg123
 
 ///
 /// Represents CMPlayer SongEntry
@@ -32,7 +32,7 @@ internal class SongEntry {
     var fullGenre: String = ""
     var albumName: String = ""
     var fullAlbumName: String = ""
-    var recodingYear: Int = 0
+    var recordingYear: Int = 0
     var trackNo: Int = 0
     let maxStringLength: Int = 32
     
@@ -77,7 +77,7 @@ internal class SongEntry {
         self.fileURL = url
         self.genre = genre.lowercased()
         self.fullGenre = genre.lowercased()
-        self.recodingYear = recordingYear
+        self.recordingYear = recordingYear
         self.trackNo = trackNo
 
     
@@ -114,11 +114,11 @@ internal class SongEntry {
         //
         // Add to g_releaseYears
         //
-        if g_recordingYears[self.recodingYear] == nil {
-            g_recordingYears[self.recodingYear] = []
+        if g_recordingYears[self.recordingYear] == nil {
+            g_recordingYears[self.recordingYear] = []
         }
         
-        g_recordingYears[self.recodingYear]?.append(self)
+        g_recordingYears[self.recordingYear]?.append(self)
     }
     
     ///
@@ -128,7 +128,7 @@ internal class SongEntry {
     /// parameter num: Song No.
     ///
     init(path: URL?, songNo: Int) throws
-    {
+    {        
         guard path != nil else {
             PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path:,songNo:)", text: "path == nil")
             throw SongEntryError.PathIsNil
@@ -147,25 +147,95 @@ internal class SongEntry {
         self.songNo = songNo
         self.fileURL = path!
 
-        /*if self.fileURL.lowercased().hasSuffix(".mp3") {
-            var mh: mpg123_handle = mpg123_new(nil, nil);
-            if (mpg123_open(mh, self.fileURL) == MPG123_OK) {
-                mpg123_scan(mh);
-                var v1: mpg123_id3v1?;
-                var v2: mpg123_id3v2?;
-                let meta = mpg123_meta_check(mh);
-                if (meta & MPG123_ID3 && mpg123_id3(mh, &v1, &v2) == MPG123_OK) {
-                    if (v1 != nil) {
-                        this.genre = "GENRE";
-                    }
-                    if (v2 != nil) {
-                        this.genre = "GENRE2";
-                    }
-                }
-                mpg123_close(mh);
+        if self.fileURL!.path.lowercased().hasSuffix(".mp3") {
+            //print("URL: \(self.fileURL!.path)")
+            guard let handle = mpg123_new(nil, nil) else {
+                print("")
+                print("mpg123_new failed!")
+                throw SongEntryError.InvalidSongEntryType
             }
-        }*/
-        
+
+            //print("")
+            //print("mpg123_new")
+            defer {
+                //print("mpg123_close")
+                mpg123_close(handle);
+            }
+
+            //print("mpg123_open")
+            guard mpg123_open(handle, self.fileURL!.path) == 0 else {
+                print("")
+                print("mpg123_new failed!")
+                throw SongEntryError.InvalidSongEntryType
+            }            
+
+            //print("mpg123_metacheck")
+            let metaCheck = mpg123_meta_check(handle)
+            if metaCheck & MPG123_ID3 != 0 {
+                var id3v1: UnsafeMutablePointer<mpg123_id3v1>? = nil
+                //var id3v2: UnsafeMutablePointer<mpg123_id3v2>? = nil
+                
+                //print("mpg123_id3")
+                if mpg123_id3(handle, &id3v1, nil/*&id3v2*/) == 0 {
+                    /*if let id3v2 = id3v2?.pointee {
+                        print("id3v2")                        
+                        // ID3v2 Metadata
+                        if let titlePtr = id3v2.title {
+                            let title = String(cString: titlePtr.pointee.p)
+                            print("Title: \(title)")
+                        }
+                        if let artistPtr = id3v2.artist {
+                            let artist = String(cString: artistPtr.pointee.p)
+                            print("Artist: \(artist)")
+                        }
+                        if let albumPtr = id3v2.album {
+                            let album = String(cString: albumPtr.pointee.p)
+                            print("Album: \(album)")
+                        }
+                        if let yearPtr = id3v2.year {
+                            let year = String(cString: yearPtr.pointee.p)
+                            print("Year: \(year)")
+                        }
+                        if let commentPtr = id3v2.comment {
+                            let comment = String(cString: commentPtr.pointee.p)
+                            print("Comment: \(comment)")
+                        }
+                        //print("Genre: \(id3v2.genre)")
+                    } else */ if let id3v1 = id3v1?.pointee {
+                        //print("id3v1")
+                        // ID3v1 Metadata
+                        let title = String(cString: withUnsafePointer(to: id3v1.title) {
+                            UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
+                        })
+                        let artist = String(cString: withUnsafePointer(to: id3v1.artist) {
+                            UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
+                        })
+                        let album = String(cString: withUnsafePointer(to: id3v1.album) {
+                            UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
+                        })
+                        let year = String(cString: withUnsafePointer(to: id3v1.year) {
+                            UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
+                        })
+                        //let comment = String(cString: withUnsafePointer(to: id3v1.comment) {
+                        //    UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
+                        //})
+                        let genre = id3v1.genre
+                        
+                        self.title = title
+                        self.artist = artist
+                        self.albumName = album
+                        self.recordingYear = Int(year) ?? -1
+                        self.genre = convertId3V1GenreIndexToName(index: genre)
+                    } else {
+                            throw SongEntryError.MetadataNotFound
+                    }
+                }// mpg123_id3
+            }// mpg123_meta_check                        
+        }// is .mp3
+        else {
+            throw SongEntryError.InvalidSongEntryType
+        }
+        //exit(1);
         /*
         autoreleasepool {
             let playerItem = AVPlayerItem(url: self.fileURL!)
@@ -195,7 +265,7 @@ internal class SongEntry {
                         self.albumName = an.trimmingCharacters(in: .whitespacesAndNewlines)
                     }
                     if let geYear = MDItemCopyAttribute(metadata,kMDItemRecordingYear) as? Int {
-                        self.recodingYear = geYear
+                        self.recordingYear = geYear
                     }
                     if let trackNo = MDItemCopyAttribute(metadata,kMDItemAudioTrackNumber) as? Int {
                         self.trackNo = trackNo
@@ -235,11 +305,11 @@ internal class SongEntry {
         //
         // Add to g_releaseYears
         //
-        if g_recordingYears[self.recodingYear] == nil {
-            g_recordingYears[self.recodingYear] = []
+        if g_recordingYears[self.recordingYear] == nil {
+            g_recordingYears[self.recordingYear] = []
         }
        
-        g_recordingYears[self.recodingYear]?.append(self)
+        g_recordingYears[self.recordingYear]?.append(self)
         
         self.fullTitle = trimAndSetStringDefaultValue(str: self.title)
         self.title = trimAndSetStringDefaultValueMaxLength(str: self.title)

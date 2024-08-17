@@ -67,7 +67,7 @@ internal class InfoWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         self.infoText.append("duration")
         self.infoText.append(" :: \(itsRenderMsToFullString(self.song?.duration ?? 0, false))")
         self.infoText.append("recording year")
-        self.infoText.append(" :: \(self.song?.recodingYear ?? 0)")
+        self.infoText.append(" :: \(self.song?.recordingYear ?? 0)")
         self.infoText.append("genre")
         self.infoText.append(" :: \(self.song?.fullGenre ?? "")")
         self.infoText.append("filename")

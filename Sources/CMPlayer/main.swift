@@ -46,10 +46,17 @@ internal var g_cols: Int = 80
 
 //
 // Startup code
-//g_player.initialize()
-//exit(g_player.run())
+guard mpg123_init() == 0 else {
+    print("Failed to initialize mpg123 library.")
+    exit(1)
+}
 
-//*************************************************
+g_player.initialize()
+exit(g_player.run())
+
+
+/*
+//
 // Initialize libao
 print("")
 print("> ao_initialize")
@@ -167,6 +174,5 @@ mpg123_exit()
 ao_shutdown()
 
 print("Playback finished.")
-
-exit(0);
-
+*/
+//exit(0);

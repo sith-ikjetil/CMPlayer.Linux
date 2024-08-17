@@ -57,7 +57,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
             //#if DEBUG
             //    let result = findSongs(path: "/Users/kjetilso/Music")//"/Volumes/ikjetil/Music/G")
             //#else
-                self.filesFoundCompleted = 0
+                self.filesFoundCompleted = 0                
                 let result = findSongs(path: mrpath)
                 self.filesFoundCompleted = 100
             //#endif
@@ -108,7 +108,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     {
         var results: [String] = []
         
-        if !isPathInMusicRootPath(path: path) || isPathInExclusionPath(path: path) {
+        if !isPathInMusicRootPath(path: path) || isPathInExclusionPath(path: path) {            
             return results
         }
         
@@ -120,19 +120,21 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
                 var nr = "\(path)/\(r)"
                 if path.hasSuffix("/") {
                     nr = "\(path)\(r)"
-                }
+                }                
                 
                 self.currentPath = nr
                 
-                if isDirectory(path: nr) {
+                if isDirectory(path: nr) {                    
                     results.append(contentsOf: findSongs(path: nr))
                 }
-                else {
-                    if FileManager.default.isReadableFile(atPath: nr) {
-                        for f in self.musicFormats {
-                            if r.hasSuffix(f) {
-                                results.append(nr)
-                                break
+                else {    
+                    if nr.lowercased().hasSuffix(".mp3") {
+                        if FileManager.default.isReadableFile(atPath: nr) {
+                            for f in self.musicFormats {
+                                if r.hasSuffix(f) {
+                                    results.append(nr)                                
+                                    break
+                                }
                             }
                         }
                     }
@@ -140,7 +142,9 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
             }
         }
         catch {
-            results.removeAll()
+            print("\(error)")            
+            exit(0)
+            //results.removeAll()
         }
         
         return results
@@ -154,8 +158,9 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     /// returns: Bool. True if path is directory. False otherwise.
     ///
     func isDirectory(path: String) -> Bool {
-        if FileManager().fileExists(atPath: path) {
-            return true;
+        var isDirectory: ObjCBool = false
+        if FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) {
+            return isDirectory.boolValue;
         }
         return false;
     }// isDirectory

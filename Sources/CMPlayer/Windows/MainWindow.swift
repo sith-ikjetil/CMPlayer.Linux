@@ -979,8 +979,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         g_library.setNextAvailableSongNo(1)
         
         g_player.audioPlayerActive = -1
-        //g_player.audio1 = nil
-        //g_player.audio2 = nil
+        g_player.audio1 = nil
+        g_player.audio2 = nil
         
         if PlayerPreferences.musicRootPath.count == 0 {
             self.isShowingTopWindow = true

@@ -126,7 +126,7 @@ internal class PlayerLibrary {
                         self.nextSongNo = songNo + 1
                     }
                     
-                    //if isPathInMusicRootPath(path: url) && !isPathInExclusionPath(path: url) {
+                    if isPathInMusicRootPath(path: url) && !isPathInExclusionPath(path: url) {
                         do
                         {
                             let se = try SongEntry(songNo: songNo, artist: artist, albumName: albumName, title: title, duration: duration, url: URL(fileURLWithPath: url), genre: genre, recordingYear: recordingYear, trackNo: trackNo)
@@ -138,7 +138,7 @@ internal class PlayerLibrary {
                         catch {
                             
                         }
-                    //}
+                    }
                 }
             }
             catch {
@@ -194,7 +194,7 @@ internal class PlayerLibrary {
             
             let xnRecordingYear: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
             xnRecordingYear.name = "recordingYear"
-            xnRecordingYear.setStringValue(String(s.recodingYear), resolvingEntities: false)
+            xnRecordingYear.setStringValue(String(s.recordingYear), resolvingEntities: false)
             xeSong.addAttribute(xnRecordingYear)
             
             let xnTrackNo: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)

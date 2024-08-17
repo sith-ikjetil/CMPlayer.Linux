@@ -19,8 +19,8 @@ internal class Player {
     //
     // Internal properties/constants.
     //
-    //var audio1: AVAudioPlayer? = nil
-    //var audio2: AVAudioPlayer? = nil
+    var audio1: XAudioPlayer? = XAudioPlayer()
+    var audio2: XAudioPlayer? = XAudioPlayer()
     var audioPlayerActive: Int = -1
     var durationAudioPlayer1: UInt64 = 0
     var durationAudioPlayer2: UInt64 = 0
@@ -35,7 +35,7 @@ internal class Player {
     ///
     /// Initializes the application.
     ///
-    func initialize() -> Void {
+    func initialize() -> Void {        
         PlayerDirectories.ensureDirectoriesExistence()
         PlayerPreferences.ensureLoadPreferences()
         PlayerLog.ApplicationLog = PlayerLog(autoSave: false, loadOldLog: (PlayerPreferences.logApplicationStartLoadType == LogApplicationStartLoadType.DoNotLoadOldLog))
@@ -61,9 +61,7 @@ internal class Player {
             self.play(player: 1, playlistIndex: 0)
         }
         
-        Console.clearScreenCurrentTheme()
-
-        mpg123_init();   
+        Console.clearScreenCurrentTheme()           
     }
     
     ///
