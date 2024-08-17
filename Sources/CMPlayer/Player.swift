@@ -19,8 +19,8 @@ internal class Player {
     //
     // Internal properties/constants.
     //
-    var audio1: XAudioPlayer? = XAudioPlayer()
-    var audio2: XAudioPlayer? = XAudioPlayer()
+    var audio1: Mp3AudioPlayer? = nil
+    var audio2: Mp3AudioPlayer? = nil
     var audioPlayerActive: Int = -1
     var durationAudioPlayer1: UInt64 = 0
     var durationAudioPlayer2: UInt64 = 0
@@ -37,8 +37,7 @@ internal class Player {
     ///
     func initialize() -> Void {        
         PlayerDirectories.ensureDirectoriesExistence()
-        PlayerPreferences.ensureLoadPreferences()
-        PlayerLog.ApplicationLog = PlayerLog(autoSave: false, loadOldLog: (PlayerPreferences.logApplicationStartLoadType == LogApplicationStartLoadType.DoNotLoadOldLog))
+        PlayerPreferences.ensureLoadPreferences()        
         
         PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Started.")
         
@@ -71,7 +70,7 @@ internal class Player {
     /// parameter playlistIndex: Index of playlist array to play.
     ///
     func play(player: Int, playlistIndex: Int) -> Void {
-        /*guard g_songs.count > 0 && g_playlist.count > playlistIndex else {
+        guard g_songs.count > 0 && g_playlist.count > playlistIndex else {            
             return
         }
         
@@ -80,13 +79,11 @@ internal class Player {
         self.audioPlayerActive = player
         if player == 1 {
             if self.audio1 == nil {
-                do {
-                    try autoreleasepool {
-                        self.audio1 = try AVAudioPlayer(contentsOf:g_playlist[playlistIndex].fileURL!)
-                    }
+                do {                    
+                    self.audio1 = Mp3AudioPlayer(path:g_playlist[playlistIndex].fileURL!)                    
                     self.durationAudioPlayer1 = g_playlist[playlistIndex].duration
-                    self.audio1?.play()
-                    self.isPaused = false
+                    try self.audio1?.play()
+                    self.isPaused = false                    
                 }
                 catch {
                     let msg = "EXIT_CODE_ERROR_PLAYING_FILE\nError playing player \(player) on index \(playlistIndex).\n\(error)"
@@ -101,11 +98,9 @@ internal class Player {
             else {
                 do {
                     self.audio1?.stop()
-                    try autoreleasepool {
-                        self.audio1 = try AVAudioPlayer(contentsOf: g_playlist[playlistIndex].fileURL!)
-                    }
+                    self.audio1 = Mp3AudioPlayer(path: g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer1 = g_playlist[playlistIndex].duration
-                    self.audio1?.play()
+                    try self.audio1?.play()
                     self.isPaused = false
                 }
                 catch {
@@ -122,11 +117,9 @@ internal class Player {
         else if player == 2 {
             if self.audio2 == nil {
                 do {
-                    try autoreleasepool {
-                        self.audio2 = try AVAudioPlayer(contentsOf:g_playlist[playlistIndex].fileURL!)
-                    }
+                    self.audio2 = Mp3AudioPlayer(path:g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer2 = g_playlist[playlistIndex].duration
-                    self.audio2?.play()
+                    try self.audio2?.play()
                     self.isPaused = false
                 }
                 catch {
@@ -142,11 +135,9 @@ internal class Player {
             else {
                 do {
                     self.audio2?.stop()
-                    try autoreleasepool {
-                        self.audio2 = try AVAudioPlayer(contentsOf: g_playlist[playlistIndex].fileURL!)
-                    }
+                    self.audio2 = Mp3AudioPlayer(path: g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer2 = g_playlist[playlistIndex].duration
-                    self.audio2?.play()
+                    try self.audio2?.play()
                     self.isPaused = false
                 }
                 catch {
@@ -159,14 +150,14 @@ internal class Player {
                     exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
                 }
             }
-        }*/
+        }
     }
     
     ///
     /// Pauses audio playback.
     ///
     func pause() -> Void {
-  /*      guard g_songs.count > 0 else {
+        guard g_songs.count > 0 else {
             return
         }
         
@@ -187,40 +178,42 @@ internal class Player {
         }
         
         g_lock.unlock()
-    */}
+    }
     
     ///
     /// Resumes audio playback.
     ///
     func resume() -> Void {
-      /*  guard g_songs.count > 0 else {
+        guard g_songs.count > 0 else {
             return
         }
         
         g_lock.lock()
         
         if self.audio1 != nil && self.audioPlayerActive == 1 {
-            if self.audio1?.currentTime.magnitude ?? 0 > 0 {
-                audio1?.play()
-                self.isPaused = false
-            }
+            //if self.audio1?.currentTime.magnitude ?? 0 > 0 {
+            //    audio1?.play()
+            //    self.isPaused = false
+            //}
+            audio1?.resume()
         }
         
         if self.audio2 != nil && self.audioPlayerActive == 2 {
-            if self.audio2?.currentTime.magnitude ?? 0 > 0 {
-                audio2?.play()
-                self.isPaused = false
-            }
+            //if self.audio2?.currentTime.magnitude ?? 0 > 0 {
+            //    audio2?.play()
+            //    self.isPaused = false
+            //}
+            audio2?.resume()
         }
         
         g_lock.unlock()
-    */}
+    }
     
     ///
     /// Plays previous song
     ///
     func prev() {
-        /*guard g_playedSongs.count > 0 else {
+        guard g_playedSongs.count > 0 else {
             return
         }
         
@@ -229,7 +222,7 @@ internal class Player {
         self.skip(play: true, crossfade: false)
         
         self.isPrev = false
-    */}
+    }
     
     ///
     /// Skips audio playback to next item in playlist.
@@ -237,7 +230,7 @@ internal class Player {
     /// parameter crossfade: True if skip should crossfade. False otherwise.
     ///
     func skip(play: Bool = true, crossfade: Bool = true) -> Void {
-        /*guard g_songs.count > 0 && g_playlist.count >= 1 else {
+        guard g_songs.count > 0 && g_playlist.count >= 1 else {
             return
         }
         
@@ -271,7 +264,7 @@ internal class Player {
                         self.audio2!.stop()
                     }
                     else {
-                        self.audio2!.setVolume(0.0, fadeDuration: Double(PlayerPreferences.crossfadeTimeInSeconds) )
+                        //self.audio2!.setVolume(0.0, fadeDuration: Double(PlayerPreferences.crossfadeTimeInSeconds) )
                     }
                 }
             }
@@ -286,14 +279,14 @@ internal class Player {
                         self.audio1!.stop()
                     }
                     else {
-                        self.audio1!.setVolume(0.0, fadeDuration: Double(PlayerPreferences.crossfadeTimeInSeconds) )
+                        //self.audio1!.setVolume(0.0, fadeDuration: Double(PlayerPreferences.crossfadeTimeInSeconds) )
                     }
                 }
             }
             if play {
                 self.play(player: 2, playlistIndex: 0)
             }
-        }*/
+        }
     }
     
     ///

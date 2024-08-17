@@ -60,26 +60,25 @@ internal class PlayerLogEntry {
     ///
     /// returnes: XML element.
     ///
-    func toXMLElement() -> XMLElement {
+    func toXMLElement() -> XMLElement {        
         let xe = XMLElement(name: PlayerLogEntry.XML_ELEMENT_NAME)
-        xe.setStringValue(self.text, resolvingEntities: true)
+    
+        // Set the text content of the element
+        xe.stringValue = self.text
         
-        let xnTitle: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
-        xnTitle.name = "Title"
-        xnTitle.setStringValue(self.title, resolvingEntities: true)
+        // Add the "Title" attribute
+        let xnTitle = XMLNode.attribute(withName: "Title", stringValue: self.title) as! XMLNode
         xe.addAttribute(xnTitle)
         
-        let xnType: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
-        xnType.name = "Type"
-        xnType.setStringValue(self.type.rawValue, resolvingEntities: true)
+        // Add the "Type" attribute
+        let xnType = XMLNode.attribute(withName: "Type", stringValue: self.type.rawValue) as! XMLNode
         xe.addAttribute(xnType)
         
+        // Format the date and add the "TimeStamp" attribute
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
         
-        let xnTimeStamp: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
-        xnTimeStamp.name = "TimeStamp"
-        xnTimeStamp.setStringValue(dateFormatter.string(from: self.timeStamp) , resolvingEntities: true)
+        let xnTimeStamp = XMLNode.attribute(withName: "TimeStamp", stringValue: dateFormatter.string(from: self.timeStamp)) as! XMLNode
         xe.addAttribute(xnTimeStamp)
         
         return xe

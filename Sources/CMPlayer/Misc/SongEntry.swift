@@ -186,6 +186,7 @@ internal class SongEntry {
             let duration = Double(length) / Double(rate)
             self.duration = UInt64(duration * 1000)
 
+            // Ensure positive duration
             guard duration > 0 else {
                 PlayerLog.ApplicationLog?.logWarning(title: "[SongEntry].init(path:songNo:)", text: "Duration was 0. File: \(path!.path)")
                 throw SongEntryError.DurationIsZero

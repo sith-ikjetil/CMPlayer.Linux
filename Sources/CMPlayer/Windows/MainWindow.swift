@@ -340,21 +340,21 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     }
                 }
                 
-                //g_lock.lock()
+                g_lock.lock()
                 if g_playlist.count > 0 {
-                    /*if g_player.audioPlayerActive == 1 {
-                        var time: Double = 0.0
+                    if g_player.audioPlayerActive == 1 {
+                        var time: UInt64 = 0
                         if let a = g_player.audio1 {
-                            time = a.currentTime.magnitude
+                            time = a.timeElapsed
                         }
-                        g_player.durationAudioPlayer1 = UInt64(Double(g_playlist[0].duration) - time * Double(1000))
+                        g_player.durationAudioPlayer1 = (g_playlist[0].duration - time)
                     }
                     else if g_player.audioPlayerActive == 2 {
-                        var time: Double = 0.0
+                        var time: UInt64 = 0
                         if let a = g_player.audio2 {
-                            time = a.currentTime.magnitude
+                            time = a.timeElapsed
                         }
-                        g_player.durationAudioPlayer2 = UInt64(Double(g_playlist[0].duration) - time * Double(1000))
+                        g_player.durationAudioPlayer2 = (g_playlist[0].duration - time)
                     }
                     
                     if g_player.audioPlayerActive == 1 && g_player.audio1 != nil {
@@ -369,9 +369,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                             g_player.skip(crossfade: PlayerPreferences.crossfadeSongs)
                         }
                     }
-                    */
+                    
                 }
-                //g_lock.unlock()
+                g_lock.unlock()
                 
                 let second: Double = 1_000_000
                 usleep(useconds_t(0.050 * second))
@@ -521,9 +521,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     }
     
     func onCommandPrev(parts: [String]) {
-        //g_lock.lock()
+        g_lock.lock()
         g_player.prev()
-        //g_lock.unlock()
+        g_lock.unlock()
     }
     
     ///
@@ -561,9 +561,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandNextSong(parts: [String]) -> Void {
-        //g_lock.lock()
+        g_lock.lock()
         g_player.skip(crossfade: false)
-        //g_lock.unlock()
+        g_lock.unlock()
     }
     
     ///

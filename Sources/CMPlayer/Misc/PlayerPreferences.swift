@@ -56,7 +56,7 @@ internal class PlayerPreferences {
     static let preferencesFilename: String = "CMPlayer.Preferences.xml"
     static var musicRootPath: [String] = []
     static var exclusionPaths: [String] = []
-    static var musicFormats: String = "mp3;mp4;m4a;wav"
+    static var musicFormats: String = "mp3"
     static var autoplayOnStartup: Bool = true
     static var crossfadeSongs: Bool = true
     static var crossfadeTimeInSeconds: Int = 4
@@ -65,12 +65,12 @@ internal class PlayerPreferences {
     static var logInformation: Bool = true
     static var logWarning: Bool = true
     static var logError: Bool = true
-    static var logDebug: Bool = false
-    static var logOther: Bool = false
+    static var logDebug: Bool = true
+    static var logOther: Bool = true
     static var logMaxSize: Int = 500
     static var logMaxSizeReached: LogMaxSizeReached = LogMaxSizeReached.EmptyLog
     static let logMaxSizes: [Int] = [100, 500, 1000, 2000, 3000, 4000, 5000]
-    static var logApplicationStartLoadType: LogApplicationStartLoadType = LogApplicationStartLoadType.LoadOldLog
+    static var logApplicationStartLoadType: LogApplicationStartLoadType = LogApplicationStartLoadType.DoNotLoadOldLog
     
     ///
     /// Default initializer.

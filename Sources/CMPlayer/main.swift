@@ -22,7 +22,7 @@ internal let g_fieldWidthTitle: Int = 33
 internal let g_fieldWidthDuration: Int = 5
 internal let g_player: Player = Player()
 internal let g_versionString: String = "1.1.0.1"
-//internal let g_lock = NSLock()
+internal let g_lock = NSLock()
 internal let g_windowContentLineCount = 17
 
 //
@@ -46,26 +46,42 @@ internal var g_cols: Int = 80
 
 //
 // Startup code
+//
+// initialize libmpg123
 guard mpg123_init() == 0 else {
-    print("Failed to initialize mpg123 library.")
+    print("Failed to initialize libmpg123")
     exit(1)
+}
+
+// initialize libao
+ao_initialize()
+
+// ensure we exit/close libmpg123/libao
+defer {
+    mpg123_exit()
+    ao_shutdown()
 }
 
 // redirect stderr
 // we do this to remove process_comment messages
 let stderr_old = redirect_stderr()
 if stderr_old != -1 {
+    // set log system
+    PlayerLog.ApplicationLog = PlayerLog(autoSave: true, loadOldLog: false)
+
     // initialize CMPlayer.Linux
     g_player.initialize()        
+
+    // run the program and save exit code
     let exitCode = g_player.run()
     
     // restore stderr
-    restore_stderr(stderr_old)
+    restore_stderr(stderr_old)    
 
     // exit with exit code
     exit(exitCode)
 } else {
-    print("Failed to redirect stderr")
+    print("Failed to redirect stderr to /dev/null")
     exit(1)
 }
 

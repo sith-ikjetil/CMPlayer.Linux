@@ -45,6 +45,15 @@ internal enum SongEntryError : Error {
 }
 
 ///
+/// AudioPlayer error when playing
+///
+internal enum AudioPlayerError : Error {
+    case AlreadyPlaying
+    case MpgSoundLibrary
+    case AoSoundLibrary
+}
+
+///
 /// Padding alignment types.
 ///
 internal enum PrintPaddingTextAlign {

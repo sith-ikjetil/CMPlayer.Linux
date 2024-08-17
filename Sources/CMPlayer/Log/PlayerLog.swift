@@ -17,16 +17,16 @@ import FoundationXML
 ///
 internal class PlayerLog {
     static let logFilename: String = "CMPlayer.Log.xml"
-    static var ApplicationLog: PlayerLog?
+    static var ApplicationLog: PlayerLog? = nil 
     var entries: [PlayerLogEntry] = []
-    private var autoSave: Bool = false
+    private var autoSave: Bool = true
     
     ///
     /// Overloaded initializer.
     ///
     init(autoSave: Bool, loadOldLog: Bool ){
         self.autoSave = autoSave
-        
+                
         if loadOldLog {
             self.loadOldLog()
         }
@@ -104,8 +104,8 @@ internal class PlayerLog {
     /// parameter title: title of log entry
     /// parameter text: log entry information
     ///
-    func logInformation(title: String, text: String) {
-        guard PlayerPreferences.logInformation else { return }
+    func logInformation(title: String, text: String) {                    
+        guard PlayerPreferences.logInformation else { return }        
         if self.entries.count >= PlayerPreferences.logMaxSize {
             if PlayerPreferences.logMaxSizeReached == LogMaxSizeReached.EmptyLog {
                 self.clear()
@@ -113,8 +113,9 @@ internal class PlayerLog {
             else {
                 return
             }
-        }
-        self.entries.append(PlayerLogEntry(type: PlayerLogEntryType.Information, title: title, text: text, timeStamp: Date()))
+        }        
+        self.entries.append(PlayerLogEntry(type: PlayerLogEntryType.Information, title: title, text: text, timeStamp: Date()))        
+        
         if self.autoSave {
             self.saveLog()
         }
@@ -170,39 +171,42 @@ internal class PlayerLog {
     ///
     /// Clears the log.
     ///
-    func clear() {
+    func clear() {        
         self.entries.removeAll()
     }
     
     ///
     /// Saves the log as an XML document
     ///
-    func saveLogAsXMLDocument() -> XMLDocument {
+    func saveLogAsXMLDocument() -> XMLDocument {        
+        // Create the root element "Log"
         let xeRoot: XMLElement = XMLElement(name: "Log")
-        let aRC24: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
-        aRC24.name = "id"
-        aRC24.setStringValue("CMPlayer.macOS.Log", resolvingEntities: true)
-        xeRoot.addAttribute(aRC24)
+        
+        // Set the attribute directly on the root element
+        xeRoot.addAttribute(XMLNode.attribute(withName: "id", stringValue: "CMPlayer.macOS.Log") as! XMLNode)
         
         for entry in self.entries
         {
             xeRoot.addChild(entry.toXMLElement())
         }
+
+        // Create the XML document with the root element
+        let xmlDoc = XMLDocument(rootElement: xeRoot)
         
-        return XMLDocument(rootElement: xeRoot)
+        return xmlDoc
     }
     
     ///
     /// Saves the log
     ///
     internal func saveLog()
-    {
+    {                
         let xd: XMLDocument = self.saveLogAsXMLDocument()
         let xml: String = xd.xmlString
         let url: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilename, isDirectory: false)
         
         do {
-            try xml.write(to: url, atomically: true,encoding: .utf8)
+            try xml.write(to: url, atomically: true,encoding: .utf8)            
         }
         catch {
             PlayerLog.ApplicationLog?.logError(title: "[PlayerLog].saveLog", text: "\(error)")
