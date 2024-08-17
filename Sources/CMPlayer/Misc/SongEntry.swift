@@ -255,10 +255,9 @@ internal class SongEntry {
                         //    let comment = String(cString: commentPtr.pointee.p)
                             //print("Comment: \(comment)")
                         //}
-                        if let genrePtr = id3v2.genre {
+                        if !bMetadataFound, let genrePtr = id3v2.genre {
                             let genre = String(cString: genrePtr.pointee.p)
                             self.genre = genre
-                            bMetadataFound = true
                         }
                     }
                     
