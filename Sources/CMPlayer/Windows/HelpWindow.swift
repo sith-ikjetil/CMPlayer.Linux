@@ -95,7 +95,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         var index_search: Int = self.helpIndex
         let max = self.helpText.count
         while index_search < max {
-            if index_screen_lines > (g_rows - 3) {
+            if index_screen_lines >= (g_rows - 3) {
                 break
             }
             

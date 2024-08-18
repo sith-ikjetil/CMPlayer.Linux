@@ -80,7 +80,7 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         var index_search: Int = self.genreIndex
         let max = self.genreText.count
         while index_search < max {
-            if index_screen_lines == (g_rows-3) {
+            if index_screen_lines >= (g_rows-3) {
                 break
             }
             

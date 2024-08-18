@@ -104,7 +104,7 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
         var index_search: Int = self.preferencesIndex
         let max = self.preferencesText.count
         while index_search < max {
-            if index_screen_lines == (g_rows-3) {
+            if index_screen_lines >= (g_rows-3) {
                 break
             }
             
