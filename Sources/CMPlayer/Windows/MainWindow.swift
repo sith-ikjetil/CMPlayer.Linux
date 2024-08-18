@@ -219,7 +219,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             text.append(" with \(modeInfo.numberOfSongsInMode.itsToString()) Songs")
         }
         else {
-            text.append( " | Mode: off" )
+            text.append( " | Mode: off | \(g_cols)x\(g_rows) | \(g_playlist.count) Songs in Queue" )
         }
         
         Console.printXY(1,g_rows, text, g_cols, .center, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
@@ -232,7 +232,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         var idx: Int = (PlayerPreferences.viewType == ViewType.Default) ? 5 : 6
         let timeRow: Int = (PlayerPreferences.viewType == ViewType.Default) ? 5 : 6
         var index: Int = 0
-        let max: Int = (PlayerPreferences.viewType == ViewType.Default) ? 22 : 21
+        let max: Int = (PlayerPreferences.viewType == ViewType.Default) ? g_rows-7+5 : g_rows-8+6//? 22 : 21
         let bgColor = getThemeBgColor()
         while idx < max {
             if index < g_playlist.count {
