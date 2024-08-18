@@ -98,36 +98,36 @@ internal class InfoWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         MainWindow.renderHeader(showTime: false)
         
         let bgColor = getThemeBgColor()
-        Console.printXY(1,3,":: SONG INFORMATION ::", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        Console.printXY(1,4," ", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+        Console.printXY(1,3,":: SONG INFORMATION ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+        Console.printXY(1,4," ", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
         var index_screen_lines: Int = 5
         var index_search: Int = infoIndex
-        let max = infoIndex + 21
+        let max = infoText.count
         while index_search < max {
-            if index_screen_lines == 22 {
+            if index_screen_lines >= (g_rows-3) {
                 break
             }
             
-            if index_search > infoText.count - 1 {
+            if index_search >= infoText.count {
                 break
             }
             
             let se = infoText[index_search]
             
             if !se.hasPrefix(" ::") {
-                Console.printXY(1, index_screen_lines, se, 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+                Console.printXY(1, index_screen_lines, se, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
             }
             else {
-                Console.printXY(1, index_screen_lines, se, 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(1, index_screen_lines, se, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             }
             
             index_screen_lines += 1
             index_search += 1
         }
         
-        Console.printXY(1,23,"PRESS ANY KEY TO EXIT", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-        Console.printXY(1,24," ", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows," ", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         Console.gotoXY(80,1)
         print("")
@@ -143,14 +143,14 @@ internal class InfoWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if (self.infoIndex + 17) < self.infoText.count {
+            if (self.infoIndex + (g_rows-7)) <= self.infoText.count {
                 self.infoIndex += 1
                 self.renderWindow()
             }
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
-            if self.infoIndex > 0 {
+            if self.infoIndex >= 1 {
                 self.infoIndex -= 1
                 self.renderWindow()
             }
@@ -158,8 +158,8 @@ internal class InfoWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
             if self.infoIndex > 0 && self.infoText.count > g_windowContentLineCount{
-                if self.infoIndex - g_windowContentLineCount > 0 {
-                    self.infoIndex -= g_windowContentLineCount
+                if (self.infoIndex - (g_rows-7)) > 0 {
+                    self.infoIndex -= (g_rows-7)
                 }
                 else {
                     self.infoIndex = 0
@@ -168,17 +168,19 @@ internal class InfoWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             }
             return false
         })
-        keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
-            if self.infoIndex >= 0 && self.infoText.count > g_windowContentLineCount {
-                if self.infoIndex + g_windowContentLineCount < self.infoText.count - g_windowContentLineCount {
-                    self.infoIndex += g_windowContentLineCount
-                }
-                else {
-                    self.infoIndex = self.infoText.count - g_windowContentLineCount
-                }
-                self.renderWindow()
+        keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in             
+            if (self.infoIndex + (g_rows-7)) <= (self.infoText.count - (g_rows-7)) {
+                self.infoIndex += (g_rows-7)
             }
-            return false
+            else {                
+                self.infoIndex = self.infoText.count - (g_rows-7) + 1                
+                if (self.infoIndex < 0 ) {
+                    self.infoIndex = 0
+                }
+            }
+            self.renderWindow()
+        
+            return false            
         })
         keyHandler.addUnknownKeyHandler(closure: { (key: UInt32) -> Bool in
             return true

@@ -155,7 +155,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             Console.printXY(10+artistCols+titleCols-2, y, endTimePart, g_fieldWidthDuration, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
         else if PlayerPreferences.viewType == ViewType.Details {
-            Console.printXY(1, y, String(song.songNo)+" ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
+            Console.printXY(1, y, "\(song.songNo) ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
             Console.printXY(1, y+1, " ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             
             let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0

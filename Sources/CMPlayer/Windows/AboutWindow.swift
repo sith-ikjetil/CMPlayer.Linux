@@ -102,7 +102,7 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if (self.aboutIndex + (g_rows-7)) < self.aboutText.count {
+            if (self.aboutIndex + (g_rows-7)) <= self.aboutText.count {
                 self.aboutIndex += 1
                 self.renderWindow()
             }
@@ -133,7 +133,10 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
                     self.aboutIndex += (g_rows-7)
                 }
                 else {
-                    self.aboutIndex = self.aboutText.count - (g_rows-7)
+                    self.aboutIndex = self.aboutText.count - (g_rows-7) + 1
+                    if self.aboutIndex < 0 {
+                        self.aboutIndex = 0
+                    }
                 }
                 self.renderWindow()
             }

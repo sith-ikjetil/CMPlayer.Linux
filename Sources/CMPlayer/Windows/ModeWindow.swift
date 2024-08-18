@@ -220,7 +220,7 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if (self.searchIndex + (g_rows-7)) < (self.modeText.count+self.searchResult.count) {
+            if (self.searchIndex + (g_rows-7)) <= (self.modeText.count+self.searchResult.count) {
                 self.searchIndex += 1
                 self.renderWindow()
             }
@@ -233,28 +233,30 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             }
             return false
         })
-        keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
-            if self.searchIndex > 0 && (self.modeText.count+self.searchResult.count) > (g_rows-7) {
-                if self.searchIndex - (g_rows-7) > 0 {
-                    self.searchIndex -= (g_rows-7)
-                }
-                else {
+        keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in            
+            if self.searchIndex >= (g_rows-7) {
+                self.searchIndex -= (g_rows-7)
+                self.renderWindow()
+            }
+            else {
+                self.searchIndex = 0
+                self.renderWindow()
+            }        
+            return false
+        })
+        keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in            
+            if (self.searchIndex + (g_rows-7)) >= (self.modeText.count+self.searchResult.count) {
+                self.searchIndex = (self.modeText.count + self.searchResult.count - (g_rows-7)) + 1
+                if self.searchIndex < 0 {
                     self.searchIndex = 0
                 }
                 self.renderWindow()
             }
-            return false
-        })
-        keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
-            if self.searchIndex >= 0 && (self.modeText.count+self.searchResult.count) > (g_rows-7) {
-                if (self.searchIndex + (g_rows-7)) < ((self.modeText.count+self.searchResult.count) - (g_rows-7)) {
-                    self.searchIndex += (g_rows-7)
-                }
-                else {
-                    self.searchIndex = (self.modeText.count+self.searchResult.count) - (g_rows-7)
-                }
+            else {
+                self.searchIndex += (g_rows-7)
                 self.renderWindow()
             }
+        
             return false
         })
         keyHandler.addUnknownKeyHandler(closure: { (key: UInt32) -> Bool in

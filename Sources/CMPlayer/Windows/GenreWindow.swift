@@ -119,7 +119,7 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if (self.genreIndex + (g_rows-7)) < self.genreText.count {
+            if (self.genreIndex + (g_rows-7)) <= self.genreText.count {
                 self.genreIndex += 1
                 self.renderWindow()
             }
@@ -150,7 +150,10 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
                     self.genreIndex += (g_rows-7)
                 }
                 else {
-                    self.genreIndex = self.genreText.count - (g_rows-7)
+                    self.genreIndex = self.genreText.count - (g_rows-7) + 1
+                    if self.genreIndex < 0 {
+                        self.genreIndex = 0
+                    }
                 }
                 self.renderWindow()
             }

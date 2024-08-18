@@ -120,14 +120,14 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if (self.artistIndex + (g_rows-7)) < self.artistText.count {
+            if (self.artistIndex + (g_rows-7)) <= self.artistText.count {
                 self.artistIndex += 1
                 self.renderWindow()
             }
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
-            if self.artistIndex > 0 {
+            if self.artistIndex >= 1 {
                 self.artistIndex -= 1
                 self.renderWindow()
             }
@@ -151,7 +151,10 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
                     self.artistIndex += (g_rows-7)
                 }
                 else {
-                    self.artistIndex = self.artistText.count - (g_rows-7)
+                    self.artistIndex = self.artistText.count - (g_rows-7) + 1
+                    if (self.artistIndex < 0) {
+                        self.artistIndex = 0
+                    }
                 }
                 self.renderWindow()
             }

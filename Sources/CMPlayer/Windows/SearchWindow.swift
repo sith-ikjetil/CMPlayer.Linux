@@ -313,76 +313,77 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
     /// Renders screen output. Does clear screen first.
     ///
     func renderWindow() -> Void {
-        //Console.clearScreenCurrentTheme()
-        
-        if g_rows < 24 || g_cols < 80 {
-            return
-        }
-        
+        Console.clearScreenCurrentTheme()                
+
         MainWindow.renderHeader(showTime: false)
         
         let bgColor = getThemeBgColor()
         
-        Console.printXY(1,3,":: SEARCH RESULT ::", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+        Console.printXY(1,3,":: SEARCH RESULT ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
         if PlayerPreferences.viewType == ViewType.Default {
             var index_screen_lines: Int = 5
             var index_search: Int = searchIndex
-            let max = searchIndex + 21
+            let max = self.searchResult.count
             while index_search < max {
-                if index_screen_lines == 22 {
+                if index_screen_lines >= (g_rows-3) {
                     break
                 }
                 
-                if index_search > self.searchResult.count - 1 {
+                if index_search >= self.searchResult.count {
                     break
                 }
                 
                 let se = self.searchResult[index_search]
                 
                 Console.printXY(1, index_screen_lines, "\(se.songNo) ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
-                
-                Console.printXY(10, index_screen_lines, "\(se.artist)", g_fieldWidthArtist, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
 
-                Console.printXY(43, index_screen_lines, "\(se.title)", g_fieldWidthTitle, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
+                let artistCols: Int = Int(floor(ncalc))
+                let titleCols: Int =  Int(ceil(ncalc))
                 
-                Console.printXY(76, index_screen_lines, itsRenderMsToFullString(se.duration, false), g_fieldWidthDuration, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(10, index_screen_lines, se.getArtist(), artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+
+                Console.printXY(10+artistCols, index_screen_lines, se.getTitle(), titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                
+                Console.printXY(10+artistCols+titleCols-2, index_screen_lines, itsRenderMsToFullString(se.duration, false), g_fieldWidthDuration, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                 
                 index_screen_lines += 1
                 index_search += 1
             }
         }
         else if PlayerPreferences.viewType == ViewType.Details {
-            let songNoColor = ConsoleColor.cyan
-            
             var index_screen_lines: Int = 5
             var index_search: Int = searchIndex
-            let max = searchIndex + 21
+            let max = self.searchResult.count
             while index_search < max {
-                if index_screen_lines >= 22 {
+                if index_screen_lines >= (g_rows-3) {
                     break
                 }
                 
-                if index_search > self.searchResult.count - 1 {
+                if index_search >= self.searchResult.count {
                     break
                 }
                 
                 let song = self.searchResult[index_search]
                 
-                Console.printXY(1, index_screen_lines, String(song.songNo)+" ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
+                Console.printXY(1, index_screen_lines, "\(song.songNo) ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
                 Console.printXY(1, index_screen_lines+1, " ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                 
-                Console.printXY(10, index_screen_lines, song.artist, g_fieldWidthArtist, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-                Console.printXY(10, index_screen_lines+1, song.albumName, g_fieldWidthArtist, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
+                let artistCols: Int = Int(floor(ncalc))
+                let titleCols: Int =  Int(ceil(ncalc))
+
+                Console.printXY(10, index_screen_lines, song.getArtist(), artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(10, index_screen_lines+1, song.getAlbumName(), artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                 
-                Console.printXY(43, index_screen_lines, song.title, g_fieldWidthTitle, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-                Console.printXY(43, index_screen_lines+1, song.genre, g_fieldWidthTitle, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(10+artistCols, index_screen_lines, song.getTitle(), titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(10+artistCols, index_screen_lines+1, song.getGenre(), titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                 
                 let timeString: String = itsRenderMsToFullString(song.duration, false)
                 let endTimePart: String = String(timeString[timeString.index(timeString.endIndex, offsetBy: -5)..<timeString.endIndex])
-                Console.printXY(76, index_screen_lines, endTimePart, g_fieldWidthDuration, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-                
-                Console.printXY(76, index_screen_lines+1, " ", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(10+artistCols+titleCols-2, index_screen_lines, endTimePart, g_fieldWidthDuration, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(10+artistCols+titleCols-2, index_screen_lines+1, " ", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                 
                 index_screen_lines += 2
                 index_search += 1
@@ -390,38 +391,38 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         }
         
         if self.searchResult.count > 0 {
-            Console.printXY(1,23,"PRESS 'SPACEBAR' TO SET MODE. PRESS ANY OTHER KEY TO EXIT", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(1,g_rows-1,"PRESS 'SPACEBAR' TO SET MODE. PRESS ANY OTHER KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
         else {
-            Console.printXY(1,23,"PRESS ANY KEY TO EXIT", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
         
-        Console.printXY(1,24,"\(self.searchResult.count.itsToString()) Songs",80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows,"\(self.searchResult.count.itsToString()) Songs", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         Console.gotoXY(80,1)
         print("")
     }
     
     ///
-      /// Returnes content line count
-      ///
-      func getSongsLineCount() -> Int {
-          if PlayerPreferences.viewType == ViewType.Default {
-              return g_windowContentLineCount
-          }
-          else {
-              return g_windowContentLineCount / 2
-          }
-      }
-      
-      func getSongsContentLineCount() -> Int {
-          if PlayerPreferences.viewType == ViewType.Default {
-              return 1
-          }
-          else {
-              return 2
-          }
-      }
+    /// Returnes content line count
+    ///
+    /*func getSongsLineCount() -> Int {
+        if PlayerPreferences.viewType == ViewType.Default {
+            return g_windowContentLineCount
+        }
+        else {
+            return g_windowContentLineCount / 2
+        }
+    }
+    
+    func getSongsContentLineCount() -> Int {
+        if PlayerPreferences.viewType == ViewType.Default {
+            return 1
+        }
+        else {
+            return 2
+        }
+    }*/
     
     ///
     /// Runs SearchWindow keyboard input and feedback.
@@ -440,19 +441,11 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         self.renderWindow()
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
-        keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if PlayerPreferences.viewType == ViewType.Details {
-                if self.searchIndex < (self.searchResult.count - self.getSongsLineCount() - 1) {
-                    self.searchIndex += 1
-                    self.renderWindow()
-                }
-            }
-            else if PlayerPreferences.viewType == ViewType.Default {
-                if self.searchIndex < (self.searchResult.count - g_windowContentLineCount) {
-                    self.searchIndex += 1
-                    self.renderWindow()
-                }
-            }
+        keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in            
+            if (self.searchIndex+(g_rows-7)) <= self.searchResult.count {
+                self.searchIndex += 1
+                self.renderWindow()
+            }        
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
@@ -462,74 +455,42 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             }
             return false
         })
-        keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
-            if PlayerPreferences.viewType == ViewType.Details {
-                let m: Int = (g_windowContentLineCount)/self.getSongsContentLineCount()
-                
-                if (self.searchIndex - m) >= 0 {
-                    self.searchIndex -= m
-                    self.renderWindow()
-                }
-                else {
-                    self.searchIndex = 0
-                    self.renderWindow()
-                }
+        keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in            
+            if self.searchIndex >= (g_rows-7) {
+                self.searchIndex -= (g_rows-7)
+                self.renderWindow()
             }
-            else if PlayerPreferences.viewType == ViewType.Default {
-                let m: Int = (g_windowContentLineCount)/self.getSongsContentLineCount()
-                
-                if (self.searchIndex - m) >= 0 {
-                    self.searchIndex -= m
-                    self.renderWindow()
-                }
-                else {
-                    self.searchIndex = 0
-                    self.renderWindow()
-                }
-            }
+            else {
+                self.searchIndex = 0
+                self.renderWindow()
+            }        
             return false
         })
-        keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
-            if PlayerPreferences.viewType == ViewType.Details {
-                let m: Int = (g_windowContentLineCount)/self.getSongsContentLineCount()
-                
-                if (self.searchIndex + m) >= (self.searchResult.count - self.getSongsLineCount() - 1) {
-                    self.searchIndex = self.searchResult.count - self.getSongsLineCount() - 1
-                    if self.searchIndex < 0 {
-                        self.searchIndex = 0
-                    }
-                    self.renderWindow()
+        keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in            
+            if (self.searchIndex + (g_rows-7)) >= self.searchResult.count {
+                self.searchIndex = (self.searchResult.count - (g_rows-7))
+                if self.searchIndex < 0 {
+                    self.searchIndex = 0
                 }
-                else {
-                    self.searchIndex += m + 1
-                    self.renderWindow()
-                }
+                self.renderWindow()
             }
-            else if PlayerPreferences.viewType == ViewType.Default {
-                if (self.searchIndex + g_windowContentLineCount) >= (self.searchResult.count - g_windowContentLineCount) {
-                    self.searchIndex = self.searchResult.count - g_windowContentLineCount
-                    if self.searchIndex < 0 {
-                        self.searchIndex = 0
-                    }
-                    self.renderWindow()
-                }
-                else {
-                    self.searchIndex += g_windowContentLineCount
-                    self.renderWindow()
-                }
+            else {
+                self.searchIndex += (g_rows-7)
+                self.renderWindow()
             }
+        
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_SPACEBAR.rawValue, closure: { () -> Bool in
             if self.searchResult.count > 0 {
                 
                 if self.modeOff {
-                    //g_lock.lock()
+                    g_lock.lock()
                     g_searchType.removeAll()
                     g_searchResult.removeAll()
                     g_modeSearch.removeAll()
                     g_modeSearchStats.removeAll()
-                    //exg_lock.unlock()
+                    g_lock.unlock()
                 }
                 
                 if  self.type == SearchType.ArtistOrTitle ||

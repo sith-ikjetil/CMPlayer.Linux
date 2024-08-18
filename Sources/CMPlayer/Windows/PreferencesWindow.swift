@@ -77,10 +77,10 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
         self.preferencesText.append(" :: \(PlayerPreferences.musicFormats)")
         self.preferencesText.append(" Enable Autoplay On Startup")
         self.preferencesText.append(" :: \(PlayerPreferences.autoplayOnStartup)")
-        self.preferencesText.append(" Enable Crossfade")
-        self.preferencesText.append(" :: \(PlayerPreferences.crossfadeSongs)")
-        self.preferencesText.append(" Crossfade Time")
-        self.preferencesText.append(" :: \(PlayerPreferences.crossfadeTimeInSeconds) seconds")
+        //self.preferencesText.append(" Enable Crossfade")
+        //self.preferencesText.append(" :: \(PlayerPreferences.crossfadeSongs)")
+        //self.preferencesText.append(" Crossfade Time")
+        //self.preferencesText.append(" :: \(PlayerPreferences.crossfadeTimeInSeconds) seconds")
         self.preferencesText.append(" View Type")
         self.preferencesText.append(" :: \(PlayerPreferences.viewType.rawValue)")
         self.preferencesText.append(" Theme")
@@ -101,33 +101,33 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
         Console.printXY(1,3,":: PREFERENCES ::", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
         var index_screen_lines: Int = 5
-        var index_search: Int = preferencesIndex
-        let max = preferencesIndex + 21
+        var index_search: Int = self.preferencesIndex
+        let max = self.preferencesText.count
         while index_search < max {
-            if index_screen_lines == 22 {
+            if index_screen_lines == (g_rows-3) {
                 break
             }
             
-            if index_search > preferencesText.count - 1 {
+            if index_search >= preferencesText.count {
                 break
             }
             
             let se = preferencesText[index_search]
             
             if se.hasPrefix(" ::") {
-                Console.printXY(1, index_screen_lines, se, 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(1, index_screen_lines, se, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             }
             else {
-                Console.printXY(1, index_screen_lines, se, 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+                Console.printXY(1, index_screen_lines, se, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
             }
             
             index_screen_lines += 1
             index_search += 1
         }
         
-        Console.printXY(1,23,"PRESS ANY KEY TO EXIT", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows-1, "PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.gotoXY(80,1)
+        Console.gotoXY(g_cols,1)
         print("")
     }
     
@@ -141,7 +141,7 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if (self.preferencesIndex + 17) < self.preferencesText.count {
+            if (self.preferencesIndex + (g_rows-7)) <= self.preferencesText.count {
                 self.preferencesIndex += 1
                 self.renderWindow()
             }
@@ -155,9 +155,9 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
-            if self.preferencesIndex > 0 && self.preferencesText.count > g_windowContentLineCount {
-                if self.preferencesIndex - g_windowContentLineCount > 0 {
-                    self.preferencesIndex -= g_windowContentLineCount
+            if self.preferencesIndex > 0 && self.preferencesText.count > (g_rows-7) {
+                if (self.preferencesIndex - (g_rows-7)) > 0 {
+                    self.preferencesIndex -= (g_rows-7)
                 }
                 else {
                     self.preferencesIndex = 0
@@ -167,12 +167,15 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
-            if self.preferencesIndex >= 0 && self.preferencesText.count > g_windowContentLineCount {
-                if self.preferencesIndex + g_windowContentLineCount < self.preferencesText.count - g_windowContentLineCount {
-                    self.preferencesIndex += g_windowContentLineCount
+            if self.preferencesIndex >= 0 && self.preferencesText.count > (g_rows-7) {
+                if self.preferencesIndex + (g_rows-7) < self.preferencesText.count - (g_rows-7) {
+                    self.preferencesIndex += (g_rows-7)
                 }
                 else {
-                    self.preferencesIndex = self.preferencesText.count - g_windowContentLineCount
+                    self.preferencesIndex = self.preferencesText.count - (g_rows-7) + 1
+                    if self.preferencesIndex < 0 {
+                        self.preferencesIndex = 0
+                    }
                 }
                 self.renderWindow()
             }

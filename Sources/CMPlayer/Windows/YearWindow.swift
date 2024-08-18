@@ -119,7 +119,7 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if (self.yearIndex + (g_rows-7)) < self.yearText.count {
+            if (self.yearIndex + (g_rows-7)) <= self.yearText.count {
                 self.yearIndex += 1
                 self.renderWindow()
             }
@@ -150,7 +150,10 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     self.yearIndex += (g_rows-7)
                 }
                 else {
-                    self.yearIndex = self.yearText.count - (g_rows-7)
+                    self.yearIndex = self.yearText.count - (g_rows-7) + 1
+                    if self.yearIndex < 0 {
+                        self.yearIndex = 0
+                    }
                 }
                 self.renderWindow()
             }
