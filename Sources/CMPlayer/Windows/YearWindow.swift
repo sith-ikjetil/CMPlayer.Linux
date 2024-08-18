@@ -80,7 +80,7 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         var index_search: Int = yearIndex
         let max = self.yearText.count
         while index_search < max {
-            if index_screen_lines == (g_rows-3) {
+            if index_screen_lines >= (g_rows-3) {
                 break
             }
             

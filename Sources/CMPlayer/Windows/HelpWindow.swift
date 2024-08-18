@@ -118,7 +118,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.printXY(1,g_rows,"\((self.helpText.count/2).itsToString()) Commands | hi:\(self.helpIndex), isl:\(index_screen_lines), is: \(index_search), max:\(max), rows: \(g_rows)", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows,"\((self.helpText.count/2).itsToString()) Commands", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         Console.gotoXY(g_cols,1)
         print("")
@@ -141,7 +141,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
-            if self.helpIndex > 0 {
+            if self.helpIndex >= 1 {
                 self.helpIndex -= 1
                 self.renderWindow()
             }
@@ -149,7 +149,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
             if self.helpIndex > 0  && self.helpText.count > (g_rows-7) {
-                if self.helpIndex - (g_rows-7) > 0 {
+                if (self.helpIndex - (g_rows-7)) > 0 {
                     self.helpIndex -= (g_rows-7)
                 }
                 else {
@@ -161,11 +161,14 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
             if self.helpIndex >= 0  && self.helpText.count > (g_rows-7) {
-                if self.helpIndex + (g_rows-7) < self.helpText.count - (g_rows-7) {
+                if (self.helpIndex + (g_rows-7)) < (self.helpText.count - (g_rows-7)) {
                     self.helpIndex += (g_rows-7)
                 }
                 else {
                     self.helpIndex = self.helpText.count - (g_rows-7)
+                    if self.helpIndex < 0 {
+                        self.helpIndex = 0
+                    }
                 }
                 self.renderWindow()
             }
