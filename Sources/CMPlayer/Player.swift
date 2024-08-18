@@ -295,7 +295,7 @@ internal class Player {
     /// returnes: Int32. Exit code.
     ///
     func run() -> Int32 {
-        g_mainWindow = MainWindow()
+        g_mainWindow = MainWindow()        
         g_mainWindow?.showWindow()
         PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Exited Normally.")
         return g_mainWindow?.exitValue ?? 0

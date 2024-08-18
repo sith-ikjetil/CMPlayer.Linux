@@ -49,7 +49,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// Handler for TerminalSizeHasChangedProtocol
     ///
     func terminalSizeHasChanged() -> Void {
-        Console.clearScreenCurrentTheme()
+        Console.clearScreenCurrentTheme()// TODO: Test remove        
         if g_rows >= 24 && g_cols >= 80 {
             self.isTooSmall = false
             self.renderWindow()
@@ -70,10 +70,10 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         let bgColor = ConsoleColor.blue
         
         if showTime {
-            Console.printXY(1,1,"CMPlayer | \(g_versionString) | \(itsRenderMsToFullString(MainWindow.timeElapsedMs, false))", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(1,1,"CMPlayer | \(g_versionString) | \(itsRenderMsToFullString(MainWindow.timeElapsedMs, false))", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
         else {
-            Console.printXY(1,1,"CMPlayer | \(g_versionString)", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(1,1,"CMPlayer | \(g_versionString)", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
     }
     
@@ -86,35 +86,43 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         let bgColor = getThemeBgColor()
         
-        Console.printXY(1,2," ", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,2," ", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
     
-        if PlayerPreferences.viewType == ViewType.Default {
+        if PlayerPreferences.viewType == ViewType.Default {            
             Console.printXY(1,3,"Song No.", g_fieldWidthSongNo+1, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
-            Console.printXY(10,3,"Artist", g_fieldWidthArtist, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
+            let artistCols: Int = Int(floor(ncalc))
+            let titleCols: Int =  Int(ceil(ncalc))
+
+            Console.printXY(10,3,"Artist", artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
-            Console.printXY(43,3,"Title", g_fieldWidthTitle, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(10+artistCols,3,"Title", titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
-            Console.printXY(76,3,"Time", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(10+artistCols+titleCols-2,3,"Time", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
             //let sep = String("\u{2550}")
-            Console.printXY(1,4,"=", 80, .left, "=", bgColor, ConsoleColorModifier.none, ConsoleColor.green, ConsoleColorModifier.bold)
+            Console.printXY(1,4,"=", g_cols, .left, "=", bgColor, ConsoleColorModifier.none, ConsoleColor.green, ConsoleColorModifier.bold)
         }
         else if PlayerPreferences.viewType == ViewType.Details {
             Console.printXY(1,3,"Song No.", g_fieldWidthSongNo+1, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
             Console.printXY(1,4," ", g_fieldWidthSongNo+1, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
             
-            Console.printXY(10,3,"Artist", g_fieldWidthArtist, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(10,4,"Album Name", g_fieldWidthArtist, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
+            let artistCols: Int = Int(floor(ncalc))
+            let titleCols: Int =  Int(ceil(ncalc))
+
+            Console.printXY(10,3,"Artist", artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(10,4,"Album Name", artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
-            Console.printXY(43,3,"Title", g_fieldWidthTitle, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(43,4,"Genre", g_fieldWidthTitle, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(10+artistCols,3,"Title", titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(10+artistCols,4,"Genre", titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
-            Console.printXY(76,3,"Time", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(76,4," ", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(10+artistCols+titleCols-2,3,"Time", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(10+artistCols+titleCols-2,4," ", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
             //let sep = String("\u{2550}")
-            Console.printXY(1,5,"=", 80, .left, "=", bgColor, ConsoleColorModifier.none, ConsoleColor.green, ConsoleColorModifier.bold)
+            Console.printXY(1,5,"=", g_cols, .left, "=", bgColor, ConsoleColorModifier.none, ConsoleColor.green, ConsoleColorModifier.bold)
         }
     }
 
@@ -135,34 +143,41 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         if PlayerPreferences.viewType == ViewType.Default {
             Console.printXY(1, y, String(song.songNo)+" ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
             
-            Console.printXY(10, y, song.artist, g_fieldWidthArtist, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-            
-            Console.printXY(43, y, song.title, g_fieldWidthTitle, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
+            let artistCols: Int = Int(floor(ncalc))
+            let titleCols: Int =  Int(ceil(ncalc))
+
+            Console.printXY(10, y, song.getArtist(), artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)            
+            Console.printXY(10+artistCols, y, song.getTitle(), titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             
             let timeString: String = itsRenderMsToFullString(time, false)
             let endTimePart: String = String(timeString[timeString.index(timeString.endIndex, offsetBy: -5)..<timeString.endIndex])
-            Console.printXY(76, y, endTimePart, g_fieldWidthDuration, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(10+artistCols+titleCols-2, y, endTimePart, g_fieldWidthDuration, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
         else if PlayerPreferences.viewType == ViewType.Details {
             Console.printXY(1, y, String(song.songNo)+" ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
             Console.printXY(1, y+1, " ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             
-            Console.printXY(10, y, song.artist, g_fieldWidthArtist, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-            Console.printXY(10, y+1, song.albumName, g_fieldWidthArtist, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
+            let artistCols: Int = Int(floor(ncalc))
+            let titleCols: Int =  Int(ceil(ncalc))
+
+            Console.printXY(10, y, song.getArtist(), artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(10, y+1, song.getAlbumName(), artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             
-            Console.printXY(43, y, song.title, g_fieldWidthTitle, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-            Console.printXY(43, y+1, song.genre, g_fieldWidthTitle, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(10+artistCols, y, song.getTitle(), titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(10+artistCols, y+1, song.getGenre(), titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             
             let timeString: String = itsRenderMsToFullString(time, false)
             let endTimePart: String = String(timeString[timeString.index(timeString.endIndex, offsetBy: -5)..<timeString.endIndex])
-            Console.printXY(76, y, endTimePart, g_fieldWidthDuration, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(10+artistCols+titleCols-2, y, endTimePart, g_fieldWidthDuration, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             
-            Console.printXY(76, y+1, " ", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(10+artistCols+titleCols-2, y+1, " ", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
     }
     
     func renderAddendumText() -> Void {
-        Console.printXY(1,22, (self.addendumText.count > 0) ? self.addendumText : " ", 80, .left, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.none)
+        Console.printXY(1,g_rows-2, (self.addendumText.count > 0) ? self.addendumText : " ", g_cols, .left, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.none)
     }
     
     ///
@@ -171,16 +186,16 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     func renderCommandLine() -> Void
     {
         var text = self.currentCommand
-        if text.count > 76 {
-            text = String(text[text.index(text.endIndex, offsetBy: -76)..<text.endIndex])
+        if text.count > (g_cols-4) {
+            text = String(text[text.index(text.endIndex, offsetBy: -1*(g_cols-4))..<text.endIndex])
         }
         
         var cursor = ""
         if self.showCursor {
             cursor = "_"
         }
-        
-        Console.printXY(1,23,">: \(text)\(cursor)", 80, .left, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+    
+        Console.printXY(1,g_rows-1,">: \(text)\(cursor)", g_cols, .left, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
     }
     
     ///
@@ -207,7 +222,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             text.append( " | Mode: off" )
         }
         
-        Console.printXY(1,24, text, 80, .center, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows, text, g_cols, .center, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
     }
     
     ///
@@ -240,11 +255,11 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             }
             else {
                 if PlayerPreferences.viewType == ViewType.Default {
-                    Console.printXY(1, idx, " ", 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(1, idx, " ", g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                 }
                 else if PlayerPreferences.viewType == ViewType.Details {
-                    Console.printXY(1, idx, " ", 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-                    Console.printXY(1, idx+1, " ", 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(1, idx, " ", g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(1, idx+1, " ", g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                 }
             }
             if PlayerPreferences.viewType == ViewType.Default {
@@ -275,7 +290,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// Runs MainWindow keyboard input and feedback. Delegation to other windows and command processing.
     ///
     func run() -> Void {
-        Console.clearScreenCurrentTheme()
+        Console.clearScreenCurrentTheme()        
         self.renderWindow()
         
         //
@@ -811,14 +826,14 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command arrary
     ///
     func onCommandClearMode(parts: [String]) -> Void {
-        //g_lock.lock()
+        g_lock.lock()
         g_searchType.removeAll()
         g_searchResult.removeAll()
         g_modeSearch.removeAll()
         g_modeSearchStats.removeAll()
-        //g_lock.unlock()
+        g_lock.unlock()
     }
-    
+
     ///
     /// Show info on given song number.
     ///
@@ -945,9 +960,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }
         self.isShowingTopWindow = true
         let wnd: InfoWindow = InfoWindow()
-        //g_lock.lock()
+        g_lock.lock()
         let song = g_playlist[0]
-        //g_lock.unlock()
+        g_lock.unlock()
         wnd.song = song
         wnd.showWindow()
         Console.clearScreenCurrentTheme()
@@ -963,7 +978,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     func onCommandReinitialize(parts: [String]) -> Void {
         g_player.pause()
                 
-        //g_lock.lock()
+        g_lock.lock()
         
         g_searchType.removeAll()
         g_genres.removeAll()
@@ -1002,7 +1017,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         self.renderWindow()
         
-        //g_lock.unlock()
+        g_lock.unlock()
         
         g_player.skip(play: PlayerPreferences.autoplayOnStartup)
     }

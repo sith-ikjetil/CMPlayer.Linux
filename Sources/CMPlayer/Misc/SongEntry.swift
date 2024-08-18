@@ -33,9 +33,9 @@ internal class SongEntry {
     var albumName: String = ""
     var fullAlbumName: String = ""
     var recordingYear: Int = 0
-    var trackNo: Int = 0
+    var trackNo: Int = 0    
     let maxStringLength: Int = 32
-    
+
     ///
     /// Overloaded initializer. Is only called from PlayerLibrary.load()
     ///
@@ -326,6 +326,66 @@ internal class SongEntry {
         if s.count > self.maxStringLength {
             s = String(s[s.startIndex..<s.index(s.startIndex, offsetBy: self.maxStringLength)])
         }
+        return s
+    }
+
+    func getArtist() -> String {
+        var s = self.trimAndSetStringDefaultValue(str: self.fullArtist)
+
+        let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
+        let artistCols: Int = Int(floor(ncalc))
+        //let titleCols: Int =  Int(ceil(ncalc))
+        let maxStringLength = artistCols - 1
+
+        if s.count > maxStringLength {
+            s = String(s[s.startIndex..<s.index(s.startIndex, offsetBy: maxStringLength)])
+        }
+
+        return s
+    }
+
+    func getAlbumName() -> String {
+        var s = self.trimAndSetStringDefaultValue(str: self.fullAlbumName)
+
+        let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
+        let artistCols: Int = Int(floor(ncalc))
+        //let titleCols: Int =  Int(ceil(ncalc))
+        let maxStringLength = artistCols - 1
+
+        if s.count > maxStringLength {
+            s = String(s[s.startIndex..<s.index(s.startIndex, offsetBy: maxStringLength)])
+        }
+        
+        return s
+    }
+
+    func getTitle() -> String {
+        var s = self.trimAndSetStringDefaultValue(str: self.fullTitle)
+
+        let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
+        //let artistCols: Int = Int(floor(ncalc))
+        let titleCols: Int =  Int(ceil(ncalc))
+        let maxStringLength = titleCols - 1
+
+        if s.count > maxStringLength {
+            s = String(s[s.startIndex..<s.index(s.startIndex, offsetBy: maxStringLength)])
+        }
+        
+        return s
+    }
+
+    func getGenre() -> String {
+        var s = self.trimAndSetStringDefaultValue(str: self.fullGenre)
+
+        let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
+        //let artistCols: Int = Int(floor(ncalc))
+        let titleCols: Int =  Int(ceil(ncalc))
+        let maxStringLength = titleCols - 1
+
+        if s.count > maxStringLength {
+            s = String(s[s.startIndex..<s.index(s.startIndex, offsetBy: maxStringLength)])
+        }
+        
         return s
     }
 }// SongEntry

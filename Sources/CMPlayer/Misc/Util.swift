@@ -705,3 +705,20 @@ func restore_stderr(_ stderr_copy: Int32) {
     dup2(stderr_copy, fileno(stderr)) // Restore stderr
     close(stderr_copy) // Close the backup
 }
+
+struct winsize {
+    var ws_row: UInt16 = 0
+    var ws_col: UInt16 = 0
+    var ws_xpixel: UInt16 = 0
+    var ws_ypixel: UInt16 = 0
+}
+
+func getTerminalSize() -> (rows: Int, cols: Int)? {
+    var w = winsize()
+    let result = ioctl(STDOUT_FILENO, UInt(TIOCGWINSZ), &w)
+    if result == 0 {
+        return (rows: Int(w.ws_row), cols: Int(w.ws_col))
+    } else {
+        return nil
+    }
+}

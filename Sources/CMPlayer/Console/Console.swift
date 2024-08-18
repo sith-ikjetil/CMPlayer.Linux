@@ -217,7 +217,12 @@ internal class Console {
     /// Initializes console.
     ///
     static func initialize() -> Void {
-        Console.setTerminalSize(width: 80, height: 24)
+        
+        var w = winsize()        
+        if ioctl(STDOUT_FILENO, UInt(TIOCGWINSZ), &w) == 0 {
+            g_rows = Int(w.ws_row)
+            g_cols = Int(w.ws_col)
+        }                
         
         Console.hideCursor()
         Console.echoOff()
