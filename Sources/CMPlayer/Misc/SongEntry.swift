@@ -365,8 +365,8 @@ internal class SongEntry {
         let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
         //let artistCols: Int = Int(floor(ncalc))
         let titleCols: Int =  Int(ceil(ncalc))
-        let maxStringLength = titleCols - 1
-
+        let maxStringLength = titleCols - 3
+        
         if s.count > maxStringLength {
             s = String(s[s.startIndex..<s.index(s.startIndex, offsetBy: maxStringLength)])
         }
@@ -380,12 +380,12 @@ internal class SongEntry {
         let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
         //let artistCols: Int = Int(floor(ncalc))
         let titleCols: Int =  Int(ceil(ncalc))
-        let maxStringLength = titleCols - 1
+        let maxStringLength = titleCols - 3
 
         if s.count > maxStringLength {
             s = String(s[s.startIndex..<s.index(s.startIndex, offsetBy: maxStringLength)])
         }
         
         return s
-    }
+    }        
 }// SongEntry
