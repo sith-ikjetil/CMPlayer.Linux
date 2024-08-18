@@ -127,17 +127,15 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
                 if isDirectory(path: nr) {                    
                     results.append(contentsOf: findSongs(path: nr))
                 }
-                else {    
-                    if nr.lowercased().hasSuffix(".mp3") {
-                        if FileManager.default.isReadableFile(atPath: nr) {
-                            for f in self.musicFormats {
-                                if r.hasSuffix(f) {
-                                    results.append(nr)                                
-                                    break
-                                }
+                else {                    
+                    if FileManager.default.isReadableFile(atPath: nr) {
+                        for f in self.musicFormats {
+                            if r.hasSuffix(f) {
+                                results.append(nr)                 
+                                break
                             }
                         }
-                    }
+                    }            
                 }
             }
         }
@@ -185,19 +183,19 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
         
         let bgColor = getThemeBgColor()
         
-        Console.printXY(1,3,":: INITIALIZE ::", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+        Console.printXY(1,3,":: INITIALIZE ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
-        Console.printXY(1, 5, "Current Path: " + self.currentPath, 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1, 5, "Current Path: " + self.currentPath, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         let pstFiles: String = "\(self.filesFoundCompleted)%"
-        Console.printXY(1, 6, "Finding Song Files: " + pstFiles, 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1, 6, "Finding Song Files: " + pstFiles, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         let pstLib: String = "\(self.libraryLoadedCompleted)%"
-        Console.printXY(1, 7, "Updating Song Library: " + pstLib, 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1, 7, "Updating Song Library: " + pstLib, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.printXY(1,23,"PLEASE BE PATIENT", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,23,"PLEASE BE PATIENT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.gotoXY(80,1)
+        Console.gotoXY(1,g_rows-3)
         print("")
     }
     

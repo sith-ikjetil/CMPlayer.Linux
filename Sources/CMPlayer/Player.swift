@@ -35,7 +35,7 @@ internal class Player {
     ///
     /// Initializes the application.
     ///
-    func initialize() -> Void {        
+    func initialize() throws -> Void {        
         PlayerDirectories.ensureDirectoriesExistence()
         PlayerPreferences.ensureLoadPreferences()        
         
@@ -57,11 +57,11 @@ internal class Player {
         g_library.save()
         
         if PlayerPreferences.autoplayOnStartup && g_playlist.count > 0 {
-            self.play(player: 1, playlistIndex: 0)
+            self.play(player: 1, playlistIndex: 0)            
         }
         
         Console.clearScreenCurrentTheme()           
-    }
+    }    
     
     ///
     /// Plays audio.
@@ -294,7 +294,7 @@ internal class Player {
     ///
     /// returnes: Int32. Exit code.
     ///
-    func run() -> Int32 {
+    func run() throws -> Int32 {
         g_mainWindow = MainWindow()        
         g_mainWindow?.showWindow()
         PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Exited Normally.")

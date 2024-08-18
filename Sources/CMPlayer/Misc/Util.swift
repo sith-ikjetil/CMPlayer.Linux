@@ -187,7 +187,7 @@ internal extension String {
     func convertStringToLengthPaddedString(_ maxLength: Int,_ padding: PrintPaddingTextAlign,_ paddingChar: Character) -> String {
         var msg: String = self
         
-        if msg.count == 0 && maxLength <= 0 {
+        if msg.count == 0 || maxLength <= 0 {
             return msg
         }
         
@@ -199,7 +199,7 @@ internal extension String {
             return result
         }
         
-        if msg.count > maxLength {
+        if msg.count > maxLength {                      
             let idx = msg.index(msg.startIndex, offsetBy: maxLength)
             msg = String(msg[msg.startIndex..<idx])
         }

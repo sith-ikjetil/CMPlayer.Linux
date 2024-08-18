@@ -70,17 +70,25 @@ guard stderr_old != -1 else {
     print("Failed to redirect stderr to /dev/null")
     exit(1)
 }
-// set log system
-PlayerLog.ApplicationLog = PlayerLog(autoSave: true, loadOldLog: false)
 
-// initialize CMPlayer.Linux
-g_player.initialize()        
+do {
+    // set log system
+    PlayerLog.ApplicationLog = PlayerLog(autoSave: true, loadOldLog: false)
 
-// run the program and save exit code
-let exitCode = g_player.run()
+    // initialize CMPlayer.Linux
+    try g_player.initialize()    
 
-// restore stderr
-restore_stderr(stderr_old)    
+    // run the program and save exit code
+    let exitCode = try g_player.run()
 
-// exit with exit code
-exit(exitCode)
+    // restore stderr
+    restore_stderr(stderr_old)    
+
+    // exit with exit code
+    exit(exitCode)
+} catch {        
+    let wnd = ErrorWindow()
+    wnd.message = "Unknown error occurred.\nMessage: \(error)"
+    wnd.showWindow()
+    exit(1)
+}
