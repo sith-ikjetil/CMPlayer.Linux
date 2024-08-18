@@ -534,7 +534,7 @@ internal func getModeStatus() -> (isInMode: Bool, modeName: [String], numberOfSo
 
 internal func isSearchTypeInMode(_ type: SearchType) -> Bool {
     for t in g_searchType {
-        if t == type {
+        if t == type {            
             return true
         }
     }

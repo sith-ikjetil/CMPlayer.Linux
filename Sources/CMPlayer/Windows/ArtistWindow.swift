@@ -75,17 +75,17 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         
         let bgColor = getThemeBgColor()
         Console.printXY(1,3,":: ARTIST ::", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        Console.printXY(1,4,"mode artist is: \((isSearchTypeInMode(SearchType.Artist)) ? "off" : "on")", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,4,"mode artist is: \((isSearchTypeInMode(SearchType.Artist)) ? "on" : "off")", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         var index_screen_lines: Int = 5
-        var index_search: Int = artistIndex
-        let max = artistIndex + 21
+        var index_search: Int = self.artistIndex
+        let max = self.artistText.count
         while index_search < max {
-            if index_screen_lines == 22 {
+            if index_screen_lines == (g_rows-3) {
                 break
             }
             
-            if index_search > artistText.count - 1 {
+            if index_search >= artistText.count {
                 break
             }
             
@@ -102,9 +102,9 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             index_search += 1
         }
         
-        Console.printXY(1,23,"PRESS ANY KEY TO EXIT", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.printXY(1,24,"\(g_artists.count.itsToString()) Artists", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows,"\(g_artists.count.itsToString()) Artists", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         Console.gotoXY(80,1)
         print("")
@@ -120,7 +120,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if (self.artistIndex + 17) < self.artistText.count {
+            if (self.artistIndex + (g_rows-7)) < self.artistText.count {
                 self.artistIndex += 1
                 self.renderWindow()
             }
@@ -134,9 +134,9 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
-            if self.artistIndex > 0 && self.artistText.count > g_windowContentLineCount {
-                if self.artistIndex - g_windowContentLineCount > 0 {
-                    self.artistIndex -= g_windowContentLineCount
+            if self.artistIndex > 0 && self.artistText.count > (g_rows-7) {
+                if self.artistIndex - (g_rows-7) > 0 {
+                    self.artistIndex -= (g_rows-7)
                 }
                 else {
                     self.artistIndex = 0
@@ -146,12 +146,12 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
-            if self.artistIndex >= 0 && self.artistText.count > g_windowContentLineCount {
-                if self.artistIndex + g_windowContentLineCount < self.artistText.count - g_windowContentLineCount {
-                    self.artistIndex += g_windowContentLineCount
+            if self.artistIndex >= 0 && self.artistText.count > (g_rows-7) {
+                if self.artistIndex + (g_rows-7) < self.artistText.count - (g_rows-7) {
+                    self.artistIndex += (g_rows-7)
                 }
                 else {
-                    self.artistIndex = self.artistText.count - g_windowContentLineCount
+                    self.artistIndex = self.artistText.count - (g_rows-7)
                 }
                 self.renderWindow()
             }

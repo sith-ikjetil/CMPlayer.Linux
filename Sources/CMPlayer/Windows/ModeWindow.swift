@@ -88,15 +88,15 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         let bgColor = getThemeBgColor()
         let songNoColor = ConsoleColor.cyan
         
-        Console.printXY(1,3,":: MODE ::", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        Console.printXY(1,4,"mode is: \((!self.inMode) ? "off" : "on")", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,3,":: MODE ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+        Console.printXY(1,4,"mode is: \((g_searchType.count > 0) ? "on" : "off")", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         if PlayerPreferences.viewType == ViewType.Default {
             var index_screen_lines: Int = 5
-            var index_search: Int = searchIndex
-            let max = searchIndex + 21
+            var index_search: Int = self.searchIndex
+            let max = self.modeText.count + self.searchResult.count
             while index_search < max {
-                if index_screen_lines == 22 {
+                if index_screen_lines >= (g_rows-3) {
                     break
                 }
                 
@@ -132,13 +132,13 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         else if PlayerPreferences.viewType == ViewType.Details {
             var index_screen_lines: Int = 5
             var index_search: Int = searchIndex
-            let max = searchIndex + g_windowContentLineCount
+            let max = self.modeText.count+self.searchResult.count
             while index_search < max {
-                if index_screen_lines >= 22 {
+                if index_screen_lines >= (g_rows-3) {
                     break
                 }
                 
-                if index_search > ((self.modeText.count + self.searchResult.count) - 1) {
+                if index_search >= (self.modeText.count + self.searchResult.count) {
                     break
                 }
                 
@@ -146,10 +146,10 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     let mt = self.modeText[index_search]
                     
                     if mt.hasPrefix(" ::") {
-                        Console.printXY(1, index_screen_lines, mt, 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                        Console.printXY(1, index_screen_lines, mt, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                     }
                     else {
-                        Console.printXY(1, index_screen_lines, mt, 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+                        Console.printXY(1, index_screen_lines, mt, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
                     }
                     
                     index_screen_lines += 1
@@ -157,7 +157,7 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 }
                 else {
                     let song = self.searchResult[index_search-self.modeText.count]
-                
+                    
                     Console.printXY(1, index_screen_lines, String(song.songNo)+" ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
                     Console.printXY(1, index_screen_lines+1, " ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                     
@@ -179,8 +179,8 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             }
         }
         
-        Console.printXY(1,23,"PRESS ANY KEY TO EXIT", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-        Console.printXY(1,24,"\(g_searchResult.count.itsToString()) Songs", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows,"\(g_searchResult.count.itsToString()) Songs", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         Console.gotoXY(80,1)
         print("")
@@ -215,110 +215,46 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     func run() -> Void {
         Console.clearScreenCurrentTheme()
-        self.searchIndex = 0
-        //self.modeIndex = 0
+        self.searchIndex = 0        
+        self.renderWindow()
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if PlayerPreferences.viewType == ViewType.Details {
-                if self.searchIndex < ((self.modeText.count + self.searchResult.count) - self.getSongsLineCount() - 1) {
-                    self.searchIndex += 1
-                    self.renderWindow()
-                }
-            }
-            else if PlayerPreferences.viewType == ViewType.Default {
-                if self.searchIndex < ((self.modeText.count + self.searchResult.count) - g_windowContentLineCount) {
-                    self.searchIndex += 1
-                    self.renderWindow()
-                }
+            if (self.searchIndex + (g_rows-7)) < (self.modeText.count+self.searchResult.count) {
+                self.searchIndex += 1
+                self.renderWindow()
             }
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
-            if self.searchIndex >= 1 {
+            if self.searchIndex > 0 {
                 self.searchIndex -= 1
                 self.renderWindow()
             }
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
-            if PlayerPreferences.viewType == ViewType.Details {
-                var n: Int = (self.modeText.count - 1) - self.searchIndex
-                if n < 0 {
-                    n = 0
-                }
-                else if n > g_windowContentLineCount {
-                    n = g_windowContentLineCount
-                }
-                let m: Int = n + (g_windowContentLineCount - n)/self.getSongsContentLineCount()
-                
-                if (self.searchIndex - m) >= 0 {
-                    self.searchIndex -= m
-                    self.renderWindow()
+            if self.searchIndex > 0 && (self.modeText.count+self.searchResult.count) > (g_rows-7) {
+                if self.searchIndex - (g_rows-7) > 0 {
+                    self.searchIndex -= (g_rows-7)
                 }
                 else {
                     self.searchIndex = 0
-                    self.renderWindow()
                 }
-            }
-            else if PlayerPreferences.viewType == ViewType.Default {
-                var n: Int = (self.modeText.count - 1) - self.searchIndex
-                if n < 0 {
-                    n = 0
-                }
-                else if n > g_windowContentLineCount {
-                    n = g_windowContentLineCount
-                }
-                let m: Int = n + (g_windowContentLineCount - n)/self.getSongsContentLineCount()
-                
-                if (self.searchIndex - m) >= 0 {
-                    self.searchIndex -= m
-                    self.renderWindow()
-                }
-                else {
-                    self.searchIndex = 0
-                    self.renderWindow()
-                }
+                self.renderWindow()
             }
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
-            if PlayerPreferences.viewType == ViewType.Details {
-                var n: Int = self.modeText.count - self.searchIndex
-                if n < 0 {
-                    n = 0
-                }
-                else if n > g_windowContentLineCount {
-                    n = g_windowContentLineCount
-                }
-                let m: Int = n + (g_windowContentLineCount - n)/self.getSongsContentLineCount()
-                
-                if (self.searchIndex + m) >= ((self.modeText.count+self.searchResult.count) - self.getSongsLineCount() - 1) {
-                    self.searchIndex = (self.modeText.count+self.searchResult.count) - self.getSongsLineCount() - 1
-                    if self.searchIndex < 0 {
-                        self.searchIndex = 0
-                    }
-                    self.renderWindow()
+            if self.searchIndex >= 0 && (self.modeText.count+self.searchResult.count) > (g_rows-7) {
+                if (self.searchIndex + (g_rows-7)) < ((self.modeText.count+self.searchResult.count) - (g_rows-7)) {
+                    self.searchIndex += (g_rows-7)
                 }
                 else {
-                    self.searchIndex += m + ((n==0) ? 1 : 0)
-                    self.renderWindow()
+                    self.searchIndex = (self.modeText.count+self.searchResult.count) - (g_rows-7)
                 }
+                self.renderWindow()
             }
-            else if PlayerPreferences.viewType == ViewType.Default {
-                if (self.searchIndex + g_windowContentLineCount) >= ((self.modeText.count+self.searchResult.count) - g_windowContentLineCount) {
-                    self.searchIndex = (self.modeText.count+self.searchResult.count) - g_windowContentLineCount
-                    if self.searchIndex < 0 {
-                        self.searchIndex = 0
-                    }
-                    self.renderWindow()
-                }
-                else {
-                    self.searchIndex += g_windowContentLineCount
-                    self.renderWindow()
-                }
-            }
-        
             return false
         })
         keyHandler.addUnknownKeyHandler(closure: { (key: UInt32) -> Bool in

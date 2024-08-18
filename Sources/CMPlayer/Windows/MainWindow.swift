@@ -825,7 +825,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     /// parameter parts: command arrary
     ///
-    func onCommandClearMode(parts: [String]) -> Void {
+    func onCommandClearMode(parts: [String]) -> Void {        
         g_lock.lock()
         g_searchType.removeAll()
         g_searchResult.removeAll()

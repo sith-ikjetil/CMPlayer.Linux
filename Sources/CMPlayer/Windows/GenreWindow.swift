@@ -74,17 +74,17 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         
         let bgColor = getThemeBgColor()
         Console.printXY(1,3,":: GENRE ::", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        Console.printXY(1,4,"mode genre is: \((isSearchTypeInMode(SearchType.Genre)) ? "off" : "on")", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,4,"mode genre is: \((isSearchTypeInMode(SearchType.Genre)) ? "on" : "off")", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         var index_screen_lines: Int = 5
-        var index_search: Int = genreIndex
-        let max = genreIndex + 21
+        var index_search: Int = self.genreIndex
+        let max = self.genreText.count
         while index_search < max {
-            if index_screen_lines == 22 {
+            if index_screen_lines == (g_rows-3) {
                 break
             }
             
-            if index_search > genreText.count - 1 {
+            if index_search >= genreText.count {
                 break
             }
             
@@ -101,9 +101,9 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             index_search += 1
         }
         
-        Console.printXY(1,23,"PRESS ANY KEY TO EXIT", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.printXY(1,24,"\(g_genres.count.itsToString()) Genres", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows,"\(g_genres.count.itsToString()) Genres", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         Console.gotoXY(80,1)
         print("")
@@ -119,7 +119,7 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if (self.genreIndex + 17) < self.genreText.count {
+            if (self.genreIndex + (g_rows-7)) < self.genreText.count {
                 self.genreIndex += 1
                 self.renderWindow()
             }
@@ -133,9 +133,9 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
-            if self.genreIndex > 0 && self.genreText.count > g_windowContentLineCount {
-                if self.genreIndex - g_windowContentLineCount > 0 {
-                    self.genreIndex -= g_windowContentLineCount
+            if self.genreIndex > 0 && self.genreText.count > (g_rows-7) {
+                if self.genreIndex - (g_rows-7) > 0 {
+                    self.genreIndex -= (g_rows-7)
                 }
                 else {
                     self.genreIndex = 0
@@ -145,12 +145,12 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
-            if self.genreIndex >= 0 && self.genreText.count > g_windowContentLineCount {
-                if self.genreIndex + g_windowContentLineCount < self.genreText.count - g_windowContentLineCount {
-                    self.genreIndex += g_windowContentLineCount
+            if self.genreIndex >= 0 && self.genreText.count > (g_rows-7) {
+                if self.genreIndex + (g_rows-7) < self.genreText.count - (g_rows-7) {
+                    self.genreIndex += (g_rows-7)
                 }
                 else {
-                    self.genreIndex = self.genreText.count - g_windowContentLineCount
+                    self.genreIndex = self.genreText.count - (g_rows-7)
                 }
                 self.renderWindow()
             }

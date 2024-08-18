@@ -73,18 +73,18 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         MainWindow.renderHeader(showTime: false)
         
         let bgColor = getThemeBgColor()
-        Console.printXY(1,3,":: RECORDING YEAR ::", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        Console.printXY(1,4,"mode year is: \((isSearchTypeInMode(SearchType.RecordedYear)) ? "off" : "on")", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,3,":: RECORDING YEAR ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+        Console.printXY(1,4,"mode year is: \((isSearchTypeInMode(SearchType.RecordedYear)) ? "on" : "off")", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         var index_screen_lines: Int = 5
         var index_search: Int = yearIndex
-        let max = yearIndex + 21
+        let max = self.yearText.count
         while index_search < max {
-            if index_screen_lines == 22 {
+            if index_screen_lines == (g_rows-3) {
                 break
             }
             
-            if index_search > yearText.count - 1 {
+            if index_search >= yearText.count {
                 break
             }
             
@@ -101,9 +101,9 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             index_search += 1
         }
         
-        Console.printXY(1,23,"PRESS ANY KEY TO EXIT", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.printXY(1,24,"\(g_recordingYears.count.itsToString()) Recorded Years", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows,"\(g_recordingYears.count.itsToString()) Recorded Years", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         Console.gotoXY(80,1)
         print("")
@@ -119,7 +119,7 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if (self.yearIndex + 17) < self.yearText.count {
+            if (self.yearIndex + (g_rows-7)) < self.yearText.count {
                 self.yearIndex += 1
                 self.renderWindow()
             }
@@ -133,9 +133,9 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
-            if self.yearIndex > 0 && self.yearText.count > g_windowContentLineCount {
-                if self.yearIndex - g_windowContentLineCount > 0 {
-                    self.yearIndex -= g_windowContentLineCount
+            if self.yearIndex > 0 && self.yearText.count > (g_rows-7) {
+                if self.yearIndex - (g_rows-7) > 0 {
+                    self.yearIndex -= (g_rows-7)
                 }
                 else {
                     self.yearIndex = 0
@@ -145,12 +145,12 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
-            if self.yearIndex >= 0 && self.yearText.count > g_windowContentLineCount {
-                if self.yearIndex + g_windowContentLineCount < self.yearText.count - g_windowContentLineCount {
-                    self.yearIndex += g_windowContentLineCount
+            if self.yearIndex >= 0 && self.yearText.count > (g_rows-7) {
+                if self.yearIndex + (g_rows-7) < self.yearText.count - (g_rows-7) {
+                    self.yearIndex += (g_rows-7)
                 }
                 else {
-                    self.yearIndex = self.yearText.count - g_windowContentLineCount
+                    self.yearIndex = self.yearText.count - (g_rows-7)
                 }
                 self.renderWindow()
             }

@@ -61,34 +61,32 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             return
         }
         
-        MainWindow.renderHeader(showTime: false)
-        
+        MainWindow.renderHeader(showTime: false)        
         
         let bgColor = getThemeBgColor()
-        Console.printXY(1,3,":: ABOUT ::", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        
+        Console.printXY(1,3,":: ABOUT ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)        
         
         var index_screen_lines: Int = 5
         var index_search: Int = self.aboutIndex
-        let max = self.aboutIndex + 21
+        let max = self.aboutText.count
         while index_search < max {
-            if index_screen_lines == 22 {
+            if index_screen_lines > (g_rows - 3) {
                 break
             }
     
-            if index_search > self.aboutText.count - 1 {
+            if index_search >= self.aboutText.count {
                 break
-            }
+            }            
     
             let se = self.aboutText[index_search]
     
-            Console.printXY(1, index_screen_lines, se, 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(1, index_screen_lines, se, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
     
             index_screen_lines += 1
             index_search += 1
         }
         
-        Console.printXY(1,23,"PRESS ANY KEY TO EXIT", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         Console.gotoXY(80,1)
         print("")
@@ -104,7 +102,7 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if (self.aboutIndex + 17) < self.aboutText.count {
+            if (self.aboutIndex + (g_rows-7)) < self.aboutText.count {
                 self.aboutIndex += 1
                 self.renderWindow()
             }
@@ -118,9 +116,9 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
-            if self.aboutIndex > 0 && self.aboutText.count > g_windowContentLineCount {
-                if self.aboutIndex - g_windowContentLineCount > 0 {
-                    self.aboutIndex -= g_windowContentLineCount
+            if self.aboutIndex > 0 && self.aboutText.count > (g_rows-7) {
+                if self.aboutIndex - (g_rows-7) > 0 {
+                    self.aboutIndex -= (g_rows-7)
                 }
                 else {
                     self.aboutIndex = 0
@@ -130,12 +128,12 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
-            if self.aboutIndex >= 0 && self.aboutText.count > g_windowContentLineCount {
-                if self.aboutIndex + g_windowContentLineCount < self.aboutText.count - g_windowContentLineCount {
-                    self.aboutIndex += g_windowContentLineCount
+            if self.aboutIndex >= 0 && self.aboutText.count > (g_rows-7) {
+                if self.aboutIndex + (g_rows-7) < self.aboutText.count - (g_rows-7) {
+                    self.aboutIndex += (g_rows-7)
                 }
                 else {
-                    self.aboutIndex = self.aboutText.count - g_windowContentLineCount
+                    self.aboutIndex = self.aboutText.count - (g_rows-7)
                 }
                 self.renderWindow()
             }
