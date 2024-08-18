@@ -134,7 +134,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if (self.helpIndex+(g_rows-7)) < self.helpText.count {
+            if (self.helpIndex+(g_rows-7)) <= self.helpText.count {
                 self.helpIndex += 1
                 self.renderWindow()                
             }
@@ -165,7 +165,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     self.helpIndex += (g_rows-7)
                 }
                 else {
-                    self.helpIndex = self.helpText.count - (g_rows-7)
+                    self.helpIndex = self.helpText.count - (g_rows-7) + 1
                     if self.helpIndex < 0 {
                         self.helpIndex = 0
                     }

@@ -468,7 +468,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in            
             if (self.searchIndex + (g_rows-7)) >= self.searchResult.count {
-                self.searchIndex = (self.searchResult.count - (g_rows-7))
+                self.searchIndex = (self.searchResult.count - (g_rows-7)) + 1
                 if self.searchIndex < 0 {
                     self.searchIndex = 0
                 }
