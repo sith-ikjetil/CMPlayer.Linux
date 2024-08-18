@@ -195,14 +195,58 @@ internal class SongEntry {
             //print("mpg123_metacheck")
             let metaCheck = mpg123_meta_check(handle)
             if metaCheck & MPG123_ID3 != 0 {
-                var id3v1: UnsafeMutablePointer<mpg123_id3v1>? = nil
-                var id3v2: UnsafeMutablePointer<mpg123_id3v2>? = nil                                
-                if mpg123_id3(handle, &id3v1, &id3v2) == 0 {                    
-                    var bMetadataFound: Bool = false
-                    
-                    if let id3v1 = id3v1?.pointee {
-                        //print("id3v1")
-                        // ID3v1 Metadata
+                let id3v1Pointer: UnsafeMutablePointer<UnsafeMutablePointer<mpg123_id3v1>?>? = UnsafeMutablePointer.allocate(capacity: 1)
+                id3v1Pointer?.initialize(to: nil)
+                
+                let id3v2Pointer: UnsafeMutablePointer<UnsafeMutablePointer<mpg123_id3v2>?>? = UnsafeMutablePointer.allocate(capacity: 1)
+                id3v2Pointer?.initialize(to: nil)
+                
+                defer {
+                    id3v1Pointer?.deallocate()
+                    id3v2Pointer?.deallocate()
+                }
+
+                // Call the mpg123_id3 function to fill in the pointers
+                if mpg123_id3(handle, id3v1Pointer, id3v2Pointer) == 0 {                    
+                    if let id3v2 = id3v2Pointer?.pointee?.pointee {
+                        // Access ID3v2 metadata fields safely
+                        if id3v2.title?.pointee.p != nil {
+                            let title = String(cString: id3v2.title.pointee.p)
+                            self.title = title
+                        }
+                        
+                        if id3v2.artist?.pointee.p != nil {
+                            let artist = String(cString: id3v2.artist.pointee.p)
+                            self.artist = artist
+                        }
+                        
+                        if id3v2.album?.pointee.p != nil {
+                            let album = String(cString: id3v2.album.pointee.p)
+                            self.albumName = album
+                        }
+
+                        if id3v2.year?.pointee.p != nil {
+                            let year = String(cString: id3v2.year.pointee.p)
+                            self.recordingYear = Int(year) ?? -1
+                        }
+
+                        if id3v2.genre?.pointee.p != nil {
+                            let genre = String(cString: id3v2.genre.pointee.p)
+                            self.genre = genre
+                        }                                                
+
+                        // Loop through the text fields to find the track number
+                        for i in 0..<id3v2.texts {                            
+                            let textItem = id3v2.text[i]
+                            let text = String(cString: textItem.text.p)
+                            let id = "\(Character(UnicodeScalar(UInt32(textItem.id.0))!))\(Character(UnicodeScalar(UInt32(textItem.id.1))!))\(Character(UnicodeScalar(UInt32(textItem.id.2))!))\(Character(UnicodeScalar(UInt32(textItem.id.3))!))"
+                            if id == "TRCK" {
+                                self.trackNo = Int(text) ?? -1
+                            }
+                        }                                                
+                    } 
+                    else if let id3v1 = id3v1Pointer?.pointee?.pointee {
+                        // ID3v1 fallback                        
                         let title = String(cString: withUnsafePointer(to: id3v1.title) {
                             UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
                         })
@@ -224,65 +268,16 @@ internal class SongEntry {
                         self.artist = artist
                         self.albumName = album
                         self.recordingYear = Int(year) ?? -1
-                        self.genre = convertId3V1GenreIndexToName(index: genre)
-
-                        bMetadataFound = true
-                    }
-
-                    if let id3v2 = id3v2?.pointee {                       
-                        // ID3v2 Metadata
-                        if let titlePtr = id3v2.title {
-                            let title = String(cString: titlePtr.pointee.p)
-                            self.title = title
-                            bMetadataFound = true
-                        }
-                        if let artistPtr = id3v2.artist {
-                            let artist = String(cString: artistPtr.pointee.p)
-                            self.artist = artist
-                            bMetadataFound = true
-                        }
-                        if let albumPtr = id3v2.album {
-                            let album = String(cString: albumPtr.pointee.p)
-                            self.albumName = album
-                            bMetadataFound = true
-                        }
-                        if let yearPtr = id3v2.year {
-                            let year = String(cString: yearPtr.pointee.p)
-                            self.recordingYear = Int(year) ?? -1
-                            bMetadataFound = true
-                        }
-                        // Loop through the text fields to find the track number
-                        for i in 0..<id3v2.texts {
-                            let text = id3v2.text[i]
-                            if let description = text.description.p {
-                                let descString = String(cString: description)
-                                // The "TRCK" frame contains the track number in ID3v2                                
-                                if descString == "TRCK" {
-                                    if let trackText = text.text.p {
-                                        let trackNumber = String(cString: trackText)
-                                        self.trackNo = Int(trackNumber) ?? -1                                        
-                                        bMetadataFound = true
-                                        break    
-                                    }                                    
-                                }
-                            }
-                        }
-                        
-                        //if let commentPtr = id3v2.comment {
-                        //    let comment = String(cString: commentPtr.pointee.p)
-                            //print("Comment: \(comment)")
-                        //}
-                        if !bMetadataFound, let genrePtr = id3v2.genre {
-                            let genre = String(cString: genrePtr.pointee.p)
-                            self.genre = genre
-                        }
-                    }
-                    
-                    if !bMetadataFound {
+                        self.genre = convertId3V1GenreIndexToName(index: genre)                        
+                    } 
+                    else {
                         throw SongEntryError.MetadataNotFound
                     }
-                }// mpg123_id3
-            }// mpg123_meta_check                        
+                } 
+                else {
+                    throw SongEntryError.MpgSoundLibrary
+                }                
+            }// mpg123_meta_check                                    
         }// is .mp3
         else {
             throw SongEntryError.InvalidSongEntryType
