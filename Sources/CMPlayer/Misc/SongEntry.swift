@@ -251,6 +251,23 @@ internal class SongEntry {
                             self.recordingYear = Int(year) ?? -1
                             bMetadataFound = true
                         }
+                        // Loop through the text fields to find the track number
+                        for i in 0..<id3v2.texts {
+                            let text = id3v2.text[i]
+                            if let description = text.description.p {
+                                let descString = String(cString: description)
+                                // The "TRCK" frame contains the track number in ID3v2                                
+                                if descString == "TRCK" {
+                                    if let trackText = text.text.p {
+                                        let trackNumber = String(cString: trackText)
+                                        self.trackNo = Int(trackNumber) ?? -1                                        
+                                        bMetadataFound = true
+                                        break    
+                                    }                                    
+                                }
+                            }
+                        }
+                        
                         //if let commentPtr = id3v2.comment {
                         //    let comment = String(cString: commentPtr.pointee.p)
                             //print("Comment: \(comment)")
