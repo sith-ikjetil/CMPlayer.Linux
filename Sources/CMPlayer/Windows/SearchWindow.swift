@@ -313,6 +313,10 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
     /// Renders screen output. Does clear screen first.
     ///
     func renderWindow() -> Void {
+        if g_rows < 24 || g_cols < 80 {
+            return
+        }
+        
         Console.clearScreenCurrentTheme()                
 
         MainWindow.renderHeader(showTime: false)

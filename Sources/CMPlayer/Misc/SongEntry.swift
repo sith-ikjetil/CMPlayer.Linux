@@ -233,6 +233,13 @@ internal class SongEntry {
                         if id3v2.genre?.pointee.p != nil {
                             let genre = String(cString: id3v2.genre.pointee.p)
                             self.genre = genre
+                            if genre.count > 2 && genre.first == Character("(") && genre.last == Character(")")  {
+                                let snum = genre.trimmingCharacters(in: CharacterSet(charactersIn: "()"))
+                                let num = UInt8(snum)
+                                if num != nil {
+                                    self.genre = convertId3V1GenreIndexToName(index: num!)  
+                                }                                
+                            }
                         }                                                
 
                         // Loop through the text fields to find the track number

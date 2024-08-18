@@ -276,13 +276,17 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// Renders screen output. Does not clear screen first.
     ///
     func renderWindow() -> Void {
+        if g_rows < 24 || g_cols < 80 {
+            return
+        }
+
         renderFrame()
         renderSongs()
         renderAddendumText()
         renderCommandLine()
         renderStatusLine()
         
-        Console.gotoXY(80,1)
+        Console.gotoXY(1, g_rows-3)
         print("")
     }
     

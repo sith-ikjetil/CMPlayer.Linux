@@ -73,8 +73,8 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         MainWindow.renderHeader(showTime: false)
         
         let bgColor = getThemeBgColor()
-        Console.printXY(1,3,":: GENRE ::", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        Console.printXY(1,4,"mode genre is: \((isSearchTypeInMode(SearchType.Genre)) ? "on" : "off")", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,3,":: GENRE ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+        Console.printXY(1,4,"mode genre is: \((isSearchTypeInMode(SearchType.Genre)) ? "on" : "off")", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         var index_screen_lines: Int = 5
         var index_search: Int = self.genreIndex

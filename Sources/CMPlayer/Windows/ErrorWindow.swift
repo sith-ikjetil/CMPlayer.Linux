@@ -52,7 +52,11 @@ internal class ErrorWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
     ///
     /// parameter message: The message to show in error.
     ///
-    func renderWindow() -> Void {        
+    func renderWindow() -> Void {   
+        if g_rows < 24 || g_cols < 80 {
+            return
+        }
+             
         Console.printXY(1, 1, "CMPlayer Error", g_cols, .center, " ", ConsoleColor.blue, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         Console.printXY(1, 3, self.message, g_cols*15, .ignore, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.red, ConsoleColorModifier.bold)
         print("")
