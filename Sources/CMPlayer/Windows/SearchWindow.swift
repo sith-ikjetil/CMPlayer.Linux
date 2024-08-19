@@ -445,11 +445,19 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         self.renderWindow()
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
-        keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in            
-            if (self.searchIndex+(g_rows-7)) <= self.searchResult.count {
-                self.searchIndex += 1
-                self.renderWindow()
-            }        
+        keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in 
+            if PlayerPreferences.viewType == ViewType.Default {                       
+                if (self.searchIndex+(g_rows-7)) < self.searchResult.count {
+                    self.searchIndex += 1
+                    self.renderWindow()
+                }
+            }
+            else if PlayerPreferences.viewType == ViewType.Details {
+                if (self.searchIndex+((g_rows-7)/2)) < self.searchResult.count {
+                    self.searchIndex += 1
+                    self.renderWindow()
+                }                
+            }
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
@@ -459,30 +467,54 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             }
             return false
         })
-        keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in            
-            if self.searchIndex >= (g_rows-7) {
-                self.searchIndex -= ((g_rows-7)/2)
+        keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in  
+            if PlayerPreferences.viewType == ViewType.Default {
+                if self.searchIndex >= (g_rows-7-1) {
+                    self.searchIndex -= (g_rows-7) - 1                   
+                }
+                else {
+                    self.searchIndex = 0                    
+                }   
+                self.renderWindow()     
+            }
+            else if PlayerPreferences.viewType == ViewType.Details {          
+                if self.searchIndex >= ((g_rows-7)/2) {
+                    self.searchIndex -= ((g_rows-7)/2)                    
+                }
+                else {
+                    self.searchIndex = 0                    
+                }        
                 self.renderWindow()
             }
-            else {
-                self.searchIndex = 0
-                self.renderWindow()
-            }        
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in            
-            if (self.searchIndex + (g_rows-7)) >= self.searchResult.count {
-                self.searchIndex = (self.searchResult.count - ((g_rows-7)/2))
-                if self.searchIndex < 0 {
-                    self.searchIndex = 0
+            if PlayerPreferences.viewType == ViewType.Default {
+                if (self.searchIndex + (g_rows-7)) >= self.searchResult.count {
+                    self.searchIndex = (self.searchResult.count - (g_rows-7)) + 1
+                    if self.searchIndex < 0 {
+                        self.searchIndex = 0
+                    }
+                    self.renderWindow()
                 }
-                self.renderWindow()
+                else {
+                    self.searchIndex += (g_rows-7) - 1
+                    self.renderWindow()
+                }
             }
-            else {
-                self.searchIndex += ((g_rows-7)/2)
-                self.renderWindow()
+            else if PlayerPreferences.viewType == ViewType.Details {
+                if (self.searchIndex + ((g_rows-7)/2)) >= self.searchResult.count {
+                    self.searchIndex = (self.searchResult.count - ((g_rows-7)/2))
+                    if self.searchIndex < 0 {
+                        self.searchIndex = 0
+                    }
+                    self.renderWindow()
+                }
+                else {
+                    self.searchIndex += ((g_rows-7)/2)
+                    self.renderWindow()
+                }
             }
-        
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_SPACEBAR.rawValue, closure: { () -> Bool in
