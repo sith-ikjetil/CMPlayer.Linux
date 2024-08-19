@@ -12,6 +12,20 @@
 import Foundation
 
 ///
+///
+///
+internal class CmpMetadata {
+    var songNo: Int = 0
+    var artist: String = ""    
+    var title: String = ""    
+    var duration: UInt64 = 0    
+    var genre: String = ""    
+    var albumName: String = ""    
+    var recordingYear: Int = 0
+    var trackNo: Int = 0        
+}
+
+///
 /// Enum exit codes
 ///
 internal enum ExitCodes: Int32 {
@@ -44,13 +58,15 @@ internal enum SongEntryError : Error {
     case MetadataNotFound
 }
 
-///
-/// AudioPlayer error when playing
-///
+//
+// MediaPlayer error
+//
 internal enum AudioPlayerError : Error {
     case AlreadyPlaying
     case MpgSoundLibrary
     case AoSoundLibrary
+    case MetadataNotFound
+    case UnknownFileType
 }
 
 ///
