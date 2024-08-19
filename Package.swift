@@ -42,5 +42,19 @@ import PackageDescription
                     .linkedLibrary("ao"),                    
                 ]
             ),
+            .target(
+                name: "Cffmpeg",
+                dependencies: [],
+                cSettings: [
+                    .headerSearchPath("include"),                    
+                    .define("MY_AO_LIBRARY", to: "1")
+                ],
+                linkerSettings: [
+                    .linkedLibrary("avcodec"),
+                    .linkedLibrary("avformat"),
+                    .linkedLibrary("avutil"),
+                    .linkedLibrary("swresample"),
+                ]
+            ),
         ]        
     )
