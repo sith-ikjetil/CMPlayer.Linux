@@ -1,5 +1,5 @@
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-#include <libswresample/swresample.h>
-#include <libavutil/opt.h>
-#include <libavutil/dict.h>
+#include "include/libavformat/avformat.h"
+#include "include/libavcodec/avcodec.h"
+#include "include/libswresample/swresample.h"
+#include "include/libavutil/opt.h"
+#include "include/libavutil/dict.h"

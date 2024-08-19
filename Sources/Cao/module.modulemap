@@ -1,0 +1,5 @@
+module Cao [system] {
+    header "include/mpg123.h"
+    link "libmpg123"
+    export *
+}

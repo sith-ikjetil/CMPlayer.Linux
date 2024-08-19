@@ -17,7 +17,8 @@ import PackageDescription
                 dependencies: [    
                     "Termios",                
                     "Cmpg123",
-                    "Cao"
+                    "Cao",
+                    "Cffmpeg",
                 ]
             ),
             .target(

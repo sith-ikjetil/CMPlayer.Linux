@@ -19,8 +19,8 @@ internal class Player {
     //
     // Internal properties/constants.
     //
-    var audio1: Mp3AudioPlayer? = nil
-    var audio2: Mp3AudioPlayer? = nil
+    var audio1: CmpAudioPlayer? = nil
+    var audio2: CmpAudioPlayer? = nil
     var audioPlayerActive: Int = -1
     var durationAudioPlayer1: UInt64 = 0
     var durationAudioPlayer2: UInt64 = 0
@@ -80,9 +80,9 @@ internal class Player {
         if player == -1 || player == 1 {
             if self.audio1 == nil {
                 do {                    
-                    self.audio1 = Mp3AudioPlayer(path:g_playlist[playlistIndex].fileURL!)                    
+                    self.audio1 = CmpAudioPlayer(path:g_playlist[playlistIndex].fileURL!)                    
                     self.durationAudioPlayer1 = g_playlist[playlistIndex].duration
-                    try self.audio1?.play()
+                    try self.audio1?.play()                    
                     self.isPaused = false                    
                 }
                 catch {
@@ -98,7 +98,7 @@ internal class Player {
             else {
                 do {
                     self.audio1?.stop()
-                    self.audio1 = Mp3AudioPlayer(path: g_playlist[playlistIndex].fileURL!)
+                    self.audio1 = CmpAudioPlayer(path: g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer1 = g_playlist[playlistIndex].duration
                     try self.audio1?.play()
                     self.isPaused = false
@@ -117,7 +117,7 @@ internal class Player {
         else if player == 2 {
             if self.audio2 == nil {
                 do {
-                    self.audio2 = Mp3AudioPlayer(path:g_playlist[playlistIndex].fileURL!)
+                    self.audio2 = CmpAudioPlayer(path:g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer2 = g_playlist[playlistIndex].duration
                     try self.audio2?.play()
                     self.isPaused = false
@@ -135,7 +135,7 @@ internal class Player {
             else {
                 do {
                     self.audio2?.stop()
-                    self.audio2 = Mp3AudioPlayer(path: g_playlist[playlistIndex].fileURL!)
+                    self.audio2 = CmpAudioPlayer(path: g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer2 = g_playlist[playlistIndex].duration
                     try self.audio2?.play()
                     self.isPaused = false

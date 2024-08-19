@@ -61,10 +61,10 @@ internal class SongEntry {
             throw SongEntryError.PathInExclusionPath
         }
         
-        guard duration > 0 else {
-            PlayerLog.ApplicationLog?.logWarning(title: "[SongEntry].init(path:songNo:)", text: "Duration was 0. File: \(url!.path)")
+        /*guard duration > 0 else {
+            PlayerLog.ApplicationLog?.logWarning(title: "[SongEntry].init(songNo:,artist:,albumName:,title:,duration:,url:,genre:,recordingYear:,trackNo:)", text: "Duration was 0. File: \(url!.path)")
             throw SongEntryError.DurationIsZero
-        }
+        }*/
         
         self.songNo = songNo
         self.artist = artist
@@ -151,13 +151,22 @@ internal class SongEntry {
         // Only support .mp3 for now.
         //        
         do {
-            if path!.path.lowercased().hasSuffix(".mp3") {            
-                let metadata = try Mp3AudioPlayer.gatherMetadata(path: path)
+            if path!.path.lowercased().hasSuffix(".mp3") || path!.path.lowercased().hasSuffix(".m4a") {            
+                let metadata = try CmpAudioPlayer.gatherMetadata(path: path!)                
                 self.title = metadata.title
                 self.artist = metadata.artist
                 self.albumName = metadata.albumName
                 self.recordingYear = metadata.recordingYear
-                self.genre = metadata.genre        
+                self.genre = metadata.genre
+                self.duration = metadata.duration        
+
+                if self.duration == 0 {
+                    print("Artist: \(self.artist)")
+                    print("Title: \(self.title)")
+                    print("Duration: \(self.duration)")
+                    print("path: \(path!.path)")
+                    exit(1)
+                }
             }// is .mp3
             else {
                 throw SongEntryError.InvalidSongEntryType

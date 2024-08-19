@@ -10,7 +10,6 @@
 // import
 //
 import Foundation
-//import Cocoa
 
 ///
 /// Represents CMPlayer MainWindow.
@@ -366,14 +365,24 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                         if let a = g_player.audio1 {
                             time = a.timeElapsed
                         }
-                        g_player.durationAudioPlayer1 = (g_playlist[0].duration - time)
+                        if g_playlist[0].duration >= time {
+                            g_player.durationAudioPlayer1 = (g_playlist[0].duration - time)
+                        }
+                        else {
+                            g_player.durationAudioPlayer1 = 0
+                        }
                     }
                     else if g_player.audioPlayerActive == 2 {
                         var time: UInt64 = 0
                         if let a = g_player.audio2 {
                             time = a.timeElapsed
                         }
-                        g_player.durationAudioPlayer2 = (g_playlist[0].duration - time)
+                        if g_playlist[0].duration >= time {
+                            g_player.durationAudioPlayer2 = (g_playlist[0].duration - time)
+                        }
+                        else {
+                            g_player.durationAudioPlayer2 = 0
+                        }
                     }
                     
                     if g_player.audioPlayerActive == 1 && g_player.audio1 != nil {

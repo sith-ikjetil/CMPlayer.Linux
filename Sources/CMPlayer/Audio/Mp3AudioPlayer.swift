@@ -33,6 +33,11 @@ internal class Mp3AudioPlayer {
             return self.m_isPlaying
         }
     }
+    var isPaused: Bool {
+        get {
+            return self.m_isPaused
+        }
+    }    
     var timeElapsed: UInt64 {
         get {
             return self.m_timeElapsed
@@ -40,7 +45,7 @@ internal class Mp3AudioPlayer {
     }
     var duration: UInt64 {
         get {
-            return self.m_timeElapsed
+            return self.m_duration
         }
     }
     init(path: URL) {
@@ -48,6 +53,11 @@ internal class Mp3AudioPlayer {
     }
 
     func play() throws {
+        // if we are already playing, return
+        if (self.m_isPlaying) {
+            return;
+        }
+        
         // if we have paused playback, then resume on play again
         if (self.m_isPaused) {
             self.resume()
@@ -111,7 +121,7 @@ internal class Mp3AudioPlayer {
         // Calculate duration in seconds
         let duration = Double(self.m_length) / Double(self.m_rate)
         self.m_duration = UInt64(duration * 1000)
-
+        
         guard self.m_duration > 0 else {
             PlayerLog.ApplicationLog?.logWarning(title: "[SongEntry].init(path:songNo:)", text: "Duration was invalid with value: \(self.m_duration)")
             throw SongEntryError.DurationIsZero
@@ -251,7 +261,7 @@ internal class Mp3AudioPlayer {
             // Calculate duration in seconds
             let duration = Double(length) / Double(rate)
             metadata.duration = UInt64(duration * 1000)
-
+            
             // Ensure positive duration
             guard duration > 0 else {
                 PlayerLog.ApplicationLog?.logWarning(title: "[Mp3AudioPlayer].gatherMetadata(path:)", text: "Duration was 0. File: \(path!.path)")
