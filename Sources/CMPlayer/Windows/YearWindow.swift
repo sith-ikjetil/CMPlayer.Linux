@@ -74,7 +74,7 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         let bgColor = getThemeBgColor()
         Console.printXY(1,3,":: RECORDING YEAR ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        Console.printXY(1,4,"mode year is: \((isSearchTypeInMode(SearchType.RecordedYear)) ? "on" : "off")", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,4,"mode year is: \((isSearchTypeInMode(SearchType.RecordedYear)) ? "on" : "off")", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         var index_screen_lines: Int = 5
         var index_search: Int = yearIndex
@@ -135,7 +135,7 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
             if self.yearIndex > 0 && self.yearText.count > (g_rows-7) {
                 if self.yearIndex - (g_rows-7) > 0 {
-                    self.yearIndex -= (g_rows-7)
+                    self.yearIndex -= (g_rows-7) - 1
                 }
                 else {
                     self.yearIndex = 0
@@ -147,7 +147,7 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
             if self.yearIndex >= 0 && self.yearText.count > (g_rows-7) {
                 if self.yearIndex + (g_rows-7) < self.yearText.count - (g_rows-7) {
-                    self.yearIndex += (g_rows-7)
+                    self.yearIndex += (g_rows-7) - 1
                 }
                 else {
                     self.yearIndex = self.yearText.count - (g_rows-7) + 1

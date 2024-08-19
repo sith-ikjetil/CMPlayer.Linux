@@ -153,7 +153,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
             if self.helpIndex > 0  && self.helpText.count > (g_rows-7) {
                 if (self.helpIndex - (g_rows-7)) > 0 {
-                    self.helpIndex -= (g_rows-7)
+                    self.helpIndex -= (g_rows-7) - 1
                 }
                 else {
                     self.helpIndex = 0
@@ -164,8 +164,8 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
             if self.helpIndex >= 0  && self.helpText.count > (g_rows-7) {
-                if (self.helpIndex + (g_rows-7)) < (self.helpText.count - (g_rows-7)) {
-                    self.helpIndex += (g_rows-7)
+                if (self.helpIndex + (g_rows-7)) <= (self.helpText.count - (g_rows-7)) {
+                    self.helpIndex += (g_rows-7) - 1
                 }
                 else {
                     self.helpIndex = self.helpText.count - (g_rows-7) + 1

@@ -118,7 +118,7 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
             if self.aboutIndex > 0 && self.aboutText.count > (g_rows-7) {
                 if self.aboutIndex - (g_rows-7) > 0 {
-                    self.aboutIndex -= (g_rows-7)
+                    self.aboutIndex -= (g_rows-7) - 1
                 }
                 else {
                     self.aboutIndex = 0
@@ -130,7 +130,7 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
             if self.aboutIndex >= 0 && self.aboutText.count > (g_rows-7) {
                 if self.aboutIndex + (g_rows-7) < self.aboutText.count - (g_rows-7) {
-                    self.aboutIndex += (g_rows-7)
+                    self.aboutIndex += (g_rows-7) - 1
                 }
                 else {
                     self.aboutIndex = self.aboutText.count - (g_rows-7) + 1

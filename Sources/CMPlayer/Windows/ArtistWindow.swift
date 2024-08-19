@@ -136,7 +136,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
             if self.artistIndex > 0 && self.artistText.count > (g_rows-7) {
                 if self.artistIndex - (g_rows-7) > 0 {
-                    self.artistIndex -= (g_rows-7)
+                    self.artistIndex -= (g_rows-7) - 1
                 }
                 else {
                     self.artistIndex = 0
@@ -148,7 +148,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
             if self.artistIndex >= 0 && self.artistText.count > (g_rows-7) {
                 if self.artistIndex + (g_rows-7) < self.artistText.count - (g_rows-7) {
-                    self.artistIndex += (g_rows-7)
+                    self.artistIndex += (g_rows-7) - 1
                 }
                 else {
                     self.artistIndex = self.artistText.count - (g_rows-7) + 1

@@ -135,7 +135,7 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
             if self.genreIndex > 0 && self.genreText.count > (g_rows-7) {
                 if self.genreIndex - (g_rows-7) > 0 {
-                    self.genreIndex -= (g_rows-7)
+                    self.genreIndex -= (g_rows-7) - 1
                 }
                 else {
                     self.genreIndex = 0
@@ -147,7 +147,7 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
             if self.genreIndex >= 0 && self.genreText.count > (g_rows-7) {
                 if self.genreIndex + (g_rows-7) < self.genreText.count - (g_rows-7) {
-                    self.genreIndex += (g_rows-7)
+                    self.genreIndex += (g_rows-7) - 1
                 }
                 else {
                     self.genreIndex = self.genreText.count - (g_rows-7) + 1

@@ -90,11 +90,11 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         Console.printXY(1,3,":: MODE ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         Console.printXY(1,4,"mode is: \((g_searchType.count > 0) ? "on" : "off")", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-        
+
+        var index_screen_lines: Int = 5
+        var index_search: Int = self.searchIndex    
+        let max = self.modeText.count + self.searchResult.count
         if PlayerPreferences.viewType == ViewType.Default {
-            var index_screen_lines: Int = 5
-            var index_search: Int = self.searchIndex
-            let max = self.modeText.count + self.searchResult.count
             while index_search < max {
                 if index_screen_lines >= (g_rows-3) {
                     break
@@ -129,10 +129,7 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 index_search += 1
             }
         }
-        else if PlayerPreferences.viewType == ViewType.Details {
-            var index_screen_lines: Int = 5
-            var index_search: Int = searchIndex
-            let max = self.modeText.count+self.searchResult.count
+        else if PlayerPreferences.viewType == ViewType.Details {           
             while index_search < max {
                 if index_screen_lines >= (g_rows-3) {
                     break
@@ -175,11 +172,12 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     
                     index_screen_lines += 2
                     index_search += 1
-                }
+                }                
             }
-        }
-        
-        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        }       
+
+        Console.printXY(1,g_rows-3," ", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold) 
+        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT mc:\(self.modeText.count) self.si:\(self.searchIndex), is:\(index_search), max:\(max)", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         Console.printXY(1,g_rows,"\(g_searchResult.count.itsToString()) Songs", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         Console.gotoXY(80,1)
@@ -220,40 +218,84 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if (self.searchIndex + (g_rows-7)) <= (self.modeText.count+self.searchResult.count) {
-                self.searchIndex += 1
-                self.renderWindow()
+            if PlayerPreferences.viewType == ViewType.Default {
+                if (self.searchIndex + (g_rows-7)) < (self.modeText.count+self.searchResult.count) {
+                    self.searchIndex += 1
+                    self.renderWindow()
+                }
+            }
+            else if PlayerPreferences.viewType == ViewType.Details {
+                if (self.searchIndex + ((g_rows-7)/2)) < (self.modeText.count+self.searchResult.count) {
+                    self.searchIndex += 1
+                    self.renderWindow()
+                }
             }
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
-            if self.searchIndex > 0 {
+            if self.searchIndex >= 1 {
                 self.searchIndex -= 1
                 self.renderWindow()
             }
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in            
-            if self.searchIndex >= (g_rows-7) {
-                self.searchIndex -= (g_rows-7)
-                self.renderWindow()
+            if PlayerPreferences.viewType == ViewType.Default {
+                if self.searchIndex >= (g_rows-7) {
+                    self.searchIndex -= (g_rows-7)                    
+                }
+                else {
+                    self.searchIndex = 0                    
+                }   
+                self.renderWindow()     
             }
-            else {
-                self.searchIndex = 0
-                self.renderWindow()
-            }        
-            return false
-        })
-        keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in            
-            if (self.searchIndex + (g_rows-7)) >= (self.modeText.count+self.searchResult.count) {
-                self.searchIndex = (self.modeText.count + self.searchResult.count - (g_rows-7)) + 1
-                if self.searchIndex < 0 {
+            else if PlayerPreferences.viewType == ViewType.Details {
+                if self.searchIndex >= self.modeText.count {
+                    if (self.searchIndex - ((g_rows-7)/2)) > 0 {
+                        self.searchIndex -= ((g_rows-7)/2)
+                        if self.searchIndex < 0 {
+                            self.searchIndex = 0
+                        }
+                    }
+                    else {
+                        self.searchIndex = 0                        
+                    }                    
+                }
+                else {
                     self.searchIndex = 0
                 }
                 self.renderWindow()
             }
-            else {
-                self.searchIndex += (g_rows-7)
+            return false
+        })
+        keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in            
+            if PlayerPreferences.viewType == ViewType.Default {
+                if (self.searchIndex + (g_rows-7)) >= (self.modeText.count+self.searchResult.count) {
+                    self.searchIndex = (self.modeText.count + self.searchResult.count) - (g_rows-7)
+                    if self.searchIndex < 0 {
+                        self.searchIndex = 0
+                    }
+                }
+                else {
+                    self.searchIndex += (g_rows-7)                    
+                }
+                self.renderWindow()
+            }
+            else if PlayerPreferences.viewType == ViewType.Details {
+                if self.searchIndex >= self.modeText.count {
+                    if (self.searchIndex + (g_rows-7)/2) < (self.modeText.count+self.searchResult.count) {
+                        self.searchIndex += ((g_rows-7)/2)
+                    }
+                    else {
+                        self.searchIndex = (self.modeText.count+self.searchResult.count) - ((g_rows-7)/2)
+                        if self.searchIndex < 0 {
+                            self.searchIndex = 0
+                        }
+                    }                    
+                }
+                else {
+                    self.searchIndex += max(self.modeText.count,((g_rows-7)/2))                    
+                }
                 self.renderWindow()
             }
         

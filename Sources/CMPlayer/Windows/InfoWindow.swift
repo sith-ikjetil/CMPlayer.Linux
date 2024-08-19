@@ -159,7 +159,7 @@ internal class InfoWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
             if self.infoIndex > 0 && self.infoText.count > g_windowContentLineCount{
                 if (self.infoIndex - (g_rows-7)) > 0 {
-                    self.infoIndex -= (g_rows-7)
+                    self.infoIndex -= (g_rows-7) - 1
                 }
                 else {
                     self.infoIndex = 0
@@ -170,7 +170,7 @@ internal class InfoWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in             
             if (self.infoIndex + (g_rows-7)) <= (self.infoText.count - (g_rows-7)) {
-                self.infoIndex += (g_rows-7)
+                self.infoIndex += (g_rows-7) - 1
             }
             else {                
                 self.infoIndex = self.infoText.count - (g_rows-7) + 1                

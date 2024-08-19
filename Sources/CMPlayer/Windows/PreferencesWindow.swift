@@ -157,7 +157,7 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
             if self.preferencesIndex > 0 && self.preferencesText.count > (g_rows-7) {
                 if (self.preferencesIndex - (g_rows-7)) > 0 {
-                    self.preferencesIndex -= (g_rows-7)
+                    self.preferencesIndex -= (g_rows-7) - 1
                 }
                 else {
                     self.preferencesIndex = 0
@@ -169,7 +169,7 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
             if self.preferencesIndex >= 0 && self.preferencesText.count > (g_rows-7) {
                 if self.preferencesIndex + (g_rows-7) < self.preferencesText.count - (g_rows-7) {
-                    self.preferencesIndex += (g_rows-7)
+                    self.preferencesIndex += (g_rows-7) - 1
                 }
                 else {
                     self.preferencesIndex = self.preferencesText.count - (g_rows-7) + 1

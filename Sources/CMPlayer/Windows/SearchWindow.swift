@@ -358,7 +358,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         }
         else if PlayerPreferences.viewType == ViewType.Details {
             var index_screen_lines: Int = 5
-            var index_search: Int = searchIndex
+            var index_search: Int = self.searchIndex
             let max = self.searchResult.count
             while index_search < max {
                 if index_screen_lines >= (g_rows-3) {
@@ -461,7 +461,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in            
             if self.searchIndex >= (g_rows-7) {
-                self.searchIndex -= (g_rows-7)
+                self.searchIndex -= ((g_rows-7)/2)
                 self.renderWindow()
             }
             else {
@@ -472,14 +472,14 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in            
             if (self.searchIndex + (g_rows-7)) >= self.searchResult.count {
-                self.searchIndex = (self.searchResult.count - (g_rows-7)) + 1
+                self.searchIndex = (self.searchResult.count - ((g_rows-7)/2))
                 if self.searchIndex < 0 {
                     self.searchIndex = 0
                 }
                 self.renderWindow()
             }
             else {
-                self.searchIndex += (g_rows-7)
+                self.searchIndex += ((g_rows-7)/2)
                 self.renderWindow()
             }
         
