@@ -21,7 +21,7 @@ internal class Mp3AudioPlayer {
     private var mpg123Handle: OpaquePointer?
     private var m_length: off_t = 0
     private var m_rate: CLong = 0
-    private let audioQueue = DispatchQueue(label: "audioQueue", qos: .background)
+    private let audioQueue = DispatchQueue(label: "dqueue.cmp.linux.mp3-audio-player", qos: .background)
     private var m_stopFlag: Bool = false
     private var m_isPlaying = false
     private var m_isPaused = false
@@ -69,21 +69,21 @@ internal class Mp3AudioPlayer {
 
         // make sure mpg123Handle is not already set
         guard mpg123Handle == nil else {            
-            PlayerLog.ApplicationLog?.logWarning(title: "[Mp3AudioPlayer].play()", text: "Already playing a file")                
-            throw AudioPlayerError.AlreadyPlaying
+            PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].play()", text: "Already playing a file")                
+            throw AudioPlayerError.MpgSoundLibrary
         }        
 
         // Initialize mpg123 handle
         var err: Int32 = 0
         self.mpg123Handle = mpg123_new(nil, &err)
         guard err == 0 else { // MPG123_OK
-            PlayerLog.ApplicationLog?.logWarning(title: "[Mp3AudioPlayer].play()", text: "Failed to create mpg123 handle")    
+            PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].play()", text: "Failed to create mpg123 handle")    
             throw AudioPlayerError.MpgSoundLibrary
         }
 
         // Open the file
         if mpg123_open(self.mpg123Handle, self.filePath.path) != 0 { // MPG123_OK
-            PlayerLog.ApplicationLog?.logWarning(title: "[Mp3AudioPlayer].play()", text: "Failed to open MP3 file")
+            PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].play()", text: "Failed to open MP3 file")
 
             mpg123_delete(self.mpg123Handle)
             self.mpg123Handle = nil
@@ -96,7 +96,7 @@ internal class Mp3AudioPlayer {
         //                      
         self.m_length = mpg123_length(self.mpg123Handle)
         if self.m_length <= 0 {
-            PlayerLog.ApplicationLog?.logWarning(title: "[SongEntry].init(path:songNo:)", text: "mpg123_length invalid with value: \(self.m_length)")
+            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path:songNo:)", text: "mpg123_length invalid with value: \(self.m_length)")
             throw AudioPlayerError.MpgSoundLibrary
         }
 
@@ -106,7 +106,7 @@ internal class Mp3AudioPlayer {
         var encoding: Int32 = 0
 
         if mpg123_getformat(mpg123Handle, &rate, &channels, &encoding) != 0 { // MPG123_OK
-            PlayerLog.ApplicationLog?.logWarning(title: "[Mp3AudioPlayer].play()", text: "Failed to get MP3 format")
+            PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].play()", text: "Failed to get MP3 format")
 
             mpg123_close(self.mpg123Handle)
             mpg123_delete(self.mpg123Handle)
@@ -123,7 +123,7 @@ internal class Mp3AudioPlayer {
         self.m_duration = UInt64(duration * 1000)
         
         guard self.m_duration > 0 else {
-            PlayerLog.ApplicationLog?.logWarning(title: "[SongEntry].init(path:songNo:)", text: "Duration was invalid with value: \(self.m_duration)")
+            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path:songNo:)", text: "Duration was invalid with value: \(self.m_duration)")
             throw SongEntryError.DurationIsZero
         }
 
@@ -145,7 +145,7 @@ internal class Mp3AudioPlayer {
 
         // open for playing
         guard let device = ao_open_live(defaultDriver, &format, nil) else {
-            PlayerLog.ApplicationLog?.logWarning(title: "[Mp3AudioPlayer].play()", text: "Couldn't open audio device")
+            PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].play()", text: "Couldn't open audio device")
 
             mpg123_close(self.mpg123Handle)
             mpg123_delete(self.mpg123Handle)
@@ -189,7 +189,7 @@ internal class Mp3AudioPlayer {
                 break;
             }
             if (err != 0) { // MPG123_OK
-                PlayerLog.ApplicationLog?.logWarning(title: "[Mp3AudioPlayer].playInBackground()", text: "mpg123_read return failure code: \(err)")
+                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: "mpg123_read return failure code: \(err)")
                 break;
             }
             if (done > 0) {
@@ -229,7 +229,7 @@ internal class Mp3AudioPlayer {
 
             //print("URL: \(self.fileURL!.path)")
             guard let handle = mpg123_new(nil, nil) else {
-                PlayerLog.ApplicationLog?.logWarning(title: "[Mp3AudioPlayer].gatherMetadata(path:)", text: "mpg123_new failed")
+                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].gatherMetadata(path:)", text: "mpg123_new failed")
                 throw AudioPlayerError.MpgSoundLibrary
             }
 
@@ -238,7 +238,7 @@ internal class Mp3AudioPlayer {
             }
             
             guard mpg123_open(handle, path!.path) == 0 else {
-                PlayerLog.ApplicationLog?.logWarning(title: "[Mp3AudioPlayer].gatherMetadata(path:)", text: "mpg123_open failed for URL: \(path!.path)")
+                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].gatherMetadata(path:)", text: "mpg123_open failed for URL: \(path!.path)")
                 throw AudioPlayerError.MpgSoundLibrary
             }      
 
@@ -248,7 +248,7 @@ internal class Mp3AudioPlayer {
             var length: off_t = 0
             length = mpg123_length(handle)
             if length <= 0 {
-                PlayerLog.ApplicationLog?.logWarning(title: "[Mp3AudioPlayer].gatherMetadata(path:)", text: "mpg123_length failed with value: \(length)")
+                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].gatherMetadata(path:)", text: "mpg123_length failed with value: \(length)")
                 throw AudioPlayerError.MpgSoundLibrary
             }
             
@@ -264,7 +264,7 @@ internal class Mp3AudioPlayer {
             
             // Ensure positive duration
             guard duration > 0 else {
-                PlayerLog.ApplicationLog?.logWarning(title: "[Mp3AudioPlayer].gatherMetadata(path:)", text: "Duration was 0. File: \(path!.path)")
+                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].gatherMetadata(path:)", text: "Duration was 0. File: \(path!.path)")
                 throw SongEntryError.DurationIsZero
             }
 

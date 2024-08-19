@@ -61,10 +61,10 @@ internal class SongEntry {
             throw SongEntryError.PathInExclusionPath
         }
         
-        /*guard duration > 0 else {
-            PlayerLog.ApplicationLog?.logWarning(title: "[SongEntry].init(songNo:,artist:,albumName:,title:,duration:,url:,genre:,recordingYear:,trackNo:)", text: "Duration was 0. File: \(url!.path)")
+        guard duration > 0 else {
+            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(songNo:,artist:,albumName:,title:,duration:,url:,genre:,recordingYear:,trackNo:)", text: "Duration was 0. File: \(url!.path)")
             throw SongEntryError.DurationIsZero
-        }*/
+        }
         
         self.songNo = songNo
         self.artist = artist
@@ -158,14 +158,21 @@ internal class SongEntry {
                 self.albumName = metadata.albumName
                 self.recordingYear = metadata.recordingYear
                 self.genre = metadata.genre
-                self.duration = metadata.duration        
+                self.duration = metadata.duration    
+                self.trackNo = metadata.trackNo    
 
-                if self.duration == 0 {
-                    print("Artist: \(self.artist)")
-                    print("Title: \(self.title)")
-                    print("Duration: \(self.duration)")
-                    print("path: \(path!.path)")
-                    exit(1)
+                if self.duration == 0 {                    
+                    //print("## DURATION 0 ERROR ##")
+                    //print("Artist: \(self.artist)")
+                    //print("AlbumName: \(self.albumName)")
+                    //print("Title: \(self.title)")
+                    //print("Duration: \(self.duration)")
+                    //print("Track: \(self.trackNo)")
+                    //print("Year: \(self.recordingYear)")
+                    //print("path: \(path!.path)")
+                    //exit(1)
+
+                    throw SongEntryError.InvalidSongEntryType
                 }
             }// is .mp3
             else {
@@ -173,6 +180,7 @@ internal class SongEntry {
             }   
         } catch {
             PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path:,songNo:)", text: "Error gathering metadata from file: \(path!.lastPathComponent). Message: \(error)")
+            throw error
         }
         
         //

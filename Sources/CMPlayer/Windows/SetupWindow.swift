@@ -56,15 +56,15 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         
         MainWindow.renderHeader(showTime: false)
         
-        Console.printXY(1,3,":: SETUP ::", 80, .center, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+        Console.printXY(1,3,":: SETUP ::", g_cols, .center, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
         var y: Int = 5
         for txt in self.setupText {
-            Console.printXY(1, y, txt, 80, .center, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(1, y, txt, g_cols, .center, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             y += 1
         }
         
-        Console.printXY(1,y+1, ":> \(self.path)", 3+path.count, .left, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+        Console.printXY(1,y+1, ":> \(self.path)", g_cols, .left, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
         
         Console.gotoXY(80,1)
         print("")
@@ -79,7 +79,7 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         Console.clearScreen()
         self.renderWindow()
         
-        let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
+        let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()        
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_BACKSPACE.rawValue, closure: { () -> Bool in
             if self.path.count > 0 {
                 self.path.removeLast()

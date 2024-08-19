@@ -67,6 +67,7 @@ internal enum AudioPlayerError : Error {
     case AoSoundLibrary
     case MetadataNotFound
     case UnknownFileType
+    case FfmpegSoundLibrary
 }
 
 ///
@@ -737,4 +738,40 @@ func getTerminalSize() -> (rows: Int, cols: Int)? {
     } else {
         return nil
     }
+}
+
+func extractMetadataTrackNo(text: String) -> Int {
+    // Define a regular expression pattern for a number or a number1/number2 format
+    let pattern = "\\b(\\d+)/?\\d*\\b"
+    
+    // Create a regular expression object
+    let regex = try? NSRegularExpression(pattern: pattern)
+    
+    // Search for the first match
+    if let match = regex?.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text)) {
+        // Extract the matched range for the first number
+        if let range = Range(match.range(at: 1), in: text) {
+            return Int(String(text[range])) ?? 0
+        }
+    }
+    
+    return 0
+}
+
+func extractMetadataYear(text: String) -> Int {
+    // Define a regular expression pattern for a number or a number1/number2 format
+    let pattern = "\\b(\\d{4})\\b"
+    
+    // Create a regular expression object
+    let regex = try? NSRegularExpression(pattern: pattern)
+    
+    // Search for the first match
+    if let match = regex?.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text)) {
+        // Extract the matched range for the first number
+        if let range = Range(match.range(at: 1), in: text) {
+            return Int(String(text[range])) ?? 0
+        }
+    }
+    
+    return 0
 }

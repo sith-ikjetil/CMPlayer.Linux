@@ -32,7 +32,7 @@ internal class AacAudioPlayer {
     private let filePath: URL    
     private var m_length: off_t = 0
     private var m_rate: CLong = 0
-    private let audioQueue = DispatchQueue(label: "audioQueue", qos: .background)
+    private let audioQueue = DispatchQueue(label: "dqueue.cmp.linux.aac-audio-player", qos: .background)
     private var m_stopFlag: Bool = false
     private var m_isPlaying = false
     private var m_isPaused = false
@@ -84,15 +84,15 @@ internal class AacAudioPlayer {
 
         // Open audio file
         if avformat_open_input(&self.m_audioState.formatCtx, self.filePath.path, nil, nil) != 0 {
-            print("Could not open file \(self.filePath.path)")
-            return
+            PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].play()", text: "avformat_open_input failed. Could not open file \(self.filePath.path)")
+            throw AudioPlayerError.FfmpegSoundLibrary
         }
         
         // Retrieve stream information
-        if avformat_find_stream_info(self.m_audioState.formatCtx, nil) < 0 {
-            print("Could not find stream information")
+        if avformat_find_stream_info(self.m_audioState.formatCtx, nil) < 0 {            
             avformat_close_input(&m_audioState.formatCtx)
-            return
+            PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].play()", text: "avformat_find_stream_info failed. Could not find stream information.")
+            throw AudioPlayerError.FfmpegSoundLibrary
         }
         
         // Find the audio stream
@@ -104,9 +104,9 @@ internal class AacAudioPlayer {
         }
         
         if self.m_audioState.audioStreamIndex == -1 {
-            print("Could not find an audio stream")
             avformat_close_input(&self.m_audioState.formatCtx)
-            return
+            PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].play()", text: "Could not find an audio stream.")
+            throw AudioPlayerError.FfmpegSoundLibrary
         }
         
         // Get codec parameters
@@ -115,41 +115,41 @@ internal class AacAudioPlayer {
         // Find the decoder for the audio stream
         self.m_audioState.codec = avcodec_find_decoder(codecpar!.pointee.codec_id)
         if self.m_audioState.codec == nil {
-            print("Unsupported codec!")
             avformat_close_input(&self.m_audioState.formatCtx)
-            return
+            PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].play()", text: "Unsupported codec.")
+            throw AudioPlayerError.FfmpegSoundLibrary
         }
         
         // Allocate codec context
         self.m_audioState.codecCtx = avcodec_alloc_context3(self.m_audioState.codec)
         if self.m_audioState.codecCtx == nil {
-            print("Could not allocate codec context")
             avformat_close_input(&self.m_audioState.formatCtx)
-            return
+            PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].play()", text: "Could not allocate codec context.")
+            throw AudioPlayerError.FfmpegSoundLibrary
         }
         
         if avcodec_parameters_to_context(self.m_audioState.codecCtx, codecpar) < 0 {
-            print("Could not copy codec context")
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)
-            return
+            PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].play()", text: "avcodec_parameters_to_context failed. Could not copy codec context.")
+            throw AudioPlayerError.FfmpegSoundLibrary
         }
         
         // Open codec
         if avcodec_open2(self.m_audioState.codecCtx, self.m_audioState.codec, nil) < 0 {
-            print("Could not open codec")
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)
-            return
+            PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].play()", text: "avcodec_open2 failed. Could not open codec.")
+            throw AudioPlayerError.FfmpegSoundLibrary
         }
         
         // Allocate frame
         self.m_audioState.frame = av_frame_alloc()
         if self.m_audioState.frame == nil {
-            print("Could not allocate audio frame")
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)
-            return
+            PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].play()", text: "Could not allocate audio frame.")
+            throw AudioPlayerError.FfmpegSoundLibrary
         }
         
         // Set up resampling context
@@ -173,10 +173,10 @@ internal class AacAudioPlayer {
         // Open libao device
         self.m_audioState.device = ao_open_live(ao_default_driver_id(), &self.m_audioState.aoFormat, nil)
         if self.m_audioState.device == nil {
-            print("Error opening audio device")
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)
-            return
+            PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].play()", text: "Error opening audio device.")
+            throw AudioPlayerError.FfmpegSoundLibrary
         }
 
         self.audioQueue.async { [weak self] in
@@ -208,7 +208,7 @@ internal class AacAudioPlayer {
             if av_read_frame(self.m_audioState.formatCtx, &self.m_audioState.packet) >= 0 {            
                 if self.m_audioState.packet.stream_index == self.m_audioState.audioStreamIndex {
                     if avcodec_send_packet(self.m_audioState.codecCtx, &self.m_audioState.packet) < 0 {
-                        print("Error sending packet to decoder")
+                        PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].playAsync()", text: "Error sending packet to decoder.")
                         break
                     }
                     
@@ -219,7 +219,7 @@ internal class AacAudioPlayer {
                         
                         // Ensure the buffer is allocated properly
                         guard bufferSize >= 0 else {
-                            print("Error allocating buffer for resampled audio")
+                            PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].playAsync()", text: "Error allocating buffer for resampled audio.")
                             break
                         }
 
@@ -242,7 +242,7 @@ internal class AacAudioPlayer {
                             
                             // Ensure resampling was successful
                             guard samples >= 0 else {
-                                print("Error resampling audio")
+                                PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].playAsync()", text: "Error resampling audio.")
                                 return
                             }
 
@@ -265,6 +265,9 @@ internal class AacAudioPlayer {
 
                         while self.m_isPaused {
                             usleep(100_000)
+                            if self.m_stopFlag {
+                                return
+                            }
                         }
                     }
                 }                
@@ -298,15 +301,15 @@ internal class AacAudioPlayer {
             
             // Open the file
             if avformat_open_input(&formatContext, filename, nil, nil) != 0 {
-                print("Could not open file")
-                exit(1)
+                PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].gatherMetadata()", text: "avformat_open_input failed. Could not open file.")
+                throw AudioPlayerError.FfmpegSoundLibrary
             }
 
             // Retrieve stream information
             if avformat_find_stream_info(formatContext, nil) < 0 {
-                print("Could not find stream information")
                 avformat_close_input(&formatContext)
-                exit(1)
+                PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].gatherMetadata()", text: "avformat_find_stream_info failed. Could not find stream information.")
+                throw AudioPlayerError.FfmpegSoundLibrary
             }
 
             // Calculate duration in seconds
@@ -319,7 +322,7 @@ internal class AacAudioPlayer {
             var tag: UnsafeMutablePointer<AVDictionaryEntry>? = nil
             while let nextTag = av_dict_get(formatContext?.pointee.metadata, "", tag, AV_DICT_IGNORE_SUFFIX) {
                 if let key = nextTag.pointee.key, let value = nextTag.pointee.value {
-                    let checkKey = String(cString: key)
+                    let checkKey = String(cString: key).lowercased()
                     switch checkKey {
                         case "artist":
                             metadata.artist = String(cString: value)
@@ -330,7 +333,11 @@ internal class AacAudioPlayer {
                         case "genre":
                             metadata.genre = String(cString: value)
                         case "track":
-                            metadata.trackNo = Int(String(cString: value)) ?? 0     
+                            metadata.trackNo =  extractMetadataTrackNo(text: String(cString: value))
+                        case "date":
+                            metadata.recordingYear = extractMetadataYear(text: String(cString: value))
+                        case "year":
+                            metadata.recordingYear = extractMetadataYear(text: String(cString: value))
                         default:
                             tag = nextTag
                             continue;
@@ -342,6 +349,9 @@ internal class AacAudioPlayer {
             // Clean up
             avformat_close_input(&formatContext)
             
+            // Log we found metadatda
+            PlayerLog.ApplicationLog?.logInformation(title: "[AacAudioPlayer].gatherMetadata()", text: "Found metadata for: \(path.lastPathComponent)")
+
             return metadata         
         }
 

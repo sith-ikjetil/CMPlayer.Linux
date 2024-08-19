@@ -22,7 +22,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     private var libraryLoadedCompleted: Int = 0
     private var isFinished: Bool = false
     private var currentPath: String = ""
-    private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.macos.Initialize", attributes: .concurrent)
+    private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.linux.Initialize", attributes: .concurrent)
     private var musicFormats: [String] = []
     
     ///
