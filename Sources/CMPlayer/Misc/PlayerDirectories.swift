@@ -11,13 +11,11 @@
 //
 import Foundation
 import FoundationNetworking
-//import Cocoa
 
 ///
 /// Represents CMPlayer PlayerDirectories
 ///
-internal class PlayerDirectories {
-    
+internal class PlayerDirectories {    
     //
     // Computed properties
     //
@@ -29,13 +27,7 @@ internal class PlayerDirectories {
     }
     internal static var consoleMusicPlayerUpdateDirectory: URL {
         return PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent("Update", isDirectory: true)
-    }
-    internal static var applicationsDirectory: URL {
-        return URL(fileURLWithPath: "/Applications")
-    }
-    internal static var volumesDirectory: URL {
-        return URL(fileURLWithPath: "/Volumes")
-    }
+    }    
     ///
     /// Ensures that directories needed exists. Is called upon application startup.
     ///

@@ -10,27 +10,25 @@
 // import.
 //
 import Foundation
-//import AppKit
-
 
 ///
 /// Represents CMPlayer ConsoleKeyboardHandler
 ///
 internal class ConsoleKeyboardHandler {
     //
-    // Private properties/constants
+    // private variables
     //
     private var keyHandlers: [UInt32 : () -> Bool] = [:]
     private var unknownKeyHandlers: [(UInt32) -> Bool] = []
-    private var characterKeyHandlers: [(Character) -> Bool] = []
-    
+    private var characterKeyHandlers: [(Character) -> Bool] = []    
+    private var inKey27: Bool = false
+    private var inKey79: Bool = false
     //
     // Default initializer
     //
     init() {
         
-    }
-    
+    }    
     ///
     /// Adds a closure keyboard handler for given key from getchar()
     ///
@@ -41,8 +39,7 @@ internal class ConsoleKeyboardHandler {
     ///
     func addKeyHandler(key: UInt32, closure: @escaping () -> Bool) {
         self.keyHandlers[key] = closure
-    }
-    
+    }    
     ///
     /// Adds a closure keyboard handler for given key from getchar() that is not processed with addKeyHandler handler.
     ///
@@ -52,8 +49,7 @@ internal class ConsoleKeyboardHandler {
     ///
     func addUnknownKeyHandler(closure: @escaping (UInt32) -> Bool) {
         self.unknownKeyHandlers.append(closure)
-    }
-    
+    }    
     ///
     /// Adds a closure keyboard handler for given input character.
     ///
@@ -63,8 +59,7 @@ internal class ConsoleKeyboardHandler {
     ///
     func addCharacterKeyHandler(closure: @escaping (Character) -> Bool) {
         self.characterKeyHandlers.append(closure)
-    }
-    
+    }    
     ///
     /// Runs keyboard processing using getchar(). Calls key event handlers .
     ///
@@ -116,11 +111,7 @@ internal class ConsoleKeyboardHandler {
                 }
             }
         }
-    }
-    
-    private var inKey27: Bool = false
-    private var inKey79: Bool = false
-    
+    }            
     ///
     /// Processes a keystroke from getchar()
     ///

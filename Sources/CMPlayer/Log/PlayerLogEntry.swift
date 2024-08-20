@@ -16,12 +16,17 @@ import FoundationXML
 /// Log entry class.
 ///
 internal class PlayerLogEntry {
+    ///
+    /// static constants
+    ///
     static let XML_ELEMENT_NAME: String = "LogEntry"
+    ///
+    /// variables
+    /// 
     var type: PlayerLogEntryType
     var title: String
     var text: String
     var timeStamp: Date
-    
     ///
     /// Overloaded initializer
     ///
@@ -37,7 +42,6 @@ internal class PlayerLogEntry {
         self.text = text
         self.timeStamp = timeStamp
     }
-    
     ///
     /// Overloaded initializer
     ///
@@ -53,8 +57,7 @@ internal class PlayerLogEntry {
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
         
         self.timeStamp = dateFormatter.date(from: e.attribute(forName: "TimeStamp")?.stringValue ?? "") ?? Date()
-    }
-    
+    }  
     ///
     /// Creates an xml element representing this log entry.
     ///

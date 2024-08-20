@@ -16,11 +16,19 @@ import FoundationXML
 /// PlayerLog log class.
 ///
 internal class PlayerLog {
+    ///
+    /// static constants/variables
+    /// 
     static let logFilename: String = "CMPlayer.Log.xml"
     static var ApplicationLog: PlayerLog? = nil 
+    ///
+    /// variables
+    /// 
     var entries: [PlayerLogEntry] = []
-    private var autoSave: Bool = true
-    
+    ///
+    /// private variables
+    /// 
+    private var autoSave: Bool = true    
     ///
     /// Overloaded initializer.
     ///
@@ -30,8 +38,7 @@ internal class PlayerLog {
         if loadOldLog {
             self.loadOldLog()
         }
-    }
-    
+    }    
     ///
     /// Loads old log into memory
     ///
@@ -48,10 +55,9 @@ internal class PlayerLog {
             }
         }
         catch {
-            PlayerLog.ApplicationLog?.logError(title: "[PlayerLog].loadOldLog", text: "\(error)")
+            PlayerLog.ApplicationLog?.logError(title: "[PlayerLog].loadOldLog()", text: "\(error)")
         }
-    }
-    
+    }    
     ///
     /// Logs an error
     ///
@@ -71,10 +77,8 @@ internal class PlayerLog {
         self.entries.append(PlayerLogEntry(type: PlayerLogEntryType.Error, title: title, text: text, timeStamp: Date()))
         if self.autoSave {
             self.saveLog()
-        }
-        //os_log("(e): %{public}s","\(title): \(text)")
-    }
-    
+        }    
+    }    
     ///
     /// Logs a warning
     ///
@@ -94,10 +98,8 @@ internal class PlayerLog {
         self.entries.append(PlayerLogEntry(type: PlayerLogEntryType.Warning, title: title, text: text, timeStamp: Date()))
         if self.autoSave {
             self.saveLog()
-        }
-        //os_log("(w): %{public}s","\(title): \(text)")
-    }
-    
+        }    
+    }    
     ///
     /// Logs an informative entry
     ///
@@ -120,8 +122,7 @@ internal class PlayerLog {
             self.saveLog()
         }
         //os_log("(i): %{public}s","\(title): \(text)")
-    }
-    
+    }    
     ///
     /// Logs a debug entry
     ///
@@ -141,10 +142,8 @@ internal class PlayerLog {
         self.entries.append(PlayerLogEntry(type: PlayerLogEntryType.Debug, title: title, text: text, timeStamp: Date()))
         if self.autoSave {
             self.saveLog()
-        }
-        //os_log("(d): %{public}s","\(title): \(text)")
-    }
-    
+        }        
+    }    
     ///
     /// Logs an other entry.
     ///
@@ -164,17 +163,14 @@ internal class PlayerLog {
         self.entries.append(PlayerLogEntry(type: PlayerLogEntryType.Other, title: title, text: text, timeStamp: Date()))
         if self.autoSave {
             self.saveLog()
-        }
-        //os_log("(o): %{public}s","\(title): \(text)")
-    }
-    
+        }     
+    }    
     ///
     /// Clears the log.
     ///
     func clear() {        
         self.entries.removeAll()
-    }
-    
+    }    
     ///
     /// Saves the log as an XML document
     ///
@@ -194,8 +190,7 @@ internal class PlayerLog {
         let xmlDoc = XMLDocument(rootElement: xeRoot)
         
         return xmlDoc
-    }
-    
+    }    
     ///
     /// Saves the log
     ///
@@ -209,10 +204,9 @@ internal class PlayerLog {
             try xml.write(to: url, atomically: true,encoding: .utf8)            
         }
         catch {
-            PlayerLog.ApplicationLog?.logError(title: "[PlayerLog].saveLog", text: "\(error)")
+            PlayerLog.ApplicationLog?.logError(title: "[PlayerLog].saveLog()", text: "\(error)")
         }
-    }
-    
+    }    
     ///
     /// Saves the log as a file
     ///
@@ -226,10 +220,9 @@ internal class PlayerLog {
             try xml.write(to: url, atomically: true,encoding: .utf8)
         }
         catch {
-            PlayerLog.ApplicationLog?.logError(title: "[PlayerLog].saveLogAs", text: "\(error)")
+            PlayerLog.ApplicationLog?.logError(title: "[PlayerLog].saveLogAs(url)", text: "\(error)")
         }
-    }
-    
+    }    
     ///
     /// Saves log to a string.
     ///

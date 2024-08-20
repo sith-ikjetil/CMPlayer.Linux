@@ -12,7 +12,8 @@
 import Foundation
 
 ///
-///
+/// CmpMetadata
+/// Container for metadata.
 ///
 internal class CmpMetadata {
     var songNo: Int = 0
@@ -24,15 +25,14 @@ internal class CmpMetadata {
     var recordingYear: Int = 0
     var trackNo: Int = 0        
 }
-
 ///
 /// Enum exit codes
 ///
 internal enum ExitCodes: Int32 {
-    case ERROR_FINDING_FILES = 1
-    case ERROR_PLAYING_FILE = 2
+    case ERROR_UNKNOWN = 1
+    case ERROR_FINDING_FILES = 2
+    case ERROR_PLAYING_FILE = 3
 }
-
 ///
 /// SearchType, type of search
 ///
@@ -44,14 +44,12 @@ internal enum SearchType : String {
     case Genre = "genre"
     case RecordedYear = "year"
 }
-
 //
 // MediaPlayer error
 //
 internal struct CmpError : Error {
     let message: String
 }
-
 ///
 /// Padding alignment types.
 ///
@@ -61,21 +59,18 @@ internal enum PrintPaddingTextAlign {
     case center
     case ignore
 }
-
 ///
 /// Protocol for terminal size changed
 ///
 internal protocol TerminalSizeHasChangedProtocol {
     func terminalSizeHasChanged() -> Void
 }
-
 ///
 /// Protocol for windows
 ///
 internal protocol PlayerWindowProtocol {
     func showWindow() -> Void
 }
-
 ///
 /// Check to see if command is one of the supported given commands.
 ///
@@ -92,7 +87,6 @@ internal func isCommandInCommands(_ command: String, _ commands: [String]) -> Bo
     }
     return false
 }
-
 ///
 /// Validates if crossfade time is a valid crossfade time.
 ///
@@ -106,7 +100,6 @@ internal func isCrossfadeTimeValid(_ ctis: Int) -> Bool {
     }
     return false
 }
-
 ///
 /// Reparses the command arguments. Makes sure that commands that are part of "<search term>" are remade into on search term without the " character.
 ///
@@ -169,7 +162,6 @@ internal func reparseCurrentCommandArguments(_ command: [String]) -> [String] {
     
     return retVal
 }
-
 ///
 /// String extension methods.
 ///
@@ -242,7 +234,6 @@ internal extension String {
         }
     }
 }// extension String
-
 ///
 /// Split ms to its parts.
 ///
@@ -269,7 +260,6 @@ internal func itsSplitMsToHourMinuteSeconds(_ time_ms: UInt64 ) -> (part_hours: 
     
     return (part_hours, part_minutes, part_seconds, part_ms)
 }
-
 ///
 /// Splits hour to its parts.
 ///
@@ -298,7 +288,6 @@ internal func itsSplitHourToYearWeekDayHour(_ houIn: UInt64 ) -> (houRest: UInt6
     
     return (houRest, day, week, year)
 }
-
 ///
 /// Renders milliseconds to a fully descriptive time string.
 ///
@@ -385,7 +374,6 @@ internal func itsRenderMsToFullString(_ milliseconds: UInt64,_ bWithMilliseconds
     
     return ss
 }
-
 ///
 /// Determines if a song url path is under music root path in Player Preferences
 ///
@@ -401,7 +389,6 @@ internal func isPathInMusicRootPath(path: String) -> Bool {
     }
     return false
 }
-
 ///
 /// Determines if a song url path is under exclustion paths in Player Preferences
 ///
@@ -417,7 +404,6 @@ internal func isPathInExclusionPath(path: String) -> Bool {
     }
     return false
 }
-
 ///
 /// Int extension methods.
 ///
@@ -434,7 +420,6 @@ internal extension Int {
         return formatter.string(from: NSNumber(value: self))!
     }
 }
-
 ///
 /// Runs regular expression agains an input string.
 ///
@@ -457,7 +442,6 @@ internal func regExMatches(for regex: String, in text: String) -> [String] {
     
     return []
 }
-
 ///
 /// Compares two song entries.
 ///
@@ -482,7 +466,6 @@ internal func sortSongEntry(se1: SongEntry, se2: SongEntry) -> Bool {
     
     return false
 }
-
 ///
 /// Give current theme color
 ///
@@ -496,7 +479,6 @@ internal func getThemeBgColor() -> ConsoleColor {
         return ConsoleColor.black
   }
 }
-
 ///
 /// Give song background theme color
 ///
@@ -510,8 +492,6 @@ internal func getThemeSongBgColor() -> ConsoleColor {
         return ConsoleColor.black
   }
 }
-
-
 ///
 /// Get mode information
 ///
@@ -529,8 +509,9 @@ internal func getModeStatus() -> (isInMode: Bool, modeName: [String], numberOfSo
 
     return (isInMode: isInMode, modeName: modeName, numberOfSongsInMode: numberOfSongsInMode)
 }
-
-
+/// 
+/// Check if SearchType is in g_searchMode
+/// 
 internal func isSearchTypeInMode(_ type: SearchType) -> Bool {
     for t in g_searchType {
         if t == type {            
@@ -539,7 +520,10 @@ internal func isSearchTypeInMode(_ type: SearchType) -> Bool {
     }
     return false
 }
- 
+/// 
+/// Converts an id3v1 genre id to a genre name.
+/// - Parameter index: id3v1 genre id
+/// - Returns:  genre name.
 internal func convertId3V1GenreIndexToName(index: UInt8) -> String {    
     switch index {
         case 0: return "Blues"
@@ -671,8 +655,9 @@ internal func convertId3V1GenreIndexToName(index: UInt8) -> String {
         default: return "Unknown"
     }
 }
-
-// Function to redirect stderr to /dev/null
+///
+/// Function to redirect stderr to /dev/null
+/// 
 func redirect_stderr() -> Int32 {
     let dev_null = open("/dev/null", O_WRONLY)
     if dev_null == -1 {
@@ -697,21 +682,26 @@ func redirect_stderr() -> Int32 {
 
     return stderr_copy
 }
-
-// Function to restore stderr from the backup
+///
+/// Function to restore stderr from the backup
+/// 
 func restore_stderr(_ stderr_copy: Int32) {
     fflush(stderr) // Flush any remaining output
     dup2(stderr_copy, fileno(stderr)) // Restore stderr
     close(stderr_copy) // Close the backup
 }
-
+///
+/// window size container.
+/// 
 struct winsize {
     var ws_row: UInt16 = 0
     var ws_col: UInt16 = 0
     var ws_xpixel: UInt16 = 0
     var ws_ypixel: UInt16 = 0
 }
-
+/// 
+/// Gets terminal size
+///
 func getTerminalSize() -> (rows: Int, cols: Int)? {
     var w = winsize()
     let result = ioctl(STDOUT_FILENO, UInt(TIOCGWINSZ), &w)
@@ -721,7 +711,9 @@ func getTerminalSize() -> (rows: Int, cols: Int)? {
         return nil
     }
 }
-
+/// 
+/// Extracts track number from aac metadata track field.
+/// 
 func extractMetadataTrackNo(text: String) -> Int {
     // Define a regular expression pattern for a number or a number1/number2 format
     let pattern = "\\b(\\d+)/?\\d*\\b"
@@ -739,7 +731,9 @@ func extractMetadataTrackNo(text: String) -> Int {
     
     return 0
 }
-
+/// 
+/// Extracts year from aac metadata date/year fields.
+/// 
 func extractMetadataYear(text: String) -> Int {
     // Define a regular expression pattern for a number or a number1/number2 format
     let pattern = "\\b(\\d{4})\\b"

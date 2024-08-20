@@ -10,16 +10,28 @@
 // import.
 //
 import Foundation
-
+///
+/// MainWindows Commands class
+/// 
 internal class PlayerCommand {
+    ///
+    /// private variables
+    /// 
     private var commands: [[String]]
     private var handler: ([String]) -> Void
-    
+    /// 
+    /// initializer    
+    /// - Parameters:
+    ///   - commands: 
+    ///   - closure: 
     init(commands: [[String]], closure: @escaping ([String]) -> Void) {
         self.commands = commands
         self.handler = closure
     }
-    
+    /// 
+    /// Executes a command
+    /// - Parameter command: array of input command values
+    /// - Returns: true if command is found and executed, false otherwise
     func execute(command: [String]) -> Bool {
         for i in 0..<self.commands.count {
             if command.count >= self.commands[i].count {
@@ -57,5 +69,5 @@ internal class PlayerCommand {
             }
         }
         return false
-    }
-}
+    }// execute(command: [String])
+}// internal class PlayerCommand

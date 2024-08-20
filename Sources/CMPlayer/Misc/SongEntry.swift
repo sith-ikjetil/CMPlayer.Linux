@@ -18,7 +18,7 @@ import Cmpg123
 ///
 internal class SongEntry {
     //
-    // Properties/Constants.
+    // variables
     //
     let unknownMetadataStringValue: String = "--unknown--"
     var songNo: Int = 0
@@ -34,8 +34,10 @@ internal class SongEntry {
     var fullAlbumName: String = ""
     var recordingYear: Int = 0
     var trackNo: Int = 0    
+    ///
+    /// constants
+    /// 
     let maxStringLength: Int = 32
-
     ///
     /// Overloaded initializer. Is only called from PlayerLibrary.load()
     ///
@@ -119,8 +121,7 @@ internal class SongEntry {
         }
         
         g_recordingYears[self.recordingYear]?.append(self)
-    }
-    
+    }    
     ///
     /// Overloaded initializer.
     ///
@@ -225,8 +226,7 @@ internal class SongEntry {
         
         self.fullAlbumName = trimAndSetStringDefaultValue(str: self.albumName)
         self.albumName = trimAndSetStringDefaultValueMaxLength(str: self.albumName)
-    }
-    
+    }    
     ///
     /// Trims string and sets default value if it is empty
     ///
@@ -237,7 +237,11 @@ internal class SongEntry {
         }
         return s
     }
-    
+    /// 
+    /// Trims string and sets default value if it is empty, then if 
+    /// length of string is longer than self.maxStringLength it crops 
+    /// the length to this length.
+    /// 
     func trimAndSetStringDefaultValueMaxLength(str: String) -> String {
         var s = self.trimAndSetStringDefaultValue(str: str)
         if s.count > self.maxStringLength {
@@ -245,7 +249,9 @@ internal class SongEntry {
         }
         return s
     }
-
+    ///
+    /// Gets the artist with width set by widt of field on screen.
+    ///
     func getArtist() -> String {
         var s = self.trimAndSetStringDefaultValue(str: self.fullArtist)
 
@@ -260,7 +266,9 @@ internal class SongEntry {
 
         return s
     }
-
+    ///
+    /// Gets the albumName with width set by widt of field on screen.
+    ///
     func getAlbumName() -> String {
         var s = self.trimAndSetStringDefaultValue(str: self.fullAlbumName)
 
@@ -275,7 +283,9 @@ internal class SongEntry {
         
         return s
     }
-
+    ///
+    /// Gets the title with width set by widt of field on screen.
+    ///
     func getTitle() -> String {
         var s = self.trimAndSetStringDefaultValue(str: self.fullTitle)
 
@@ -290,7 +300,9 @@ internal class SongEntry {
         
         return s
     }
-
+    ///
+    /// Gets the genre with width set by widt of field on screen.
+    ///
     func getGenre() -> String {
         var s = self.trimAndSetStringDefaultValue(str: self.fullGenre)
 

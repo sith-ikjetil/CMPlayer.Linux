@@ -51,7 +51,7 @@ internal enum ColorTheme: String {
 ///
 internal class PlayerPreferences {
     //
-    // Static properties/constants
+    // Static variables
     //
     static let preferencesFilename: String = "CMPlayer.Preferences.xml"
     static var musicRootPath: [String] = []
@@ -70,15 +70,13 @@ internal class PlayerPreferences {
     static var logMaxSize: Int = 500
     static var logMaxSizeReached: LogMaxSizeReached = LogMaxSizeReached.EmptyLog
     static let logMaxSizes: [Int] = [100, 500, 1000, 2000, 3000, 4000, 5000]
-    static var logApplicationStartLoadType: LogApplicationStartLoadType = LogApplicationStartLoadType.DoNotLoadOldLog
-    
+    static var logApplicationStartLoadType: LogApplicationStartLoadType = LogApplicationStartLoadType.DoNotLoadOldLog    
     ///
     /// Default initializer.
     ///
-    internal init() {
+    init() {
         
-    }
-    
+    }    
     ///
     /// Loads preferences from file
     ///
@@ -175,7 +173,6 @@ internal class PlayerPreferences {
             
         }
     }
-    
     ///
     /// Saves preferences to file
     ///
@@ -291,7 +288,6 @@ internal class PlayerPreferences {
             
         }
     }
-    
     ///
     /// Ensures that preferences file exists. If it does not create it by saving it. Anyhow load it.
     ///

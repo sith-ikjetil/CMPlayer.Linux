@@ -22,20 +22,17 @@ internal class PlayerLibrary {
     //
     private let filename: String = "CMPLayer.Library.xml"
     private var nextSongNo: Int = 1
-    private var dictionary: [String: Int] = [:]
-    
+    private var dictionary: [String: Int] = [:]    
     //
-    // Internal properties/Constants
+    // variables
     //
-    var library: [SongEntry] = []
-    
+    var library: [SongEntry] = []    
     ///
     /// Default initializer
     ///
-    init() {
-        
-    }
+    init() {        
     
+    }    
     ///
     /// Find SongEntry in self.dictionary. Return it or nil if not existing.
     ///
@@ -46,8 +43,7 @@ internal class PlayerLibrary {
             }
         }
         return nil
-    }
-    
+    }    
     ///
     /// Return next available SongNo.
     ///
@@ -57,8 +53,7 @@ internal class PlayerLibrary {
         let retVal: Int = self.nextSongNo
         self.nextSongNo += 1
         return retVal
-    }
-    
+    }    
     ///
     /// Sets the next available number
     ///
@@ -66,8 +61,7 @@ internal class PlayerLibrary {
     ///
     func setNextAvailableSongNo(_ songNo: Int) -> Void {
         self.nextSongNo = songNo
-    }
-    
+    }    
     ///
     /// Loads the CMPlayer.Library.xml song library for faster song initialization load time.
     ///
@@ -149,8 +143,7 @@ internal class PlayerLibrary {
                 
             }
         }
-    }
-    
+    }    
     ///
     /// Saves the self.library SongEntry array to CMPlayer.Library.xml.
     ///

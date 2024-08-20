@@ -26,7 +26,6 @@ enum ConsoleColor : Int {
     case white = 37
     case reset = 0
 }
-
 ///
 /// Console color modifier
 ///
@@ -34,7 +33,6 @@ enum ConsoleColorModifier : Int {
     case none = 0
     case bold = 1
 }
-
 ///
 /// Represents CMPlayer Console
 ///
@@ -76,7 +74,6 @@ internal class Console {
     //static private let sigintSrcSIGUSR2 = DispatchSource.makeSignalSource(signal: Int32(SIGUSR2), queue: Console.concurrentQueue1)
     //static private let sigintSrcSIGTHR = DispatchSource.makeSignalSource(signal: Int32(SIGTHR), queue: Console.concurrentQueue1)
     //static private let sigintSrcSIGLIBRT = DispatchSource.makeSignalSource(signal: Int32(SIGLIBRT), queue: Console.concurrentQueue1)
-
     ///
     /// Clears console screen.
     ///
@@ -85,7 +82,6 @@ internal class Console {
         //print("\u{001B}[2J")
         Console.printXY(1,1," ", g_rows*g_cols, .left, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.none)
     }
-    
     ///
     /// Clears console screen given colors.
     ///
@@ -94,7 +90,6 @@ internal class Console {
         //print("\u{001B}[2J")
         Console.printXY(1,1," ", g_rows*g_cols, .left, " ", colorBg, modBg, colorText, modText)
     }
-    
     ///
     /// Clears console screen current theme.
     ///
@@ -108,22 +103,19 @@ internal class Console {
             Console.printXY(1,1," ", g_rows*g_cols, .left, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.none)
         }
         //print("\u{001B}[2J")
-    }
-    
+    }    
     ///
     /// Hides console cursor.
     ///
     static func hideCursor() -> Void {
         print("\u{001B}[?25l")
     }
-    
     ///
     /// Shows console cursor.
     ///
     static func showCursor() -> Void {
         print("\u{001B}[?25h")
     }
-    
     ///
     /// Turns console echo off.
     ///
@@ -135,10 +127,15 @@ internal class Console {
             try newt.update(fd: STDIN_FILENO)
         }
         catch {
-            exit(-1);
+            let msg = "[Console].echoOff().\n Unknown error.\n Message: \(error)"
+            let wnd: ErrorWindow = ErrorWindow()
+            wnd.message = msg
+            wnd.showWindow()
+
+            PlayerLog.ApplicationLog?.logError(title: "[Console].echoOff()", text: msg.trimmingCharacters(in: .newlines))
+            exit(1);
         }
     }
-    
     ///
     /// Turns console echo on.
     ///
@@ -150,10 +147,15 @@ internal class Console {
             try newt.update(fd: STDIN_FILENO)
         }
         catch {
-            exit(-1);
+            let msg = "[Console].echoOn().\n Unknown error.\n Message: \(error)"
+            let wnd: ErrorWindow = ErrorWindow()
+            wnd.message = msg
+            wnd.showWindow()
+
+            PlayerLog.ApplicationLog?.logError(title: "[Console].echoOn()", text: msg.trimmingCharacters(in: .newlines))
+            exit(1);
         }
     }
-    
     ///
     /// Applies color to text string.
     ///
@@ -172,7 +174,6 @@ internal class Console {
         
         return "\u{001B}[\(colorText.rawValue)\(addToText)m\u{001B}[\(colorBg.rawValue+10)\(addToBg)m\(text)\u{001B}[0m"
     }
-    
     ///
     /// Sets terminal size in character length.
     ///
@@ -182,7 +183,6 @@ internal class Console {
     static func setTerminalSize(width: Int, height: Int) -> Void {
         print("\u{001B}[8;\(height);\(width)t", terminator: "")
     }
-    
     ///
     /// Moves console position.
     ///
@@ -193,7 +193,6 @@ internal class Console {
     {
         print("\u{001B}[\(y);\(x)H", terminator: "")
     }
-    
     ///
     /// Prints a string to console at given position.
     ///
@@ -212,7 +211,6 @@ internal class Console {
         let nmsg = text.convertStringToLengthPaddedString(maxLength, padding, paddingChar)
         print("\u{001B}[\(y);\(x)H\(Console.applyTextColor(colorBg: bgColor, modifierBg: modifierBg, colorText: colorText, modifierText: modifierText, text: nmsg))", terminator: "")
     }
-    
     ///
     /// Initializes console.
     ///
