@@ -191,7 +191,7 @@ internal class SongEntry {
         
         //
         // Add to genre
-        //
+        //        
         self.fullGenre = trimAndSetStringDefaultValue(str: self.genre)
         self.genre = trimAndSetStringDefaultValueMaxLength(str: self.genre)
         if g_genres[self.genre] == nil {
@@ -210,8 +210,7 @@ internal class SongEntry {
         }
     
         g_artists[self.artist]?.append(self)
-    
-        
+            
         //
         // Add to g_releaseYears
         //
@@ -226,7 +225,7 @@ internal class SongEntry {
         
         self.fullAlbumName = trimAndSetStringDefaultValue(str: self.albumName)
         self.albumName = trimAndSetStringDefaultValueMaxLength(str: self.albumName)
-    }    
+    }
     ///
     /// Trims string and sets default value if it is empty
     ///
