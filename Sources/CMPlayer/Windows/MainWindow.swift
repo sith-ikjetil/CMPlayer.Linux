@@ -277,6 +277,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             return
         }
 
+        //Console.clearScreenCurrentTheme()
+
         renderFrame()
         renderSongs()
         renderAddendumText()

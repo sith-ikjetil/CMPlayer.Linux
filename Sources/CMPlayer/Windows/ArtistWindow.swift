@@ -67,6 +67,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             return
         }
         
+        Console.clearScreenCurrentTheme()
         MainWindow.renderHeader(showTime: false)
         
         let bgColor = getThemeBgColor()

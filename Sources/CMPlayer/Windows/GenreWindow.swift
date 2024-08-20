@@ -70,6 +70,7 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             return
         }
         
+        Console.clearScreenCurrentTheme()
         MainWindow.renderHeader(showTime: false)
         
         let bgColor = getThemeBgColor()

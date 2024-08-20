@@ -91,6 +91,7 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
             return
         }
         
+        Console.clearScreenCurrentTheme()
         MainWindow.renderHeader(showTime: false)
         
         let bgColor = getThemeBgColor()

@@ -51,6 +51,7 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             return
         }
         
+        Console.clearScreenCurrentTheme()
         MainWindow.renderHeader(showTime: false)
         
         Console.printXY(1,3,":: SETUP ::", g_cols, .center, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)

@@ -55,6 +55,8 @@ internal class ErrorWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         if g_rows < 24 || g_cols < 80 {
             return
         }
+
+        Console.clearScreenCurrentTheme()
              
         Console.printXY(1, 1, "CMPlayer Error", g_cols, .center, " ", ConsoleColor.blue, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         Console.printXY(1, 3, self.message, g_cols*15, .ignore, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.red, ConsoleColorModifier.bold)

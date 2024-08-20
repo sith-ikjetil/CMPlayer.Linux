@@ -78,6 +78,8 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             return
         }
         
+        Console.clearScreenCurrentTheme()
+
         MainWindow.renderHeader(showTime: false)
         
         let bgColor = getThemeBgColor()
@@ -172,7 +174,7 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }       
 
         Console.printXY(1,g_rows-3," ", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold) 
-        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT mc:\(self.modeText.count) self.si:\(self.searchIndex), is:\(index_search), max:\(max)", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         Console.printXY(1,g_rows,"\(g_searchResult.count.itsToString()) Songs", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         Console.gotoXY(g_cols,1)
@@ -211,7 +213,7 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
             if PlayerPreferences.viewType == ViewType.Default {
-                if (self.searchIndex + (g_rows-7)) < (self.modeText.count+self.searchResult.count) {
+                if (self.searchIndex + (g_rows-7)) <= (self.modeText.count+self.searchResult.count) {
                     self.searchIndex += 1
                     self.renderWindow()
                 }
@@ -262,32 +264,31 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in            
             if PlayerPreferences.viewType == ViewType.Default {
-                if (self.searchIndex + (g_rows-7)) >= (self.modeText.count+self.searchResult.count) {
-                    self.searchIndex = (self.modeText.count + self.searchResult.count) - (g_rows-7)
-                    if self.searchIndex < 0 {
-                        self.searchIndex = 0
-                    }
-                }
-                else {
-                    self.searchIndex += (g_rows-7)                    
-                }
-                self.renderWindow()
-            }
-            else if PlayerPreferences.viewType == ViewType.Details {
-                if self.searchIndex >= self.modeText.count {
-                    if (self.searchIndex + (g_rows-7)/2) < (self.modeText.count+self.searchResult.count) {
-                        self.searchIndex += ((g_rows-7)/2)
+                if self.searchIndex >= 0 && (self.modeText.count+self.searchResult.count) > (g_rows-7) {
+                    if self.searchIndex + (g_rows-7) < ((self.modeText.count+self.searchResult.count) - (g_rows-7)) {
+                        self.searchIndex += (g_rows-7) - 1
                     }
                     else {
-                        self.searchIndex = (self.modeText.count+self.searchResult.count) - ((g_rows-7)/2)
-                        if self.searchIndex < 0 {
+                        self.searchIndex = (self.modeText.count+self.searchResult.count) - (g_rows-7) + 1
+                        if (self.searchIndex < 0) {
                             self.searchIndex = 0
                         }
                     }                    
-                }
-                else {
-                    self.searchIndex += max(self.modeText.count,((g_rows-7)/2))                    
-                }
+                }             
+                self.renderWindow()
+            }
+            else if PlayerPreferences.viewType == ViewType.Details {
+                if self.searchIndex >= 0 && (self.modeText.count+self.searchResult.count) > (g_rows-7) {
+                    if self.searchIndex + ((g_rows-7)/2) < ((self.modeText.count+self.searchResult.count) - ((g_rows-7)/2)) {
+                        self.searchIndex += ((g_rows-7)/2) 
+                    }
+                    else {
+                        self.searchIndex = (self.modeText.count+self.searchResult.count) - ((g_rows-7)/2)
+                        if (self.searchIndex < 0) {
+                            self.searchIndex = 0
+                        }
+                    }                    
+                }             
                 self.renderWindow()
             }
         
