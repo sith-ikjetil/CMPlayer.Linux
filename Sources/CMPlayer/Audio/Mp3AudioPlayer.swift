@@ -355,6 +355,11 @@ internal class Mp3AudioPlayer {
                             let id = "\(Character(UnicodeScalar(UInt32(textItem.id.0))!))\(Character(UnicodeScalar(UInt32(textItem.id.1))!))\(Character(UnicodeScalar(UInt32(textItem.id.2))!))\(Character(UnicodeScalar(UInt32(textItem.id.3))!))"
                             if id == "TRCK" {
                                 metadata.trackNo = Int(text) ?? -1
+                            }                                                                               
+                            if id == "TYER" || id == "TDAT" || id == "TORY" {                                                                
+                                if metadata.recordingYear == 0 {
+                                    metadata.recordingYear = extractMetadataYear(text: text)                                    
+                                }
                             }
                         }                                                
                     } 

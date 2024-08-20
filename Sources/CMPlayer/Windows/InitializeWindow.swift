@@ -174,8 +174,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
         if g_rows < 24 || g_cols < 80 {
             return
         }
-        
-        Console.clearScreenCurrentTheme()
+                
         MainWindow.renderHeader(showTime: false)
         
         let bgColor = getThemeBgColor()
