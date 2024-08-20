@@ -619,26 +619,13 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         if g_player.audioPlayerActive == -1 {
             self.onCommandPlay(parts: parts)
         }
-        else if g_player.audioPlayerActive == 1 {
-            if let player = g_player.audio1 {
-                if player.isPlaying {
-                    self.onCommandPause(parts: parts)
-                }
-                else {
-                    self.onCommandPlay(parts: parts)
-                }
-            }
+        
+        if g_player.isPaused {
+            g_player.resume()
         }
-        else if g_player.audioPlayerActive == 2 {
-            if let player = g_player.audio2 {
-                if player.isPlaying {
-                    self.onCommandPause(parts: parts)
-                }
-                else {
-                    self.onCommandPlay(parts: parts)
-                }
-            }
-        }
+        else {
+            g_player.pause()
+        }        
     }    
     ///
     /// Resume playback.

@@ -76,7 +76,7 @@ internal class Player {
         
         self.audioPlayerActive = player
         do {
-            if player == -1 || player == 1 {
+            if player == 1 {
                 if self.audio1 == nil {                      
                     self.audio1 = CmpAudioPlayer(path:g_playlist[playlistIndex].fileURL!)                    
                     self.durationAudioPlayer1 = g_playlist[playlistIndex].duration
@@ -139,21 +139,24 @@ internal class Player {
         guard g_songs.count > 0 else {
             return
         }
-        
-        g_lock.lock()
-        
-        if self.audio1 != nil {
-            if self.audio1?.isPlaying ?? false {
-                audio1?.pause()
-                self.isPaused = true
-            }
+
+        guard self.isPaused == false else {
+            return
+        }
+
+        guard self.audioPlayerActive != -1 else {
+            return
         }
         
-        if self.audio2 != nil {
-            if self.audio2?.isPlaying ?? false {
-                audio2?.pause()
-                self.isPaused = true
-            }
+        g_lock.lock()
+                
+        if self.audioPlayerActive == 1 {
+            audio1?.pause()            
+            self.isPaused = true
+        }
+        else if self.audioPlayerActive == 2 {
+            audio2?.pause()
+            self.isPaused = true
         }
         
         g_lock.unlock()
@@ -165,23 +168,24 @@ internal class Player {
         guard g_songs.count > 0 else {
             return
         }
-        
-        g_lock.lock()
-        
-        if self.audio1 != nil && self.audioPlayerActive == 1 {
-            //if self.audio1?.currentTime.magnitude ?? 0 > 0 {
-            //    audio1?.play()
-            //    self.isPaused = false
-            //}
-            audio1?.resume()
+
+        guard self.isPaused == true else {
+            return
+        }
+
+        guard self.audioPlayerActive != -1 else {
+            return
         }
         
-        if self.audio2 != nil && self.audioPlayerActive == 2 {
-            //if self.audio2?.currentTime.magnitude ?? 0 > 0 {
-            //    audio2?.play()
-            //    self.isPaused = false
-            //}
+        g_lock.lock()
+                
+        if self.audioPlayerActive == 1 {
+            audio1?.resume()
+            self.isPaused = false            
+        }
+        else if self.audioPlayerActive == 2 {
             audio2?.resume()
+            self.isPaused = false            
         }
         
         g_lock.unlock()
