@@ -77,79 +77,55 @@ internal class Player {
         PlayerLog.ApplicationLog?.logInformation(title: "[Player].play", text: "Playing index \(playlistIndex), file \(g_playlist[playlistIndex].fileURL?.path ?? "--unknown")")
         
         self.audioPlayerActive = player
-        if player == -1 || player == 1 {
-            if self.audio1 == nil {
-                do {                    
+        do {
+            if player == -1 || player == 1 {
+                if self.audio1 == nil {                      
                     self.audio1 = CmpAudioPlayer(path:g_playlist[playlistIndex].fileURL!)                    
                     self.durationAudioPlayer1 = g_playlist[playlistIndex].duration
                     try self.audio1?.play()                    
-                    self.isPaused = false                    
+                    self.isPaused = false                            
                 }
-                catch {
-                    let msg = "EXIT_CODE_ERROR_PLAYING_FILE\nError playing player \(player) on index \(playlistIndex).\n\(error)"
-                    PlayerLog.ApplicationLog?.logError(title: "[Player].play", text: msg)
-                    
-                    let wnd: ErrorWindow = ErrorWindow()
-                    wnd.message = msg
-                    wnd.showWindow()
-                    exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
-                }
-            }
-            else {
-                do {
+                else {
                     self.audio1?.stop()
                     self.audio1 = CmpAudioPlayer(path: g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer1 = g_playlist[playlistIndex].duration
                     try self.audio1?.play()
                     self.isPaused = false
-                }
-                catch {
-                    let msg = "EXIT_CODE_ERROR_PLAYING_FILE\nError playing player \(player) on index \(playlistIndex).\n\(error)"
-                    PlayerLog.ApplicationLog?.logError(title: "[Player].play", text: msg)
-                    
-                    let wnd: ErrorWindow = ErrorWindow()
-                    wnd.message = msg
-                    wnd.showWindow()
-                    exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
-                }
+                }                
             }
-        }
-        else if player == 2 {
-            if self.audio2 == nil {
-                do {
+            else if player == 2 {
+                if self.audio2 == nil {
                     self.audio2 = CmpAudioPlayer(path:g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer2 = g_playlist[playlistIndex].duration
                     try self.audio2?.play()
                     self.isPaused = false
                 }
-                catch {
-                    let msg = "EXIT_CODE_ERROR_PLAYING_FILE\nError playing player \(player) on index \(playlistIndex).\n\(error)"
-                    PlayerLog.ApplicationLog?.logError(title: "[Player].play", text: msg)
-                    
-                    let wnd: ErrorWindow = ErrorWindow()
-                    wnd.message = msg
-                    wnd.showWindow()
-                    exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
-                }
-            }
-            else {
-                do {
+                else {
                     self.audio2?.stop()
                     self.audio2 = CmpAudioPlayer(path: g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer2 = g_playlist[playlistIndex].duration
                     try self.audio2?.play()
                     self.isPaused = false
-                }
-                catch {
-                    let msg = "EXIT_CODE_ERROR_PLAYING_FILE\nError playing player \(player) on index \(playlistIndex).\n\(error)"
-                    PlayerLog.ApplicationLog?.logError(title: "[Player].play", text: msg)
-                    
-                    let wnd: ErrorWindow = ErrorWindow()
-                    wnd.message = msg
-                    wnd.showWindow()
-                    exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
-                }
+                }            
             }
+        }
+        catch let error as CmpError {
+            let msg = "Error playing player \(player) on index \(playlistIndex).\n Message: \(error.message)"
+            PlayerLog.ApplicationLog?.logError(title: "[Player].play(player,playlistIndex)", text: msg.trimmingCharacters(in: .newlines))
+
+            let wnd: ErrorWindow = ErrorWindow()
+            wnd.message = msg
+            wnd.showWindow()
+            exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
+        }
+        catch {
+            let msg = "Unknown Error.\n Error playing player \(player) on index \(playlistIndex).\n\(error)"
+            PlayerLog.ApplicationLog?.logError(title: "[Player].play(player,playlistIndex)", text: msg)
+            
+            let wnd: ErrorWindow = ErrorWindow()
+            wnd.message = msg
+            wnd.showWindow()
+            exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
         }
     }
     
