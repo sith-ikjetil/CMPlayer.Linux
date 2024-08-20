@@ -16,12 +16,14 @@ import Foundation
 ///
 internal class InfoWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol {
     //
-    // Private properties/constants
+    // private variables
     //
     private var infoIndex: Int = 0
     private var infoText: [String] = []
-    var song: SongEntry?
-    
+    ///
+    /// variables
+    /// 
+    var song: SongEntry?    
     ///
     /// Shows this HelpWindow on screen.
     ///
@@ -38,21 +40,17 @@ internal class InfoWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         self.run()
         
         g_tscpStack.removeLast()
-    }
-    
+    }    
     ///
     /// TerminalSizeChangedProtocol method
     ///
     func terminalSizeHasChanged() -> Void {
         Console.clearScreenCurrentTheme()
         self.renderWindow()
-    }
-    
+    }    
     ///
     /// Updates information to be rendered on screen
-    ///
-    /// parameter song: Instance of SongEntry to render info.
-    ///
+    ///    
     func updateInfoText() -> Void {
         self.infoText.append("song no.")
         self.infoText.append(" :: \(self.song?.songNo ?? 0)")
@@ -86,7 +84,6 @@ internal class InfoWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             self.infoText.append(" :: \(pathOnly)")
         }
     }
-    
     ///
     /// Renders screen output. Does clear screen first.
     ///
@@ -129,10 +126,9 @@ internal class InfoWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         Console.printXY(1,g_rows," ", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.gotoXY(80,1)
+        Console.gotoXY(g_cols,1)
         print("")
-    }
-    
+    }    
     ///
     /// Runs HelpWindow keyboard input and feedback.
     ///
@@ -187,4 +183,4 @@ internal class InfoWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         })
         keyHandler.run()
     }// run
-}// HelpWindow
+}// InfoWindow

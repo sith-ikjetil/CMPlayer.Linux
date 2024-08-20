@@ -16,17 +16,16 @@ import Foundation
 ///
 internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol {
     ///
-    /// Private properties/variables/constants.
+    /// private constants
     ///
     private let setupText: [String] = ["CMPlayer needs to have a path to search for music",
                                        "In CMPlayer you can have many root paths.",
                                        "In CMPlayer Use: add mrp <path> or: remove mrp <path> to add remove path.",
                                        "Please enter the path to the root directory of where your music resides."]
     //
-    // Public propreties/variables/constants
+    // variables
     //
-    var path: String = ""
-    
+    var path: String = ""    
     ///
     /// Shows this InitialSetupWindow on screen.
     ///
@@ -34,16 +33,14 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         g_tscpStack.append(self)
         self.run()
         g_tscpStack.removeLast()
-    }
-    
+    }    
     ///
     /// TerminalSizeChangedProtocol method
     ///
     func terminalSizeHasChanged() -> Void {
         Console.clearScreen()
         self.renderWindow()
-    }
-    
+    }    
     ///
     /// Renders screen output. Does clear screen first.
     ///
@@ -66,10 +63,9 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         
         Console.printXY(1,y+1, ":> \(self.path)", g_cols, .left, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
         
-        Console.gotoXY(80,1)
+        Console.gotoXY(g_cols,1)
         print("")
-    }
-    
+    }    
     ///
     /// Runs InitialSetupWindow keyboard input and feedback.
     ///
@@ -103,4 +99,4 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         })
         keyHandler.run()
     }// run
-}// InitialSetupWindow
+}// SetupWindow

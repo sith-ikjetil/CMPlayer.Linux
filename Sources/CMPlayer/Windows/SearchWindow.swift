@@ -16,28 +16,25 @@ import Foundation
 ///
 internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol {
     //
-    // Private properties/variables/constants.
+    // private variables
     //
     private var searchIndex: Int = 0
     private var partsYear: [String] = []
-    private var modeOff: Bool = false
-    
+    private var modeOff: Bool = false    
     //
-    // Public properties/variables/constants
+    // variables
     //
     var searchResult: [SongEntry] = []
     var parts: [String] = []
     var stats: [Int] = []
-    var type: SearchType = SearchType.ArtistOrTitle
-    
+    var type: SearchType = SearchType.ArtistOrTitle    
     ///
     /// TerminalSizeChangedProtocol method
     ///
     func terminalSizeHasChanged() -> Void {
         Console.clearScreenCurrentTheme()
         self.renderWindow()
-    }
-    
+    }    
     ///
     /// Perform narrow search from arguments.
     ///
@@ -162,8 +159,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         }
     
         self.searchResult = self.searchResult.sorted {sortSongEntry(se1: $0, se2: $1)} // $0.artist < $1.artist }
-    }
-    
+    }    
     ///
     /// Performs search from arguments. Searches g_songs.
     ///
@@ -296,8 +292,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         }
     
         self.searchResult = self.searchResult.sorted {sortSongEntry(se1: $0, se2: $1)} // $0.artist < $1.artist }
-    }
-    
+    }    
     ///
     /// Shows this SearchWindow on screen.
     ///
@@ -307,8 +302,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         self.renderWindow()
         self.run()
         g_tscpStack.removeLast()
-    }
-    
+    }    
     ///
     /// Renders screen output. Does clear screen first.
     ///
@@ -403,31 +397,9 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         
         Console.printXY(1,g_rows,"\(self.searchResult.count.itsToString()) Songs", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.gotoXY(80,1)
+        Console.gotoXY(g_cols,1)
         print("")
-    }
-    
-    ///
-    /// Returnes content line count
-    ///
-    /*func getSongsLineCount() -> Int {
-        if PlayerPreferences.viewType == ViewType.Default {
-            return g_windowContentLineCount
-        }
-        else {
-            return g_windowContentLineCount / 2
-        }
-    }
-    
-    func getSongsContentLineCount() -> Int {
-        if PlayerPreferences.viewType == ViewType.Default {
-            return 1
-        }
-        else {
-            return 2
-        }
-    }*/
-    
+    }        
     ///
     /// Runs SearchWindow keyboard input and feedback.
     ///

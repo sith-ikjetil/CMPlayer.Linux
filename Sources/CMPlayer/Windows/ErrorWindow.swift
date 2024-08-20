@@ -12,9 +12,10 @@
 import Foundation
 
 internal class ErrorWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol {
-    
-    var message: String = ""
-    
+    ///
+    /// variables
+    /// 
+    var message: String = ""    
     ///
     /// Shows this ErrorWindow on screen.
     ///
@@ -24,15 +25,13 @@ internal class ErrorWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         g_tscpStack.append(self)        
         self.run()
         g_tscpStack.removeLast()
-    }
-    
+    }    
     //
     // TerminalSizeChangedProtocol implementation handler.
     //
     func terminalSizeHasChanged() {
         self.renderWindow()
-    }
-    
+    }    
     //
     // Run method.
     //
@@ -45,8 +44,7 @@ internal class ErrorWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             return true
         })
         keyHandler.run()
-    }
-    
+    }    
     ///
     /// Renders error message on screen. Waits for user to press Enter key to continue.
     ///
@@ -63,7 +61,7 @@ internal class ErrorWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         print("")
         print(Console.applyTextColor(colorBg: ConsoleColor.black, modifierBg: ConsoleColorModifier.none, colorText: ConsoleColor.white, modifierText: ConsoleColorModifier.bold, text: "> Press ENTER Key To Continue <"))
         
-        Console.gotoXY(1,g_rows-3)
+        Console.gotoXY(g_cols,1)
         print("")
     }// renderErrorMessage
 }// ErrorWindow

@@ -105,10 +105,9 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         
         Console.printXY(1,g_rows,"\(g_genres.count.itsToString()) Genres", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.gotoXY(80,1)
+        Console.gotoXY(g_cols,1)
         print("")
-    }
-    
+    }  
     ///
     /// Runs AboutWindow keyboard input and feedback.
     ///
@@ -164,4 +163,4 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         })
         keyHandler.run()
     }// run
-}// AboutWindow
+}// GenreWindow

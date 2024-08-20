@@ -16,11 +16,10 @@ import Foundation
 ///
 internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol {
     ///
-    /// Private properties/constants.
+    /// private variables
     ///
     private var yearIndex: Int = 0
-    private var yearText: [String] = []
-    
+    private var yearText: [String] = []    
     ///
     /// Shows this AboutWindow on screen.
     ///
@@ -34,16 +33,14 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         self.run()
         
         g_tscpStack.removeLast()
-    }
-    
+    }    
     ///
     /// TerminalSizeChangedProtocol method
     ///
     func terminalSizeHasChanged() -> Void {
         Console.clearScreenCurrentTheme()
         self.renderWindow()
-    }
-    
+    }    
     ///
     /// Updates the genere text array. Called before visual showing.
     ///
@@ -60,8 +57,7 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             self.yearText.append(name)
             self.yearText.append(desc)
         }
-    }
-    
+    }    
     ///
     /// Renders screen output. Does clear screen first.
     ///
@@ -107,8 +103,7 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         Console.gotoXY(80,1)
         print("")
-    }
-    
+    }    
     ///
     /// Runs AboutWindow keyboard input and feedback.
     ///
@@ -164,4 +159,4 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         })
         keyHandler.run()
     }// run
-}// AboutWindow
+}// YearWindow

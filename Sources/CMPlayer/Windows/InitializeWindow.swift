@@ -16,15 +16,17 @@ import Foundation
 ///
 internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol {
     //
-    // Private properties/constants
+    // private variables
     //
     private var filesFoundCompleted: Int = 0
     private var libraryLoadedCompleted: Int = 0
     private var isFinished: Bool = false
-    private var currentPath: String = ""
-    private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.linux.Initialize", attributes: .concurrent)
+    private var currentPath: String = ""    
     private var musicFormats: [String] = []
-    
+    ///
+    /// private constants
+    /// 
+    private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.linux.Initialize", attributes: .concurrent)
     ///
     /// Shows this HelpWindow on screen.
     ///
@@ -46,7 +48,9 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
         
         g_tscpStack.removeLast()
     }
-    
+    /// 
+    /// Finds all songs and appends them to g_songs and initializes g_playlist.
+    ///     
     func initialize() -> Void {
         g_songs.removeAll()
         g_playlist.removeAll()
@@ -95,13 +99,12 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
             g_playlist.append(r1!)
             g_playlist.append(r2!)
         }
-    }
-    
+    }    
     ///
-    /// Finds all songs from path and all folder paths under path. Songs must be of format in PlayerPreferences.musicFormats.
+    /// Finds all songs from path and all folder paths under path. Songs must be 
+    /// of format in PlayerPreferences.musicFormats.
     ///
     /// parameter path: The root path to start finding supported audio files.
-    ///
     /// returns: [String]. Array of file paths to audio files found.
     ///
     func findSongs(path: String) -> [String]
@@ -146,8 +149,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
         }
         
         return results
-    }
-    
+    }    
     ///
     /// Determines if a path is a directory or not.
     ///
@@ -161,16 +163,14 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
             return isDirectory.boolValue;
         }
         return false;
-    }// isDirectory
-    
+    }// isDirectory    
     ///
     /// TerminalSizeChangedProtocol method
     ///
     func terminalSizeHasChanged() -> Void {
         Console.clearScreenCurrentTheme()
         self.renderWindow()
-    }
-    
+    }    
     ///
     /// Renders screen output. Does clear screen first.
     ///
@@ -195,10 +195,9 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
         
         Console.printXY(1,23,"PLEASE BE PATIENT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.gotoXY(1,g_rows-3)
+        Console.gotoXY(g_cols,1)
         print("")
-    }
-    
+    }    
     ///
     /// Runs HelpWindow keyboard input and feedback.
     ///
@@ -211,4 +210,4 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
             usleep(useconds_t(0.050 * second))
         }
     }// run
-}// HelpWindow
+}// InitializeWindow

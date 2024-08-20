@@ -16,9 +16,12 @@ import Foundation
 ///
 internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol {
     ///
-    /// Private properties/constants.
+    /// private variables
     ///
     private var aboutIndex: Int = 0
+    ///
+    /// private constants
+    /// 
     private let aboutText: [String] = ["   CMPlayer (Console Music Player) is a clone and improvement over the",
                                        "   Interactive DJ software written in summer 1997 running on DOS.",
                                        "   ",
@@ -29,8 +32,7 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
                                        "   by searching for them, and in the main window entering the number",
                                        "   associated with the song to add to the playlist.",
                                        "   ",
-                                       "   CMPlayer was made by Kjetil Kristoffer Solberg. ENJOY!"]
-    
+                                       "   CMPlayer was made by Kjetil Kristoffer Solberg. ENJOY!"]    
     ///
     /// Shows this AboutWindow on screen.
     ///
@@ -43,16 +45,14 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         self.run()
         
         g_tscpStack.removeLast()
-    }
-    
+    }    
     ///
     /// TerminalSizeChangedProtocol method
     ///
     func terminalSizeHasChanged() -> Void {
         Console.clearScreenCurrentTheme()
         self.renderWindow()
-    }
-    
+    }    
     ///
     /// Renders screen output. Does clear screen first.
     ///
@@ -88,10 +88,9 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         
         Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.gotoXY(80,1)
+        Console.gotoXY(g_cols,1)
         print("")
-    }
-    
+    }    
     ///
     /// Runs AboutWindow keyboard input and feedback.
     ///

@@ -15,10 +15,13 @@ import Foundation
 /// Represents CMPlayer HelpWindow.
 ///
 internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol {
-    //
-    // Private properties/constants
-    //
+    ///
+    /// private variables
+    ///
     private var helpIndex: Int = 0
+    ///
+    /// private constants
+    /// 
     private let helpText: [String] = [" exit, quit, q", " :: exits application",
                                       " next, skip, n, s, 'TAB'-key", " :: plays next song",
                                       " play, p", " :: plays music",
@@ -59,8 +62,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                                       //" update cmplayer", " :: updates cmplayer if new version is found online",
                                       " set viewtype <type>", " :: sets view type. can be 'default' or 'details'",
                                       " set theme <color>", " :: sets theme color. color can be 'default', 'blue' or 'black'"]
-                                      //" restart", " :: restarts the application. picks up changes when files are removed or added"]
-    
+                                      //" restart", " :: restarts the application. picks up changes when files are removed or added"]    
     ///
     /// Shows this HelpWindow on screen.q
     ///
@@ -70,16 +72,14 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         Console.clearScreenCurrentTheme()
         self.run()
         g_tscpStack.removeLast()
-    }
-    
+    }    
     ///
     /// TerminalSizeChangedProtocol method
     ///
     func terminalSizeHasChanged() -> Void {
         Console.clearScreenCurrentTheme()
         self.renderWindow()
-    }
-    
+    }    
     ///
     /// Renders screen output. Does clear screen first.
     ///
@@ -125,8 +125,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         Console.gotoXY(g_cols,1)
         print("")
-    }
-    
+    }    
     ///
     /// Runs HelpWindow keyboard input and feedback.
     ///

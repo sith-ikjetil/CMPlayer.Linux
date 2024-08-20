@@ -16,11 +16,10 @@ import Foundation
 ///
 internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol {
     ///
-    /// Private properties/constants.
+    /// private variables
     ///
     private var artistIndex: Int = 0
-    private var artistText: [String] = []
-    
+    private var artistText: [String] = []    
     ///
     /// Shows this AboutWindow on screen.
     ///
@@ -35,16 +34,14 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         self.run()
         
         g_tscpStack.removeLast()
-    }
-    
+    }    
     ///
     /// TerminalSizeChangedProtocol method
     ///
     func terminalSizeHasChanged() -> Void {
         Console.clearScreenCurrentTheme()
         self.renderWindow()
-    }
-    
+    }    
     ///
     /// Updates the genere text array. Called before visual showing.
     ///
@@ -61,8 +58,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             self.artistText.append(name)
             self.artistText.append(desc)
         }
-    }
-    
+    }    
     ///
     /// Renders screen output. Does clear screen first.
     ///
@@ -74,8 +70,8 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         MainWindow.renderHeader(showTime: false)
         
         let bgColor = getThemeBgColor()
-        Console.printXY(1,3,":: ARTIST ::", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        Console.printXY(1,4,"mode artist is: \((isSearchTypeInMode(SearchType.Artist)) ? "on" : "off")", 80, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,3,":: ARTIST ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+        Console.printXY(1,4,"mode artist is: \((isSearchTypeInMode(SearchType.Artist)) ? "on" : "off")", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         var index_screen_lines: Int = 5
         var index_search: Int = self.artistIndex
@@ -106,10 +102,9 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         
         Console.printXY(1,g_rows,"\(g_artists.count.itsToString()) Artists", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.gotoXY(80,1)
+        Console.gotoXY(g_cols,1)
         print("")
     }
-    
     ///
     /// Runs AboutWindow keyboard input and feedback.
     ///
@@ -165,4 +160,4 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         })
         keyHandler.run()
     }// run
-}// AboutWindow
+}// ArtistWindow

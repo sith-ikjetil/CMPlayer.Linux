@@ -16,11 +16,10 @@ import Foundation
 ///
 internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol {
     //
-    // Private properties/constants
+    // private variables
     //
     private var preferencesIndex: Int = 0
-    private var preferencesText: [String] = []
-    
+    private var preferencesText: [String] = []    
     ///
     /// Shows this HelpWindow on screen.
     ///
@@ -35,16 +34,14 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
         self.run()
         
         g_tscpStack.removeLast()
-    }
-    
+    }    
     ///
     /// TerminalSizeChangedProtocol method
     ///
     func terminalSizeHasChanged() -> Void {
         Console.clearScreenCurrentTheme()
         self.renderWindow()
-    }
-    
+    }    
     ///
     /// Updates the preferences text based on running values.
     ///
@@ -85,8 +82,7 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
         self.preferencesText.append(" :: \(PlayerPreferences.viewType.rawValue)")
         self.preferencesText.append(" Theme")
         self.preferencesText.append(" :: \(PlayerPreferences.colorTheme.rawValue)")
-    }
-    
+    }    
     ///
     /// Renders screen output. Does clear screen first.
     ///
@@ -129,8 +125,7 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
         
         Console.gotoXY(g_cols,1)
         print("")
-    }
-    
+    }    
     ///
     /// Runs HelpWindow keyboard input and feedback.
     ///
@@ -186,4 +181,4 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
         })
         keyHandler.run()
     }// run
-}// HelpWindow
+}// Preferencesindow

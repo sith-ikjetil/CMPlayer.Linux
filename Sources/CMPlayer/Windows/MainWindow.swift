@@ -15,22 +15,31 @@ import Foundation
 /// Represents CMPlayer MainWindow.
 ///
 internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol {
-    //
-    // properties/constants/variables.
-    //
+    ///
+    /// static private variables
+    /// 
     static private var timeElapsedMs: UInt64 = 0
+    //
+    // private variables
+    //    
     private var quit: Bool = false
     private var currentCommand: String = ""
     private var commands: [PlayerCommand] = []
     private var commandReturnValue: Bool = false
-    private let concurrentQueue1 = DispatchQueue(label: "dqueue.cmp.linux.main-window.1", attributes: .concurrent)
-    private let concurrentQueue2 = DispatchQueue(label: "dqueue.cmp.linux.main-window.2", attributes: .concurrent)
     private var isShowingTopWindow = false
     private var addendumText: String = ""
     private var updateFileName: String = ""
     private var isTooSmall: Bool = false
     private var showCursor: Bool = false
     private var cursorTimeout: UInt64 = 0
+    ///
+    /// priate constants
+    /// 
+    private let concurrentQueue1 = DispatchQueue(label: "dqueue.cmp.linux.main-window.1", attributes: .concurrent)
+    private let concurrentQueue2 = DispatchQueue(label: "dqueue.cmp.linux.main-window.2", attributes: .concurrent)
+    ///
+    /// variables
+    /// 
     var exitValue: Int32 = 0    
     ///
     /// Shows this MainWindow on screen.
@@ -1157,4 +1166,4 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     func onCommandUpdate(parts: [String]) -> Void {
         
     }        
-}// CMPlayer
+}// MainWindow

@@ -16,14 +16,12 @@ import Foundation
 ///
 internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol {
     ///
-    /// Private properties/constants.
-    ///
-    //private var modeIndex: Int = 0
+    /// private variables
+    ///    
     private var modeText: [String] = []
     private var inMode: Bool = false
     private var searchResult: [SongEntry] = g_searchResult
-    private var searchIndex: Int = 0
-    
+    private var searchIndex: Int = 0    
     ///
     /// Shows this AboutWindow on screen.
     ///
@@ -38,16 +36,14 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         self.run()
         
         g_tscpStack.removeLast()
-    }
-    
+    }    
     ///
     /// TerminalSizeChangedProtocol method
     ///
     func terminalSizeHasChanged() -> Void {
         Console.clearScreenCurrentTheme()
         self.renderWindow()
-    }
-    
+    }    
     ///
     /// Updates the genere text array. Called before visual showing.
     ///
@@ -73,8 +69,7 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }
         
         self.modeText.append(" ");
-    }
-    
+    }    
     ///
     /// Renders screen output. Does clear screen first.
     ///
@@ -180,10 +175,9 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT mc:\(self.modeText.count) self.si:\(self.searchIndex), is:\(index_search), max:\(max)", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         Console.printXY(1,g_rows,"\(g_searchResult.count.itsToString()) Songs", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.gotoXY(80,1)
+        Console.gotoXY(g_cols,1)
         print("")
-    }
-    
+    }    
     ///
     /// Returns content line count
     ///
@@ -194,8 +188,7 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         else {
             return g_windowContentLineCount / 2
         }
-    }
-    
+    }    
     ///
     /// Returns song content line count
     ///
@@ -207,7 +200,6 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             return 2
         }
     }
-
     ///
     /// Runs AboutWindow keyboard input and feedback.
     ///
@@ -306,4 +298,4 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         })
         keyHandler.run()
     }// run
-}// AboutWindow
+}// ModeWindow
