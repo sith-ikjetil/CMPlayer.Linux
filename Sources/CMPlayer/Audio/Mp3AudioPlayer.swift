@@ -333,7 +333,7 @@ internal class Mp3AudioPlayer {
 
                         if id3v2.year?.pointee.p != nil {
                             let year = String(cString: id3v2.year.pointee.p)
-                            metadata.recordingYear = Int(year) ?? -1
+                            metadata.recordingYear = Int(year) ?? 0
                         }
 
                         if id3v2.genre?.pointee.p != nil {
