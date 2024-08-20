@@ -7,6 +7,7 @@ import PackageDescription
             .executable(name: "CMPlayer", targets: ["CMPlayer"]),
             .library(name: "Cmpg123", type: .dynamic, targets: ["Cmpg123"]),
             .library(name: "Cao", type: .dynamic, targets: ["Cao"]),
+            .library(name: "Cffmpeg", type: .dynamic, targets: ["Cffmpeg"]),
         ],    
         dependencies: [
             .package(url: "https://github.com/ponyboy47/Termios.git", from: "0.1.1"),
