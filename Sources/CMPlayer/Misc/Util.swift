@@ -45,29 +45,11 @@ internal enum SearchType : String {
     case RecordedYear = "year"
 }
 
-///
-/// SongEntry error when constructing a new object.
-///
-internal enum SongEntryError : Error {
-    case DurationIsZero
-    case PathIsNil
-    case PathNotInMusicRootPath
-    case PathInExclusionPath
-    case InvalidSongEntryType
-    case MpgSoundLibrary
-    case MetadataNotFound
-}
-
 //
 // MediaPlayer error
 //
-internal enum AudioPlayerError : Error {
-    case AlreadyPlaying
-    case MpgSoundLibrary
-    case AoSoundLibrary
-    case MetadataNotFound
-    case UnknownFileType
-    case FfmpegSoundLibrary
+internal struct CmpError : Error {
+    let message: String
 }
 
 ///

@@ -135,6 +135,10 @@ internal class PlayerLibrary {
                                 self.dictionary[url] = self.library.count-1
                             }
                         }
+                        catch let error as CmpError {
+                            let msg = "Error adding song to library. Message: \(error.message)"
+                            PlayerLog.ApplicationLog?.logWarning(title: "[PlayerLibrary].load()", text: msg)
+                        }
                         catch {
                             
                         }

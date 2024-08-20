@@ -47,23 +47,23 @@ internal class SongEntry {
     ///
     init(songNo: Int, artist: String, albumName: String, title: String, duration: UInt64, url: URL?, genre: String, recordingYear: Int, trackNo: Int) throws {
         guard url != nil else {
-            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(songNo:,artist:,albumName:,title:,duration:,url:,genre:,recordingYear:,trackNo:)", text: "path == nil")
-            throw SongEntryError.PathIsNil
+            let msg = "[SongEntry].init(...). path == nil"
+            throw CmpError(message: msg)
         }
         
         guard isPathInMusicRootPath(path: url!.path) else {
-            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(songNo:,artist:,albumName:,title:,duration:,url:,genre:,recordingYear:,trackNo:)", text: "url not in music root path:\(url!.path)}")
-            throw SongEntryError.PathNotInMusicRootPath
+            let msg = "[SongEntry].init(...). url not in music root path:\(url!.path)"
+            throw CmpError(message: msg)            
         }
         
         guard !isPathInExclusionPath(path: url!.path) else {
-            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(songNo:,artist:,albumName:,title:,duration:,url:,genre:,recordingYear:,trackNo:)", text: "url in exclusion path:\(url!.path)}")
-            throw SongEntryError.PathInExclusionPath
+            let msg = "[SongEntry].init(...). url in exclusion path:\(url!.path)"
+            throw CmpError(message: msg)
         }
         
         guard duration > 0 else {
-            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(songNo:,artist:,albumName:,title:,duration:,url:,genre:,recordingYear:,trackNo:)", text: "Duration was 0. File: \(url!.path)")
-            throw SongEntryError.DurationIsZero
+            let msg = "[SongEntry].init(...). Duration invalid with value: \(duration)"            
+            throw CmpError(message: msg)
         }
         
         self.songNo = songNo
@@ -130,20 +130,20 @@ internal class SongEntry {
     init(path: URL?, songNo: Int) throws
     {        
         guard path != nil else {
-            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path:,songNo:)", text: "path == nil")
-            throw SongEntryError.PathIsNil
+            let msg = "[SongEntry].init(path,songNo). path == nil"
+            throw CmpError(message: msg)
         }
         
         guard isPathInMusicRootPath(path: path!.path) else {
-            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path:,songNo:)", text: "path not in music root path: \(path!.path)")
-            throw SongEntryError.PathNotInMusicRootPath
+            let msg = "[SongEntry].init(path,songNo). url not in music root path:\(path!.path)"
+            throw CmpError(message: msg)            
         }
         
         guard !isPathInExclusionPath(path: path!.path) else {
-            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path:,songNo:)", text: "url in exclusion path:\(path!.path)}")
-            throw SongEntryError.PathInExclusionPath
+            let msg = "[SongEntry].init(path,songNo). url in exclusion path:\(path!.path)"
+            throw CmpError(message: msg)
         }
-        
+                
         self.songNo = songNo
         self.fileURL = path!
 
@@ -172,14 +172,19 @@ internal class SongEntry {
                     //print("path: \(path!.path)")
                     //exit(1)
 
-                    throw SongEntryError.InvalidSongEntryType
+                    let msg = "[SongEntry].init(path,songNo). Duration from CmpAudioPlayer.gatherMetadata was 0."
+                    throw CmpError(message: msg)
                 }
             }// is .mp3
             else {
-                throw SongEntryError.InvalidSongEntryType
+                let msg = "[SongEntry].init(path,songNo). Unsupported extension from file: \(path!.lastPathComponent)"
+                throw CmpError(message: msg)
             }   
+        } catch let error as CmpError {
+            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path,songNo)", text: "Error gathering metadata from file: \(path!.lastPathComponent). Message: \(error.message)")
+            throw error
         } catch {
-            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path:,songNo:)", text: "Error gathering metadata from file: \(path!.lastPathComponent). Message: \(error)")
+            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path,songNo)", text: "Unknown error gathering metadata from file: \(path!.lastPathComponent). Message: \(error)")
             throw error
         }
         

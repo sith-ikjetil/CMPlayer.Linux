@@ -69,26 +69,26 @@ internal class Mp3AudioPlayer {
 
         // make sure mpg123Handle is not already set
         guard mpg123Handle == nil else {            
-            PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].play()", text: "Already playing a file")                
-            throw AudioPlayerError.MpgSoundLibrary
+            let msg = "[Mp3AudioPlayer].play(). Already playing a file."            
+            throw CmpError(message: msg)
         }        
 
         // Initialize mpg123 handle
         var err: Int32 = 0
         self.mpg123Handle = mpg123_new(nil, &err)
         guard err == 0 else { // MPG123_OK
-            PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].play()", text: "Failed to create mpg123 handle")    
-            throw AudioPlayerError.MpgSoundLibrary
+            let msg = "[Mp3AudioPlayer].play(). mpg123_new failed. Failed to create mpg123 handle"            
+            throw CmpError(message: msg)
         }
 
         // Open the file
         if mpg123_open(self.mpg123Handle, self.filePath.path) != 0 { // MPG123_OK
-            PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].play()", text: "Failed to open MP3 file")
+            let msg = "[Mp3AudioPlayer].play(). mpg123_open failed. Failed to open MP3 file: \(self.filePath.lastPathComponent)"
 
             mpg123_delete(self.mpg123Handle)
             self.mpg123Handle = nil
-            
-            throw AudioPlayerError.MpgSoundLibrary
+
+            throw CmpError(message: msg)
         }
 
         //
@@ -96,8 +96,9 @@ internal class Mp3AudioPlayer {
         //                      
         self.m_length = mpg123_length(self.mpg123Handle)
         if self.m_length <= 0 {
-            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path:songNo:)", text: "mpg123_length invalid with value: \(self.m_length)")
-            throw AudioPlayerError.MpgSoundLibrary
+            let msg = "[Mp3AudioPlayer].play(). mpg123_length with invalid value: \(self.m_length)"
+                        
+            throw CmpError(message: msg)
         }
 
         // Set the output format (PCM)
@@ -106,13 +107,13 @@ internal class Mp3AudioPlayer {
         var encoding: Int32 = 0
 
         if mpg123_getformat(mpg123Handle, &rate, &channels, &encoding) != 0 { // MPG123_OK
-            PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].play()", text: "Failed to get MP3 format")
+            let msg = "[Mp3AudioPlayer].play(). mpg123_getformat failed. Failed to get MP3 format."            
 
             mpg123_close(self.mpg123Handle)
             mpg123_delete(self.mpg123Handle)
             self.mpg123Handle = nil
-            
-            throw AudioPlayerError.MpgSoundLibrary
+                        
+            throw CmpError(message: msg)
         }        
 
         self.m_rate = rate
@@ -123,8 +124,8 @@ internal class Mp3AudioPlayer {
         self.m_duration = UInt64(duration * 1000)
         
         guard self.m_duration > 0 else {
-            PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path:songNo:)", text: "Duration was invalid with value: \(self.m_duration)")
-            throw SongEntryError.DurationIsZero
+            let msg = "[Mp3AudioPlayer].play(). Duration was invalid with value: \(self.m_duration)"            
+            throw CmpError(message: msg)
         }
 
 
@@ -145,13 +146,13 @@ internal class Mp3AudioPlayer {
 
         // open for playing
         guard let device = ao_open_live(defaultDriver, &format, nil) else {
-            PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].play()", text: "Couldn't open audio device")
+            let msg = "[Mp3AudioPlayer].play(). ao_open_live failed. Couldn't open audio device"            
 
             mpg123_close(self.mpg123Handle)
             mpg123_delete(self.mpg123Handle)
             self.mpg123Handle = nil
-            
-            throw AudioPlayerError.AoSoundLibrary
+                        
+            throw CmpError(message:msg)
         }
 
         self.audioQueue.async { [weak self] in
@@ -164,7 +165,7 @@ internal class Mp3AudioPlayer {
         self.m_isPlaying = true
 
         // log we have started to play
-        PlayerLog.ApplicationLog?.logInformation(title: "[Mp3AudioPlayer].playAsync()", text: "Started playing \(self.filePath.lastPathComponent)")        
+        PlayerLog.ApplicationLog?.logInformation(title: "[Mp3AudioPlayer].playAsync()", text: "Started playing file: \(self.filePath.lastPathComponent)")
         
         // make sure we clean up
         defer {            
@@ -189,7 +190,7 @@ internal class Mp3AudioPlayer {
                 break;
             }
             if (err != 0) { // MPG123_OK
-                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: "mpg123_read return failure code: \(err)")
+                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: "mpg123_read return failure code: \(err). File: \(self.filePath.lastPathComponent)")
                 break;
             }
             if (done > 0) {
@@ -223,23 +224,24 @@ internal class Mp3AudioPlayer {
         self.m_isPaused = false
     }
 
-    static func gatherMetadata(path: URL?) throws -> CmpMetadata {
-        if path!.path.lowercased().hasSuffix(".mp3") {
+    static func gatherMetadata(path: URL) throws -> CmpMetadata {
+        if path.path.lowercased().hasSuffix(".mp3") {
             let metadata = CmpMetadata()
 
             //print("URL: \(self.fileURL!.path)")
             guard let handle = mpg123_new(nil, nil) else {
-                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].gatherMetadata(path:)", text: "mpg123_new failed")
-                throw AudioPlayerError.MpgSoundLibrary
+                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_new failed. File: \(path.lastPathComponent)"
+                throw CmpError(message: msg)
             }
 
             defer {                
                 mpg123_close(handle);
             }
             
-            guard mpg123_open(handle, path!.path) == 0 else {
-                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].gatherMetadata(path:)", text: "mpg123_open failed for URL: \(path!.path)")
-                throw AudioPlayerError.MpgSoundLibrary
+            let err = mpg123_open(handle, path.path)
+            guard err == 0 else {
+                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_open failed for file: \(path.lastPathComponent)"
+                throw CmpError(message: msg)
             }      
 
             //
@@ -248,8 +250,8 @@ internal class Mp3AudioPlayer {
             var length: off_t = 0
             length = mpg123_length(handle)
             if length <= 0 {
-                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].gatherMetadata(path:)", text: "mpg123_length failed with value: \(length)")
-                throw AudioPlayerError.MpgSoundLibrary
+                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_length failed with length: \(length). File: \(path.lastPathComponent)"                
+                throw CmpError(message: msg)
             }
             
             // Get the rate and channels to calculate duration
@@ -264,11 +266,10 @@ internal class Mp3AudioPlayer {
             
             // Ensure positive duration
             guard duration > 0 else {
-                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].gatherMetadata(path:)", text: "Duration was 0. File: \(path!.path)")
-                throw SongEntryError.DurationIsZero
+                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). Duration was 0. File: \(path.lastPathComponent)"
+                throw CmpError(message: msg)
             }
-
-            //print("mpg123_metacheck")
+            
             let metaCheck = mpg123_meta_check(handle)
             if metaCheck & MPG123_ID3 != 0 {
                 let id3v1Pointer: UnsafeMutablePointer<UnsafeMutablePointer<mpg123_id3v1>?>? = UnsafeMutablePointer.allocate(capacity: 1)
@@ -283,7 +284,8 @@ internal class Mp3AudioPlayer {
                 }
 
                 // Call the mpg123_id3 function to fill in the pointers
-                if mpg123_id3(handle, id3v1Pointer, id3v2Pointer) == 0 {                    
+                let err = mpg123_id3(handle, id3v1Pointer, id3v2Pointer)
+                if err == 0 {
                     if let id3v2 = id3v2Pointer?.pointee?.pointee {
                         // Access ID3v2 metadata fields safely
                         if id3v2.title?.pointee.p != nil {
@@ -354,7 +356,8 @@ internal class Mp3AudioPlayer {
                         metadata.genre = convertId3V1GenreIndexToName(index: genre)                        
                     } 
                     else {
-                        throw AudioPlayerError.MetadataNotFound
+                        let msg = "[Mp3AudioPlayer].gatherMetadata(path:). Metadata not found. File: \(path.lastPathComponent)"
+                        throw CmpError(message: msg)
                     }
                     //
                     // return metadata
@@ -362,12 +365,15 @@ internal class Mp3AudioPlayer {
                     return metadata
                 } 
                 else {
-                    throw AudioPlayerError.MpgSoundLibrary
+                    let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_id3 failed with value \(err). File: \(path.lastPathComponent)"
+                    throw CmpError(message: msg)
                 }                
             }// mpg123_meta_check            
-            throw AudioPlayerError.MetadataNotFound            
+            let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_meta_check failed with value: \(metaCheck). File: \(path.lastPathComponent)"
+            throw CmpError(message: msg)
         }// is .mp3
         
-        throw AudioPlayerError.UnknownFileType                              
+        let msg = "[Mp3AudioPlayer].gatherMetadata(path:). Unknown file type. File: \(path.lastPathComponent)"
+        throw CmpError(message: msg)
     }
 }// AudioPlayer
