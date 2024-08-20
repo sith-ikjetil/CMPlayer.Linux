@@ -399,7 +399,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }
         
         //
-        // Count down and render songs
+        // Keep up-time in header and blink the cursor.
         //
         concurrentQueue2.async {
             while !self.quit {
