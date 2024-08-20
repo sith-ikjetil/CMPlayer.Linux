@@ -32,7 +32,7 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
                                        "   by searching for them, and in the main window entering the number",
                                        "   associated with the song to add to the playlist.",
                                        "   ",
-                                       "   CMPlayer was made by Kjetil Kristoffer Solberg. ENJOY!"]    
+                                       "   CMPlayer was made by Kjetil Kristoffer Solberg <post@ikjetil.no>. ENJOY!"]    
     ///
     /// Shows this AboutWindow on screen.
     ///
