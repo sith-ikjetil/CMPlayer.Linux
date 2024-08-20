@@ -86,6 +86,7 @@ do {
     restore_stderr(stderr_old)    
 
     // clear screen
+    Console.clearScreen()
     Console.gotoXY(1, 1)    
     system("clear") 
     
@@ -95,15 +96,21 @@ do {
     // exit with exit code
     exit(ExitCodes.SUCCESS.rawValue)
 } catch let error as CmpError {
+    let msg = "Application exited abnormally.\n Exception caught.\n Message: \(error.message)"
     let wnd = ErrorWindow()
-    wnd.message = "Exception caught.\nMessage: \(error.message)"
+    wnd.message = msg
     wnd.showWindow()
     system("clear")
+
+    PlayerLog.ApplicationLog?.logError(title: "CMPlayer", text: msg.trimmingCharacters(in: .newlines))        
     exit(ExitCodes.ERROR_UNKNOWN.rawValue)
 } catch {        
+    let msg = "Application exited abnormally.\n Unknown exception caught.\n Message: \(error)"
     let wnd = ErrorWindow()
-    wnd.message = "Unknown error occurred.\nMessage: \(error)"
+    wnd.message = msg
     wnd.showWindow()
     system("clear")
+
+    PlayerLog.ApplicationLog?.logError(title: "CMPlayer", text: msg.trimmingCharacters(in: .newlines))        
     exit(ExitCodes.ERROR_UNKNOWN.rawValue)
 }

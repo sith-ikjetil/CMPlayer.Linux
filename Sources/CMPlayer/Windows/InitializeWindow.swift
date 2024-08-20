@@ -57,14 +57,10 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
         
         self.musicFormats = PlayerPreferences.musicFormats.components(separatedBy: ";")
         
-        for mrpath in PlayerPreferences.musicRootPath {
-            //#if DEBUG
-            //    let result = findSongs(path: "/Users/kjetilso/Music")//"/Volumes/ikjetil/Music/G")
-            //#else
-                self.filesFoundCompleted = 0                
-                let result = findSongs(path: mrpath)
-                self.filesFoundCompleted = 100
-            //#endif
+        for mrpath in PlayerPreferences.musicRootPath {            
+            self.filesFoundCompleted = 0                
+            let result = findSongs(path: mrpath)
+            self.filesFoundCompleted = 100        
             
             self.currentPath = mrpath
             self.libraryLoadedCompleted = 0
@@ -75,7 +71,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
                 self.libraryLoadedCompleted = Int(Double(i) * Double(100.0) / Double(result.count))
                 
                 let u: URL = URL(fileURLWithPath: r)
-                if let se = g_library.find(url: u) {
+                if let se = g_library.find(url: u) {                    
                     g_songs.append(se)
                 }
                 else {

@@ -114,6 +114,8 @@ internal class Player {
             let wnd: ErrorWindow = ErrorWindow()
             wnd.message = msg
             wnd.showWindow()
+            Console.clearScreen()
+            Console.gotoXY(1,1)
             system("clear")
             exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
         }
@@ -124,8 +126,10 @@ internal class Player {
             let wnd: ErrorWindow = ErrorWindow()
             wnd.message = msg
             wnd.showWindow()
+            Console.clearScreen()
+            Console.gotoXY(1,1)
             system("clear")
-            exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
+            exit(ExitCodes.ERROR_UNKNOWN.rawValue)
         }
     }    
     ///
