@@ -215,7 +215,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 text.append(mn)
                 b = true
             }
-            text.append(" with \(modeInfo.numberOfSongsInMode.itsToString()) Songs")
+            text.append(" with \(modeInfo.numberOfSongsInMode.itsToString()) Songs | \(g_cols)x\(g_rows) | \(g_playlist.count) Songs in Queue")
         }
         else {
             text.append( " | Mode: off | \(g_cols)x\(g_rows) | \(g_playlist.count) Songs in Queue" )
