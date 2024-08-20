@@ -26,7 +26,7 @@ import PackageDescription
                 dependencies: [],
                 cSettings: [
                     .headerSearchPath("include"),                    
-                    .define("MY_MPG123_LIBRARY", to: "1")
+                    .define("CMP_MPG123_LIBRARY", to: "1")
                 ],
                 linkerSettings: [
                     .linkedLibrary("mpg123"),                    
@@ -37,7 +37,7 @@ import PackageDescription
                 dependencies: [],
                 cSettings: [
                     .headerSearchPath("include"),                    
-                    .define("MY_AO_LIBRARY", to: "1")
+                    .define("CMP_AO_LIBRARY", to: "1")
                 ],
                 linkerSettings: [
                     .linkedLibrary("ao"),                    
@@ -47,8 +47,11 @@ import PackageDescription
                 name: "Cffmpeg",
                 dependencies: [],
                 cSettings: [
-                    .headerSearchPath("include"),                    
-                    .define("MY_AO_LIBRARY", to: "1")
+                    .headerSearchPath("include/libavcodec"),
+                    .headerSearchPath("include/libavformat"),
+                    .headerSearchPath("include/libavutil"),
+                    .headerSearchPath("include/libswresample"),
+                    .define("CMP_FFMPEG_LIBRARY", to: "1")
                 ],
                 linkerSettings: [
                     .linkedLibrary("avcodec"),
