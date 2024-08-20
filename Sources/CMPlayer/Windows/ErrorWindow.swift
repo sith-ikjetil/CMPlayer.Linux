@@ -30,6 +30,7 @@ internal class ErrorWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
     // TerminalSizeChangedProtocol implementation handler.
     //
     func terminalSizeHasChanged() {
+        Console.clearScreenCurrentTheme()
         self.renderWindow()
     }    
     //

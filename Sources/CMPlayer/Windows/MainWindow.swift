@@ -36,11 +36,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// priate constants
     /// 
     private let concurrentQueue1 = DispatchQueue(label: "dqueue.cmp.linux.main-window.1", attributes: .concurrent)
-    private let concurrentQueue2 = DispatchQueue(label: "dqueue.cmp.linux.main-window.2", attributes: .concurrent)
-    ///
-    /// variables
-    /// 
-    var exitValue: Int32 = 0    
+    private let concurrentQueue2 = DispatchQueue(label: "dqueue.cmp.linux.main-window.2", attributes: .concurrent)     
     ///
     /// Shows this MainWindow on screen.
     ///

@@ -29,6 +29,7 @@ internal class CmpMetadata {
 /// Enum exit codes
 ///
 internal enum ExitCodes: Int32 {
+    case SUCCESS = 0
     case ERROR_UNKNOWN = 1
     case ERROR_FINDING_FILES = 2
     case ERROR_PLAYING_FILE = 3

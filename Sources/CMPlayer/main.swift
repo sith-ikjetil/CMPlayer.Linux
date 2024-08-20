@@ -13,6 +13,7 @@ import Foundation
 import Cmpg123
 import Cao
 import Termios
+import Glibc
 
 //
 // Global constants.
@@ -79,21 +80,29 @@ do {
     try g_player.initialize()    
 
     // run the program and save exit code
-    let exitCode = try g_player.run()
+    try g_player.run()
 
     // restore stderr
     restore_stderr(stderr_old)    
 
+    // clear screen
+    system("clear")
+
+    // log exit
+    PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Exited Normally.")        
+
     // exit with exit code
-    exit(exitCode)
+    exit(ExitCodes.SUCCESS.rawValue)
 } catch let error as CmpError {
     let wnd = ErrorWindow()
     wnd.message = "Exception caught.\nMessage: \(error.message)"
     wnd.showWindow()
-    exit(1)
+    system("clear")
+    exit(ExitCodes.ERROR_UNKNOWN.rawValue)
 } catch {        
     let wnd = ErrorWindow()
     wnd.message = "Unknown error occurred.\nMessage: \(error)"
     wnd.showWindow()
-    exit(1)
+    system("clear")
+    exit(ExitCodes.ERROR_UNKNOWN.rawValue)
 }

@@ -11,6 +11,7 @@
 //
 import Foundation
 import Cmpg123
+import Glibc
 
 //
 // Represents CMPlayer Player.
@@ -113,6 +114,7 @@ internal class Player {
             let wnd: ErrorWindow = ErrorWindow()
             wnd.message = msg
             wnd.showWindow()
+            system("clear")
             exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
         }
         catch {
@@ -122,6 +124,7 @@ internal class Player {
             let wnd: ErrorWindow = ErrorWindow()
             wnd.message = msg
             wnd.showWindow()
+            system("clear")
             exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
         }
     }    
@@ -262,10 +265,8 @@ internal class Player {
     ///
     /// returnes: Int32. Exit code.
     ///
-    func run() throws -> Int32 {
+    func run() throws {
         g_mainWindow = MainWindow()        
-        g_mainWindow?.showWindow()
-        PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Exited Normally.")
-        return g_mainWindow?.exitValue ?? 0
+        g_mainWindow?.showWindow()        
     }
 }// Player
