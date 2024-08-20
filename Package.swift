@@ -4,7 +4,7 @@ import PackageDescription
         name: "CMPlayer",        
         defaultLocalization: "en",        
         products: [
-            .executable(name: "CMPlayer", targets: ["CMPlayer"]),
+            .executable(name: "cmplayer", targets: ["CMPlayer"]),
             .library(name: "Cmpg123", type: .dynamic, targets: ["Cmpg123"]),
             .library(name: "Cao", type: .dynamic, targets: ["Cao"]),
             .library(name: "Cffmpeg", type: .dynamic, targets: ["Cffmpeg"]),
