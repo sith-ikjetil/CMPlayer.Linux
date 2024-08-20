@@ -86,8 +86,9 @@ do {
     restore_stderr(stderr_old)    
 
     // clear screen
-    system("clear")
-
+    Console.gotoXY(1, 1)    
+    system("clear") 
+    
     // log exit
     PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Exited Normally.")        
 
