@@ -287,7 +287,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         renderCommandLine()
         renderStatusLine()
         
-        Console.gotoXY(1, g_rows-3)
+        Console.gotoXY(g_cols, g_rows-3)
         print("")
     }    
     ///

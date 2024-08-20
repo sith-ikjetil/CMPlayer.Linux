@@ -61,7 +61,7 @@ internal class ErrorWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         print("")
         print(Console.applyTextColor(colorBg: ConsoleColor.black, modifierBg: ConsoleColorModifier.none, colorText: ConsoleColor.white, modifierText: ConsoleColorModifier.bold, text: "> Press ENTER Key To Continue <"))
         
-        Console.gotoXY(g_cols,1)
+        Console.gotoXY(g_cols,g_rows-3)
         print("")
     }// renderErrorMessage
 }// ErrorWindow
