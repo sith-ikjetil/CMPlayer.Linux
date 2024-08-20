@@ -13,6 +13,9 @@ import Foundation
 import Cffmpeg
 import Cao
 
+///
+/// Audio state variables.
+///
 internal struct AacAudioState {
     var formatCtx: UnsafeMutablePointer<AVFormatContext>?
     var codecCtx: UnsafeMutablePointer<AVCodecContext>?
@@ -29,10 +32,16 @@ internal struct AacAudioState {
 // Represents CMPlayer AudioPlayer.
 //
 internal class AacAudioPlayer {
+    ///
+    /// constants
+    ///
     private let filePath: URL    
-    private var m_length: off_t = 0
-    private var m_rate: CLong = 0
     private let audioQueue = DispatchQueue(label: "dqueue.cmp.linux.aac-audio-player", qos: .background)
+    ///
+    /// variables
+    ///
+    private var m_length: off_t = 0
+    private var m_rate: CLong = 0    
     private var m_stopFlag: Bool = false
     private var m_isPlaying = false
     private var m_isPaused = false
@@ -40,6 +49,9 @@ internal class AacAudioPlayer {
     private var m_duration: UInt64 = 0
     private var m_channels: Int32 = 2
     private var m_audioState: AacAudioState = AacAudioState()
+    ///
+    /// get properties
+    ///
     var isPlaying: Bool {
         get {
             return self.m_isPlaying
@@ -60,14 +72,15 @@ internal class AacAudioPlayer {
             return self.m_duration
         }
     }
-
-    //
-    // Only initializer
-    //
+    ///
+    /// Only initializer
+    ///
     init(path: URL) {
         self.filePath = path        
     }
-
+    ///
+    /// initiates playback of the audio file from init(path)
+    /// 
     func play() throws {
         // if we are already playing, return
         if (self.m_isPlaying) {
@@ -187,7 +200,10 @@ internal class AacAudioPlayer {
             self?.playAsync()
         }
     }
-
+    ///
+    /// Performs the actual playback from play().
+    /// Runs in the background.
+    /// 
     private func playAsync() {
         // Set flags
         self.m_isPlaying = true
@@ -204,7 +220,7 @@ internal class AacAudioPlayer {
             avformat_close_input(&self.m_audioState.formatCtx)
         }
 
-        // total amount of sampels
+        // total amount of samples
         var total: UInt64 = 0
 
         // Main decoding and playback loop
@@ -289,20 +305,31 @@ internal class AacAudioPlayer {
                 }
             }
         }
-    }// private func playAsync(info: AudioState) {
-
+    }// private func playAsync()
+    ///
+    /// stops playback if we are playing.
+    /// 
     func stop() {
         self.m_stopFlag = true
     }
-
+    ///
+    /// pauses playback if we are playing
+    /// 
     func pause() {
         self.m_isPaused = true
     }
-
+    ///
+    /// resumes playback if we are playing.
+    ///
     func resume() {
         self.m_isPaused = false
     }
-
+    ///
+    /// Gathers metadata.
+    /// - Parameter path: file to gather metadata from.
+    /// - Throws: CmpError
+    /// - Returns: CmpMetadata
+    /// 
     static func gatherMetadata(path: URL) throws -> CmpMetadata {
         let metadata = CmpMetadata()      
 

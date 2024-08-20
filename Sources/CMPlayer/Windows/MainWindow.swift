@@ -23,16 +23,15 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     private var currentCommand: String = ""
     private var commands: [PlayerCommand] = []
     private var commandReturnValue: Bool = false
-    private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.linux.1", attributes: .concurrent)
-    private let concurrentQueue2 = DispatchQueue(label: "cqueue.cmplayer.linux.2", attributes: .concurrent)
+    private let concurrentQueue1 = DispatchQueue(label: "dqueue.cmp.linux.main-window.1", attributes: .concurrent)
+    private let concurrentQueue2 = DispatchQueue(label: "dqueue.cmp.linux.main-window.2", attributes: .concurrent)
     private var isShowingTopWindow = false
     private var addendumText: String = ""
     private var updateFileName: String = ""
     private var isTooSmall: Bool = false
     private var showCursor: Bool = false
     private var cursorTimeout: UInt64 = 0
-    var exitValue: Int32 = 0
-    
+    var exitValue: Int32 = 0    
     ///
     /// Shows this MainWindow on screen.
     ///
@@ -42,8 +41,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         g_tscpStack.append(self)
         self.run()
         g_tscpStack.removeLast()
-    }
-    
+    }    
     ///
     /// Handler for TerminalSizeHasChangedProtocol
     ///
@@ -59,7 +57,6 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             print("")
         }
     }
-
     ///
     /// Renders header on screen
     ///
@@ -74,8 +71,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         else {
             Console.printXY(1,1,"CMPlayer | \(g_versionString)", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
-    }
-    
+    }    
     ///
     /// Renders main window frame on screen
     ///
@@ -124,7 +120,6 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             Console.printXY(1,5,"=", g_cols, .left, "=", bgColor, ConsoleColorModifier.none, ConsoleColor.green, ConsoleColorModifier.bold)
         }
     }
-
     ///
     /// Renders a song on screen
     ///
@@ -174,11 +169,12 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             Console.printXY(10+artistCols+titleCols-2, y+1, " ", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
     }
-    
+    /// 
+    /// renders addendum text at g_rows-2
+    ///     
     func renderAddendumText() -> Void {
         Console.printXY(1,g_rows-2, (self.addendumText.count > 0) ? self.addendumText : " ", g_cols, .left, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.none)
-    }
-    
+    }    
     ///
     /// Renders the command line on screen
     ///
@@ -195,8 +191,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }
     
         Console.printXY(1,g_rows-1,">: \(text)\(cursor)", g_cols, .left, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
-    }
-    
+    }    
     ///
     /// Renders the status line on screen
     ///
@@ -222,8 +217,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }
         
         Console.printXY(1,g_rows, text, g_cols, .center, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-    }
-    
+    }    
     ///
     /// Traverses all songs and ask the screen renderer to render them on screen
     ///
@@ -269,8 +263,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             }
             index += 1
         }
-    }
-    
+    }    
     ///
     /// Renders screen output. Does not clear screen first.
     ///
@@ -287,8 +280,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         Console.gotoXY(1, g_rows-3)
         print("")
-    }
-    
+    }    
     ///
     /// Runs MainWindow keyboard input and feedback. Delegation to other windows and command processing.
     ///
@@ -478,8 +470,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             return false
         })
         keyHandler.run()
-    }
-    
+    }    
     ///
     /// Processes commands
     ///
@@ -505,8 +496,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }
         
         return self.commandReturnValue
-    }
-    
+    }    
     ///
     /// Exits the application
     ///
@@ -514,8 +504,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     func onCommandExit(parts: [String]) -> Void {
         self.commandReturnValue = true
-    }
-    
+    }    
     ///
     /// Restarts the application
     ///
@@ -527,8 +516,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         //let _ = NSWorkspace.shared.openFile(fname)
         
         //self.commandReturnValue = true
-    }
-    
+    }    
     ///
     /// Sets main window song bg color
     ///
@@ -546,14 +534,16 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             PlayerPreferences.savePreferences()
         }
         self.renderWindow()
-    }
-    
+    }    
+    /// 
+    /// Plays previous song
+    /// - Parameter parts:  command array.
+    /// 
     func onCommandPrev(parts: [String]) {
         g_lock.lock()
         g_player.prev()
         g_lock.unlock()
-    }
-    
+    }    
     ///
     /// Sets ViewType on Main Window
     ///
@@ -561,8 +551,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         PlayerPreferences.viewType = ViewType(rawValue: parts[0].lowercased() ) ?? ViewType.Default
         PlayerPreferences.savePreferences()
         self.renderFrame()
-    }
-    
+    }    
     ///
     /// Restarts current playing song.
     ///
@@ -581,8 +570,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             }
             g_player.audio2?.currentTime = TimeInterval(exactly: 0.0)!
         }*/
-    }
-    
+    }    
     ///
     /// Play next song
     ///
@@ -592,8 +580,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         g_lock.lock()
         g_player.skip(crossfade: false)
         g_lock.unlock()
-    }
-    
+    }    
     ///
     /// Play if not playing.
     ///
@@ -609,8 +596,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         else if g_player.audioPlayerActive == 2 {
             g_player.resume()
         }
-    }
-    
+    }    
     ///
     /// Pause playback.
     ///
@@ -618,15 +604,14 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     func onCommandPause(parts: [String]) -> Void {
         g_player.pause()
-    }
-    
+    }    
     ///
     /// Play or pause playback
     ///
     /// parameter parts: command array.
     ///
     func onCommandPlayOrPause(parts: [String]) -> Void {
-        /*if g_player.audioPlayerActive == -1 {
+        if g_player.audioPlayerActive == -1 {
             self.onCommandPlay(parts: parts)
         }
         else if g_player.audioPlayerActive == 1 {
@@ -648,9 +633,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     self.onCommandPlay(parts: parts)
                 }
             }
-        }*/
-    }
-    
+        }
+    }    
     ///
     /// Resume playback.
     ///
@@ -658,8 +642,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     func onCommandResume(parts: [String]) -> Void {
         g_player.resume()
-    }
-    
+    }    
     ///
     /// Repaint main window.
     ///
@@ -668,8 +651,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     func onCommandRepaint(parts: [String]) -> Void {
         Console.clearScreenCurrentTheme()
         self.renderWindow()
-    }
-    
+    }    
     ///
     /// Add song to playlist
     ///
@@ -685,8 +667,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 }
             }
         }
-    }
-    
+    }    
     ///
     /// Enable crossfade
     ///
@@ -695,8 +676,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     func onCommandEnableCrossfade(parts: [String]) -> Void {
         PlayerPreferences.crossfadeSongs = true
         PlayerPreferences.savePreferences()
-    }
-    
+    }    
     ///
     /// Disable crossfade.
     ///
@@ -705,8 +685,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     func onCommandDisableCrossfade(parts: [String]) -> Void {
         PlayerPreferences.crossfadeSongs = false
         PlayerPreferences.savePreferences()
-    }
-    
+    }    
     ///
     /// Enable audoplay on startup and after reinitialize.
     ///
@@ -715,8 +694,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     func onCommandEnableAutoPlayOnStartup(parts: [String]) -> Void {
         PlayerPreferences.autoplayOnStartup = true
         PlayerPreferences.savePreferences()
-    }
-    
+    }    
     ///
     /// Disable autoplay on startup and after reinitialize.
     ///
@@ -725,8 +703,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     func onCommandDisableAutoPlayOnStartup(parts: [String]) -> Void {
         PlayerPreferences.autoplayOnStartup = false
         PlayerPreferences.savePreferences()
-    }
-    
+    }    
     ///
     /// Add path to root paths.
     ///
@@ -736,8 +713,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         let nparts = reparseCurrentCommandArguments(parts)
         PlayerPreferences.musicRootPath.append(nparts[0])
         PlayerPreferences.savePreferences()
-    }
-    
+    }    
     ///
     /// Add path to exclusion paths.
     ///
@@ -747,8 +723,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         let nparts = reparseCurrentCommandArguments(parts)
         PlayerPreferences.exclusionPaths.append(nparts[0])
         PlayerPreferences.savePreferences()
-    }
-    
+    }    
     ///
     /// Remove root path.
     ///
@@ -765,8 +740,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             }
             i += 1
         }
-    }
-    
+    }    
     ///
     /// Remove exclustion path.
     ///
@@ -783,8 +757,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             }
             i += 1
         }
-    }
-    
+    }    
     ///
     /// Set crossfade time in seconds.
     ///
@@ -797,8 +770,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 PlayerPreferences.savePreferences()
             }
         }
-    }
-    
+    }    
     ///
     /// Set music formats.
     ///
@@ -807,8 +779,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     func onCommandSetMusicFormats(parts: [String]) -> Void {
         PlayerPreferences.musicFormats = parts[0]
         PlayerPreferences.savePreferences()
-    }
-    
+    }    
     ///
     /// Goto playback point of current playing item.
     ///
@@ -831,8 +802,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 }
             }
         }*/
-    }
-    
+    }    
     ///
     /// Clears any search mode
     ///
@@ -846,7 +816,6 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         g_modeSearchStats.removeAll()
         g_lock.unlock()
     }
-
     ///
     /// Show info on given song number.
     ///
@@ -869,8 +838,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 }
             }
         }
-    }
-    
+    }    
     ///
     /// Show help window.
     ///
@@ -883,8 +851,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         Console.clearScreenCurrentTheme()
         self.renderWindow()
         self.isShowingTopWindow = false
-    }
-    
+    }    
     ///
     /// Clear music root paths.
     ///
@@ -893,8 +860,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     func onCommandClearMusicRootPath(parts: [String]) -> Void {
         PlayerPreferences.musicRootPath.removeAll()
         PlayerPreferences.savePreferences()
-    }
-    
+    }    
     ///
     /// Clear music root paths.
     ///
@@ -903,8 +869,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     func onCommandClearExclusionPath(parts: [String]) -> Void {
         PlayerPreferences.exclusionPaths.removeAll()
         PlayerPreferences.savePreferences()
-    }
-    
+    }    
     ///
     /// Show about window.
     ///
@@ -917,8 +882,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         Console.clearScreenCurrentTheme()
         self.renderWindow()
         self.isShowingTopWindow = false
-    }
-    
+    }    
     ///
     /// Show artist window.
     ///
@@ -931,8 +895,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         Console.clearScreenCurrentTheme()
         self.renderWindow()
         self.isShowingTopWindow = false
-    }
-    
+    }    
     ///
     /// Show genre window.
     ///
@@ -945,8 +908,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         Console.clearScreenCurrentTheme()
         self.renderWindow()
         self.isShowingTopWindow = false
-    }
-    
+    }    
     ///
     /// Show mode window.
     ///
@@ -960,7 +922,6 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         self.renderWindow()
         self.isShowingTopWindow = false
     }
-
     ///
     /// Show info window about current playing item.
     ///
@@ -981,8 +942,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         Console.clearScreenCurrentTheme()
         self.renderWindow()
         self.isShowingTopWindow = false
-    }
-    
+    }    
     ///
     /// Reinitialize library and player.
     ///
@@ -1033,8 +993,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         g_lock.unlock()
         
         g_player.skip(play: PlayerPreferences.autoplayOnStartup)
-    }
-    
+    }    
     ///
     /// Rebuild song numbers.
     ///
@@ -1049,8 +1008,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         g_library.setNextAvailableSongNo(i)
         g_library.library = g_songs
         g_library.save()
-    }
-    
+    }    
     ///
     /// Show preferences window.
     ///
@@ -1063,8 +1021,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         Console.clearScreenCurrentTheme()
         self.renderWindow()
         self.isShowingTopWindow = false
-    }
-    
+    }    
     ///
     /// Show year window.
     ///
@@ -1077,8 +1034,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         Console.clearScreenCurrentTheme()
         self.renderWindow()
         self.isShowingTopWindow = false
-    }
-    
+    }    
     ///
     /// Show search window.
     ///
@@ -1097,8 +1053,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             self.renderWindow()
             self.isShowingTopWindow = false
         }
-    }
-    
+    }    
     ///
     /// Show search window.
     ///
@@ -1117,8 +1072,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             self.renderWindow()
             self.isShowingTopWindow = false
         }
-    }
-    
+    }    
     ///
     /// Show search window.
     ///
@@ -1137,8 +1091,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             self.renderWindow()
             self.isShowingTopWindow = false
         }
-    }
-    
+    }    
     ///
     /// Show search window.
     ///
@@ -1157,8 +1110,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             self.renderWindow()
             self.isShowingTopWindow = false
         }
-    }
-    
+    }    
     ///
     /// Show search window.
     ///
@@ -1177,8 +1129,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             self.renderWindow()
             self.isShowingTopWindow = false
         }
-    }
-    
+    }    
     ///
     /// Show search window.
     ///
@@ -1197,143 +1148,13 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             self.renderWindow()
             self.isShowingTopWindow = false
         }
-    }
-    
+    }    
     ///
-    /// Updates CMPlayer if newer version is available.
+    /// Updates CMPlayer if newer version is available then exits, updates, and starts again.
     ///
     /// parameter parts: command array.
     ///
     func onCommandUpdate(parts: [String]) -> Void {
-        /*self.addendumText = "Checking for updates..."
-        var request = URLRequest(url: URL(string: "http://www.ikjetil.no/Home/GetFileName/45?GUID=4dae77f8-e7f3-4631-a8e5-8afda6d065af")! )
-        let session = URLSession.shared
-
-        request.httpMethod = "GET"
-        //request.addValue("text/plain; charset=utf-8", forHTTPHeaderField: "Content-Type")
-        request.addValue("www.ikjetil.no", forHTTPHeaderField: "Host")
-        request.addValue("0", forHTTPHeaderField: "Content-Length")
-
-        let task = session.dataTask(with: request, completionHandler: {
-            (data, response, error) -> Void in
-           
-            if error != nil {
-                PlayerLog.ApplicationLog?.logWarning(title: "MainWindow::onCommandUpdate", text: "session.dataTask failed. With error: \(error!)")
-                self.addendumText = "Error contacting server!"
-                return
-            }
-           
-            var didUpdate: Bool = false
-            if let textData = data {
-                let textRaw: String? = String(data: textData, encoding: .utf8)
-                if let text = textRaw {
-                    let version = regExMatches(for: "[0-9]+.[0-9]+.[0-9]+.[0-9]+", in: text)
-                    if version.count > 0 {
-                        self.addendumText = "Found version: \(version[0])"
-                        self.updateFileName = text
-                        
-                        let partsServer = version[0].components(separatedBy: ".")
-                        let partsCMP = g_versionString.components(separatedBy: ".")
-                        
-                        if partsServer.count == 4 && partsCMP.count == 4 {
-                            let majorServer: Int = Int(partsServer[0]) ?? 0
-                            let minorServer: Int = Int(partsServer[1]) ?? 0
-                            let buildServer: Int = Int(partsServer[2]) ?? 0
-                            let revisionServer: Int = Int(partsServer[3]) ?? 0
-                            
-                            let majorCMP: Int = Int(partsCMP[0]) ?? 0
-                            let minorCMP: Int = Int(partsCMP[1]) ?? 0
-                            let buildCMP: Int = Int(partsCMP[2]) ?? 0
-                            let revisionCMP: Int = Int(partsCMP[3]) ?? 0
-                            
-                            if majorServer > majorCMP ||
-                               (majorServer == majorCMP && minorServer > minorCMP) ||
-                               (majorServer == majorCMP && minorServer == minorCMP && buildServer > buildCMP) ||
-                                (majorServer == majorCMP && minorServer == minorCMP && buildServer == buildCMP && revisionServer > revisionCMP)
-                            {
-                                didUpdate = true
-                                self.onPerformUpdate()
-                            }
-                        }
-                    }
-                }
-            }
-            if !didUpdate {
-                self.addendumText = ""
-            }
-        })
-        task.resume()
-        */
-    }
-    
-    ///
-    /// We have found a new version and now we do the actual downloading and updating
-    ///
-    private func onPerformUpdate() -> Void {
-        /*self.addendumText = "Updating..."
         
-        var request = URLRequest(url: URL(string: "http://www.ikjetil.no/Home/DownloadFile/45?GUID=4dae77f8-e7f3-4631-a8e5-8afda6d065af")! )
-        let session = URLSession.shared
-        
-        request.httpMethod = "GET"
-        //request.addValue("text/plain; charset=utf-8", forHTTPHeaderField: "Content-Type")
-        request.addValue("www.ikjetil.no", forHTTPHeaderField: "Host")
-        request.addValue("0", forHTTPHeaderField: "Content-Length")
-        
-        let task = session.dataTask(with: request, completionHandler: {
-            data, response, error -> Void in
-            
-            if error != nil {
-                PlayerLog.ApplicationLog?.logError(title: "MainWindow::onPerformUpdate", text: "session.dataTask failed. With error: \(error!)")
-                self.addendumText = "Error downloading file!"
-                return
-            }
-            
-            if let igData = data {
-                do {
-                    let filename = PlayerDirectories.consoleMusicPlayerUpdateDirectory.appendingPathComponent("\(self.updateFileName)")
-                    try igData.write(to: filename)
-                    
-                    NSWorkspace.shared.openFile(filename.path)
-                    
-                    self.addendumText = "Updating, please be patient..."
-                    
-                    sleep(7)
-                    
-                    do {
-                        let atFilename: URL = PlayerDirectories.volumesDirectory.appendingPathComponent("CMPlayer", isDirectory: true).appendingPathComponent("CMPlayer", isDirectory: false)
-                        //let atFilename: URL = URL(fileURLWithPath: "/Volumes/Ignition").appendingPathComponent("Ignition.app", isDirectory: true)
-                        let toFilename: URL = PlayerDirectories.applicationsDirectory.appendingPathComponent("CMPlayer", isDirectory: false)
-                        //let toFilename: URL = URL(fileURLWithPath: "/Applications").appendingPathComponent("Ignition.app", isDirectory: true)
-                        if FileManager.default.fileExists(atPath: toFilename.path) {
-                            try FileManager.default.removeItem(atPath: toFilename.path)
-                        }
-                        try FileManager.default.copyItem(at: atFilename, to: toFilename)
-                        
-                        sleep(2)
-                        
-                        try NSWorkspace.shared.unmountAndEjectDevice(at: PlayerDirectories.volumesDirectory.appendingPathComponent("CMPlayer", isDirectory: true))
-                        
-                        let _ = NSWorkspace.shared.openFile(toFilename.path)
-                        
-                        PlayerLog.ApplicationLog?.logInformation(title: "MainWindow::onPerformUpdate", text: "Update Completed to: \(self.updateFileName)")
-                        
-                        exit(0)
-                    }
-                    catch {
-                        let msg = "Error Updating CMPlayer: \(error)"
-                        PlayerLog.ApplicationLog?.logInformation(title: "MainWindow::onPerformUpdate", text: msg)
-                        self.addendumText = msg
-                    }
-                }
-                catch {
-                    let msg = "Error writing file '\(self.updateFileName)': \(error)"
-                    PlayerLog.ApplicationLog?.logInformation(title: "MainWindow::onPerformUpdate", text: msg)
-                    self.addendumText = msg
-                }
-            }
-        })
-        
-        task.resume()*/
-    }// onPerformUpdate
+    }        
 }// CMPlayer

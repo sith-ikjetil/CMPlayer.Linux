@@ -17,10 +17,18 @@ import Cao
 // Represents CMPlayer AudioPlayer.
 //
 internal class CmpAudioPlayer {
+    ///
+    /// private constants
+    /// 
     private let filePath: URL    
+    ///
+    /// private variables
+    /// 
     private var mp3Player: Mp3AudioPlayer? = nil
     private var aacPlayer: AacAudioPlayer? = nil
-    
+    ///
+    /// get properties
+    ///
     var isPlaying: Bool {
         get {
             if mp3Player != nil {
@@ -63,6 +71,9 @@ internal class CmpAudioPlayer {
             return 0
         }
     }
+    ///
+    /// Only initializer
+    ///
     init(path: URL) {
         self.filePath = path       
         if path.path.lowercased().hasSuffix(".mp3") {
@@ -72,16 +83,20 @@ internal class CmpAudioPlayer {
             self.aacPlayer = AacAudioPlayer(path: path);            
         }
     }
-
+    ///
+    /// initiates playback of the audio file from init(path)
+    /// 
     func play() throws {
         if mp3Player != nil {
             return try mp3Player!.play()
         }
         else if aacPlayer != nil {
             return try aacPlayer!.play()
-        }
+        }        
     }
-
+    ///
+    /// stops playback if we are playing.
+    /// 
     func stop() {
         if mp3Player != nil {
             return mp3Player!.stop()
@@ -90,7 +105,9 @@ internal class CmpAudioPlayer {
             return aacPlayer!.stop()
         }
     }
-
+    ///
+    /// pauses playback if we are playing
+    /// 
     func pause() {
         if mp3Player != nil {
             return mp3Player!.pause()
@@ -99,7 +116,9 @@ internal class CmpAudioPlayer {
             return aacPlayer!.pause()
         }
     }
-
+    ///
+    /// resumes playback if we are playing.
+    ///
     func resume() {
         if mp3Player != nil {
             return mp3Player!.resume()
@@ -108,7 +127,12 @@ internal class CmpAudioPlayer {
             return aacPlayer!.resume()
         }
     }
-
+    ///
+    /// Gathers metadata.
+    /// - Parameter path: file to gather metadata from.
+    /// - Throws: CmpError
+    /// - Returns: CmpMetadata
+    /// 
     static func gatherMetadata(path: URL) throws -> CmpMetadata {
         if path.path.lowercased().hasSuffix(".mp3") {
             return try Mp3AudioPlayer.gatherMetadata(path: path);
@@ -117,12 +141,6 @@ internal class CmpAudioPlayer {
             return try AacAudioPlayer.gatherMetadata(path: path);            
         }
 
-        let metadata = CmpMetadata()
-        metadata.duration = 25000
-        metadata.artist = "?"
-        metadata.title = "?"
-        metadata.genre = "?"
-        metadata.albumName = "?"
-        return metadata
+        throw CmpError(message: "Error trying to gather metadata on unknown file format. File: \(path.path)")
     }
 }// AudioPlayer

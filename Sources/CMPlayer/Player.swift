@@ -17,7 +17,7 @@ import Cmpg123
 //
 internal class Player {
     //
-    // Internal properties/constants.
+    // internal varables
     //
     var audio1: CmpAudioPlayer? = nil
     var audio2: CmpAudioPlayer? = nil
@@ -25,13 +25,11 @@ internal class Player {
     var durationAudioPlayer1: UInt64 = 0
     var durationAudioPlayer2: UInt64 = 0
     var isPaused: Bool = false
-    var isPrev: Bool = false
-    
+    var isPrev: Bool = false    
     //
-    // Private properties/constants.
+    // private variables
     //
-    private var currentCommandReady: Bool = false
-    
+    private var currentCommandReady: Bool = false    
     ///
     /// Initializes the application.
     ///
@@ -61,8 +59,7 @@ internal class Player {
         }
         
         Console.clearScreenCurrentTheme()           
-    }    
-    
+    }        
     ///
     /// Plays audio.
     ///
@@ -127,8 +124,7 @@ internal class Player {
             wnd.showWindow()
             exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
         }
-    }
-    
+    }    
     ///
     /// Pauses audio playback.
     ///
@@ -154,8 +150,7 @@ internal class Player {
         }
         
         g_lock.unlock()
-    }
-    
+    }    
     ///
     /// Resumes audio playback.
     ///
@@ -183,8 +178,7 @@ internal class Player {
         }
         
         g_lock.unlock()
-    }
-    
+    }    
     ///
     /// Plays previous song
     ///
@@ -198,8 +192,7 @@ internal class Player {
         self.skip(play: true, crossfade: false)
         
         self.isPrev = false
-    }
-    
+    }    
     ///
     /// Skips audio playback to next item in playlist.
     ///
@@ -263,8 +256,7 @@ internal class Player {
                 self.play(player: 2, playlistIndex: 0)
             }
         }
-    }
-    
+    }    
     ///
     /// Runs the application.
     ///

@@ -86,6 +86,11 @@ do {
 
     // exit with exit code
     exit(exitCode)
+} catch let error as CmpError {
+    let wnd = ErrorWindow()
+    wnd.message = "Exception caught.\nMessage: \(error.message)"
+    wnd.showWindow()
+    exit(1)
 } catch {        
     let wnd = ErrorWindow()
     wnd.message = "Unknown error occurred.\nMessage: \(error)"

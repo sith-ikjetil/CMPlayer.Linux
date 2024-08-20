@@ -17,7 +17,13 @@ import Cao
 // Represents CMPlayer AudioPlayer.
 //
 internal class Mp3AudioPlayer {
+    ///
+    /// private constants
+    /// 
     private let filePath: URL    
+    ///
+    /// private variables
+    /// 
     private var mpg123Handle: OpaquePointer?
     private var m_length: off_t = 0
     private var m_rate: CLong = 0
@@ -28,6 +34,9 @@ internal class Mp3AudioPlayer {
     private var m_timeElapsed: UInt64 = 0
     private var m_duration: UInt64 = 0
     private var m_channels: Int32 = 2
+    ///
+    /// get properties
+    ///
     var isPlaying: Bool {
         get {
             return self.m_isPlaying
@@ -48,10 +57,15 @@ internal class Mp3AudioPlayer {
             return self.m_duration
         }
     }
+    ///
+    /// Only initializer
+    ///
     init(path: URL) {
         self.filePath = path        
     }
-
+    ///
+    /// initiates playback of the audio file from init(path)
+    /// 
     func play() throws {
         // if we are already playing, return
         if (self.m_isPlaying) {
@@ -159,7 +173,10 @@ internal class Mp3AudioPlayer {
             self?.playAsync(device: device)
         }
     }
-
+    ///
+    /// Performs the actual playback from play().
+    /// Runs in the background.        
+    /// - Parameter device: mpg123 handle
     private func playAsync(device: OpaquePointer?) {
         // set flags
         self.m_isPlaying = true
@@ -211,19 +228,30 @@ internal class Mp3AudioPlayer {
             }
         }
     }
-
+    ///
+    /// stops playback if we are playing.
+    /// 
     func stop() {
         self.m_stopFlag = true
     }
-
+    ///
+    /// pauses playback if we are playing
+    /// 
     func pause() {
         self.m_isPaused = true
     }
-
+    ///
+    /// resumes playback if we are playing.
+    ///
     func resume() {
         self.m_isPaused = false
     }
-
+    ///
+    /// Gathers metadata.
+    /// - Parameter path: file to gather metadata from.
+    /// - Throws: CmpError
+    /// - Returns: CmpMetadata
+    /// 
     static func gatherMetadata(path: URL) throws -> CmpMetadata {
         if path.path.lowercased().hasSuffix(".mp3") {
             let metadata = CmpMetadata()
