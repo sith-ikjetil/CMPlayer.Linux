@@ -1,5 +1,0 @@
-module Cao [system] {
-    header "include/mpg123.h"
-    link "libao"
-    export *
-}
