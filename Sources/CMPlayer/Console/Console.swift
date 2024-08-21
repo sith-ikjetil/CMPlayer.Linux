@@ -218,7 +218,7 @@ internal class Console {
     static func printXY(_ x: Int,_ y: Int,_ text: String,_ maxLength: Int,_ padding: PrintPaddingTextAlign,_ paddingChar: Character, _ bgColor: ConsoleColor, _ modifierBg: ConsoleColorModifier, _ colorText: ConsoleColor,_ modifierText: ConsoleColorModifier) -> Void {
         let nmsg = text.convertStringToLengthPaddedString(maxLength, padding, paddingChar)
         print("\u{001B}[\(y);\(x)H\(Console.applyTextColor(colorBg: bgColor, modifierBg: modifierBg, colorText: colorText, modifierText: modifierText, text: nmsg))", terminator: "")
-    }
+    }    
     ///
     /// Initializes console.
     ///
@@ -229,7 +229,7 @@ internal class Console {
             g_rows = Int(w.ws_row)
             g_cols = Int(w.ws_col)
         }                
-        
+
         Console.hideCursor()
         Console.echoOff()
         
@@ -244,8 +244,7 @@ internal class Console {
         //
         // Respond to window resize
         //
-        sigintSrcSIGWINCH.setEventHandler {
-            
+        sigintSrcSIGWINCH.setEventHandler {            
             var w = winsize()
             var rows: Int = g_rows
             var cols: Int = g_cols
