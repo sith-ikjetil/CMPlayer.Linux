@@ -33,6 +33,7 @@ internal enum ExitCodes: Int32 {
     case ERROR_UNKNOWN = 1
     case ERROR_FINDING_FILES = 2
     case ERROR_PLAYING_FILE = 3
+    case ERROR_CONSOLE = 4
 }
 ///
 /// SearchType, type of search

@@ -40,7 +40,7 @@ internal class Console {
     //
     // Private properties/constants.
     //
-    static private let concurrentQueue1 = DispatchQueue(label: "cqueue.console.music.player.linux.1.console", attributes: .concurrent)
+    static private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.linux.console.1", attributes: .concurrent)
     //static private let concurrentQueue2 = DispatchQueue(label: "cqueue.console.music.player.macos.2.console", attributes: .concurrent)
     //static private let sigintSrcSIGINT = DispatchSource.makeSignalSource(signal: Int32(SIGINT), queue: Console.concurrentQueue1)
     //static private let sigintSrcSIGQUIT = DispatchSource.makeSignalSource(signal: Int32(SIGQUIT), queue: Console.concurrentQueue1)
@@ -128,14 +128,18 @@ internal class Console {
         }
         catch {
             let msg = "[Console].echoOff().\n Unknown error.\n Message: \(error)"
+            
             let wnd: ErrorWindow = ErrorWindow()
             wnd.message = msg
             wnd.showWindow()
+            Console.clearScreen()
+            Console.gotoXY(1,1)
+            system("clear")
 
             PlayerLog.ApplicationLog?.logError(title: "[Console].echoOff()", text: msg.trimmingCharacters(in: .newlines))
-            exit(1);
+            exit(ExitCodes.ERROR_CONSOLE.rawValue)
         }
-    }
+    }    
     ///
     /// Turns console echo on.
     ///
@@ -148,12 +152,16 @@ internal class Console {
         }
         catch {
             let msg = "[Console].echoOn().\n Unknown error.\n Message: \(error)"
+
             let wnd: ErrorWindow = ErrorWindow()
             wnd.message = msg
             wnd.showWindow()
+            Console.clearScreen()
+            Console.gotoXY(1,1)
+            system("clear")
 
             PlayerLog.ApplicationLog?.logError(title: "[Console].echoOn()", text: msg.trimmingCharacters(in: .newlines))
-            exit(1);
+            exit(ExitCodes.ERROR_CONSOLE.rawValue)
         }
     }
     ///
