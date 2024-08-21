@@ -122,6 +122,12 @@ internal class AacAudioPlayer {
                 break
             }
         }
+
+        // Calculate duration in seconds
+        if let formatCtx = self.m_audioState.formatCtx, formatCtx.pointee.duration != 0x00 { // AV_NOPTS_VALUE {
+            let durationInSeconds = Double(formatCtx.pointee.duration) / Double(AV_TIME_BASE)                
+            self.m_duration = UInt64(durationInSeconds * 1000)
+        }     
         
         if self.m_audioState.audioStreamIndex == -1 {
             let msg = "[AacAudioPlayer].play(). Could not find an audio stream."
@@ -225,13 +231,23 @@ internal class AacAudioPlayer {
             avformat_close_input(&self.m_audioState.formatCtx)
         }
 
-        // total amount of samples
-        var total: UInt64 = 0
         var timeToStartCrossfade: Bool = false
         var currentVolume: Float = 1
 
+        self.m_timeElapsed = 0
+
         // Main decoding and playback loop
-        while !self.m_stopFlag {
+        while !self.m_stopFlag {                                    
+             if (self.m_doSeekToPos) {
+                self.m_doSeekToPos = false
+
+                let seconds: UInt64 = self.m_seekPos / 1000
+                let newPos: Int64 = Int64(seconds) / Int64(AV_TIME_BASE)                
+                if av_seek_frame(self.m_audioState.formatCtx, self.m_audioState.audioStreamIndex, newPos, AVSEEK_FLAG_ANY) == 0 {                
+                    self.m_timeElapsed = (self.duration - self.m_seekPos)                                        
+                }                
+            }
+
             if av_read_frame(self.m_audioState.formatCtx, &self.m_audioState.packet) >= 0 {            
                 if self.m_audioState.packet.stream_index == self.m_audioState.audioStreamIndex {
                     let err = avcodec_send_packet(self.m_audioState.codecCtx, &self.m_audioState.packet)
@@ -241,7 +257,7 @@ internal class AacAudioPlayer {
                         break
                     }
                                         
-                    while avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame) >= 0 {
+                    while avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame) >= 0 {                        
                         // Allocate buffer for resampled audio
                         var outputBuffer: UnsafeMutablePointer<UInt8>? = nil
                         let bufferSize = av_samples_alloc(&outputBuffer, nil, 2, self.m_audioState.frame!.pointee.nb_samples, AV_SAMPLE_FMT_S16, 0)
@@ -277,11 +293,10 @@ internal class AacAudioPlayer {
                                 return
                             }
 
-                            // Update time elapsed
-                            total += UInt64(bufferSize)
-                            let totalPerChannel = total / UInt64(self.m_audioState.aoFormat.channels)
+                            // Update time elapsed                            
+                            let totalPerChannel = UInt64(bufferSize) / UInt64(self.m_audioState.aoFormat.channels)
                             let currentDuration = Double(totalPerChannel) / Double(self.m_audioState.aoFormat.rate)
-                            self.m_timeElapsed = UInt64(currentDuration * Double(1000/self.m_audioState.aoFormat.channels))
+                            self.m_timeElapsed += UInt64(currentDuration * Double(1000/self.m_audioState.aoFormat.channels))
                             
                             // set crossfade volume
                             let timeLeft: UInt64 = (self.duration >= self.m_timeElapsed) ? self.duration - self.m_timeElapsed : self.duration
@@ -312,8 +327,8 @@ internal class AacAudioPlayer {
                             if self.m_stopFlag {
                                 return
                             }
-                        }                        
-                    }// while err >= 0
+                        }                                                                       
+                    }// while 
                 }                
                 av_packet_unref(&self.m_audioState.packet)                
             }// if av_read_frame
@@ -324,7 +339,7 @@ internal class AacAudioPlayer {
                     return
                 }
             }
-        }
+        }// while !self.m_stopFlag
     }// private func playAsync()
     /// 
     /// seeks playback from start to position (ms)

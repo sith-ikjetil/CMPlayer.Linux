@@ -795,13 +795,13 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                         }
 
                         let posMs: UInt64 = UInt64(pos * 1000)
-                        if g_player.audioPlayerActive == 1 {
-                            if posMs < g_player.audio1!.duration {
+                        if g_player.audioPlayerActive == 1 {                              
+                            if posMs < g_player.audio1!.duration {                                
                                 g_player.audio1?.seekToPos(position: posMs)
                             }
                         }
-                        else if g_player.audioPlayerActive == 2 {
-                            if posMs < g_player.audio1!.duration {
+                        else if g_player.audioPlayerActive == 2 {                             
+                            if posMs < g_player.audio2!.duration {                                
                                 g_player.audio2?.seekToPos(position: posMs)
                             }
                         }
