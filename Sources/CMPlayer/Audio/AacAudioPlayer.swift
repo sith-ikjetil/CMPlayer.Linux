@@ -49,6 +49,9 @@ internal class AacAudioPlayer {
     private var m_duration: UInt64 = 0
     private var m_channels: Int32 = 2
     private var m_audioState: AacAudioState = AacAudioState()
+    private var m_targetFadeVolume: Float = 1
+    private var m_targetFadeDuration: UInt64 = 0
+    private var m_enableCrossfade: Bool = false
     ///
     /// get properties
     ///
@@ -222,6 +225,8 @@ internal class AacAudioPlayer {
 
         // total amount of samples
         var total: UInt64 = 0
+        var timeToStartCrossfade: Bool = false
+        var currentVolume: Float = 1
 
         // Main decoding and playback loop
         while !self.m_stopFlag {
@@ -276,6 +281,19 @@ internal class AacAudioPlayer {
                             let currentDuration = Double(totalPerChannel) / Double(self.m_audioState.aoFormat.rate)
                             self.m_timeElapsed = UInt64(currentDuration * Double(1000/self.m_audioState.aoFormat.channels))
                             
+                            // set crossfade volume
+                            let timeLeft: UInt64 = (self.duration >= self.m_timeElapsed) ? self.duration - self.m_timeElapsed : self.duration
+                            if timeLeft > 0 && timeLeft <= self.m_targetFadeDuration {
+                                timeToStartCrossfade = true
+
+                                currentVolume = Float(Float(timeLeft)/Float(self.m_targetFadeDuration))                    
+                            }
+
+                            // adjust crossfade volume
+                            if self.m_enableCrossfade && timeToStartCrossfade {
+                                adjustVolume(buffer: UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), size: Int(bufferSize), volume: currentVolume)                        
+                            }
+
                             // Write audio data to device
                             ao_play(self.m_audioState.device, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), UInt32(UInt32(samples) * UInt32(2) * UInt32(MemoryLayout<Int16>.size)))                            
                         }
@@ -306,6 +324,29 @@ internal class AacAudioPlayer {
             }
         }
     }// private func playAsync()
+    /// 
+    /// Adjusts volume in the sample buffer to a factor 0.0-1.0
+    ///     
+    func adjustVolume(buffer: UnsafeMutablePointer<Int8>, size: Int, volume: Float) {
+        let sampleCount = size / MemoryLayout<Int16>.size
+        let samples = buffer.withMemoryRebound(to: Int16.self, capacity: sampleCount) { $0 }
+
+        for i in 0..<sampleCount {
+            let adjustedSample = Float(samples[i]) * volume
+            // Ensure the value is within the Int16 range
+            samples[i] = Int16(max(min(adjustedSample, Float(Int16.max)), Float(Int16.min)))
+        }
+    }
+    /// 
+    /// Sets how the volume is done with crossfading enabled.
+    /// - Parameters:
+    ///   - volume: target volume. usually 0.
+    ///   - duration: time from end of song, fading should be done.
+    func setCrossfadeVolume(volume: Float, fadeDuration: UInt64) {
+        self.m_targetFadeVolume = volume
+        self.m_targetFadeDuration = fadeDuration
+        self.m_enableCrossfade = true
+    }
     ///
     /// stops playback if we are playing.
     /// 

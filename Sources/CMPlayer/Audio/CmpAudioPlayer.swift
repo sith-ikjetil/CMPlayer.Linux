@@ -127,6 +127,19 @@ internal class CmpAudioPlayer {
             return aacPlayer!.resume()
         }
     }
+    /// 
+    /// Sets how the volume is done with crossfading enabled.
+    /// - Parameters:
+    ///   - volume: target volume. usually 0.
+    ///   - duration: time from end of song, fading should be done.
+    func setCrossfadeVolume(volume: Float, fadeDuration: UInt64) {
+        if mp3Player != nil {
+            return mp3Player!.setCrossfadeVolume(volume: volume, fadeDuration: fadeDuration)
+        }
+        else if aacPlayer != nil {
+            return aacPlayer!.setCrossfadeVolume(volume: volume, fadeDuration: fadeDuration)
+        }
+    }
     ///
     /// Gathers metadata.
     /// - Parameter path: file to gather metadata from.

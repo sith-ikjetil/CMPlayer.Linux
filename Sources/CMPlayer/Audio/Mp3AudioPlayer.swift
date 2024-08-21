@@ -34,6 +34,9 @@ internal class Mp3AudioPlayer {
     private var m_timeElapsed: UInt64 = 0
     private var m_duration: UInt64 = 0
     private var m_channels: Int32 = 2
+    private var m_targetFadeVolume: Float = 1
+    private var m_targetFadeDuration: UInt64 = 0
+    private var m_enableCrossfade: Bool = false
     ///
     /// get properties
     ///
@@ -199,6 +202,8 @@ internal class Mp3AudioPlayer {
         var buffer = [UInt8](repeating: 0, count: bufferSize)
         var done: Int = 0
         var total: off_t = 0
+        var timeToStartCrossfade: Bool = false
+        var currentVolume: Float = 1
 
         // Decode and play the file        
         while !self.m_stopFlag {
@@ -217,9 +222,24 @@ internal class Mp3AudioPlayer {
                 let currentDuration = Double(totalPerChannel) / Double(self.m_rate)
                 self.m_timeElapsed = UInt64(currentDuration * Double(1000/self.m_channels))
 
+                // set crossfade volume
+                let timeLeft: UInt64 = (self.duration >= self.m_timeElapsed) ? self.duration - self.m_timeElapsed : self.duration
+                if timeLeft > 0 && timeLeft <= self.m_targetFadeDuration {
+                    timeToStartCrossfade = true
+
+                    currentVolume = Float(Float(timeLeft)/Float(self.m_targetFadeDuration))                    
+                }
+
                 // play samples
                 buffer.withUnsafeMutableBytes { bufferPointer in
                     let pointer = bufferPointer.baseAddress!.assumingMemoryBound(to: Int8.self)
+
+                    // adjust crossfade volume
+                    if self.m_enableCrossfade && timeToStartCrossfade {
+                        adjustVolume(buffer: pointer, size: Int(done), volume: currentVolume)                        
+                    }
+
+                    // play audio samples
                     ao_play(device, pointer, UInt32(done))
                 }
             }
@@ -227,6 +247,29 @@ internal class Mp3AudioPlayer {
                 usleep(100_000)
             }
         }
+    }
+    /// 
+    /// Adjusts volume in the sample buffer to a factor 0.0-1.0
+    ///     
+    func adjustVolume(buffer: UnsafeMutablePointer<Int8>, size: Int, volume: Float) {
+        let sampleCount = size / MemoryLayout<Int16>.size
+        let samples = buffer.withMemoryRebound(to: Int16.self, capacity: sampleCount) { $0 }
+
+        for i in 0..<sampleCount {
+            let adjustedSample = Float(samples[i]) * volume
+            // Ensure the value is within the Int16 range
+            samples[i] = Int16(max(min(adjustedSample, Float(Int16.max)), Float(Int16.min)))
+        }
+    }
+    /// 
+    /// Sets how the volume is done with crossfading enabled.
+    /// - Parameters:
+    ///   - volume: target volume. usually 0.
+    ///   - duration: time from end of song, fading should be done.
+    func setCrossfadeVolume(volume: Float, fadeDuration: UInt64) {
+        self.m_targetFadeVolume = volume
+        self.m_targetFadeDuration = fadeDuration
+        self.m_enableCrossfade = true
     }
     ///
     /// stops playback if we are playing.

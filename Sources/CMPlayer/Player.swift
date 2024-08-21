@@ -24,13 +24,27 @@ internal class Player {
     var audio2: CmpAudioPlayer? = nil
     var audioPlayerActive: Int = -1
     var durationAudioPlayer1: UInt64 = 0
-    var durationAudioPlayer2: UInt64 = 0
-    var isPaused: Bool = false
+    var durationAudioPlayer2: UInt64 = 0    
     var isPrev: Bool = false    
     //
     // private variables
     //
     private var currentCommandReady: Bool = false    
+    ///
+    /// property
+    /// 
+    var isPaused: Bool {
+        get {            
+            if self.audioPlayerActive == 1 {
+                return audio1?.isPaused ?? false
+            }
+            else if self.audioPlayerActive == 2 {
+                return audio2?.isPaused ?? false
+            }
+
+            return false
+        }
+    }
     ///
     /// Initializes the application.
     ///
@@ -81,14 +95,12 @@ internal class Player {
                     self.audio1 = CmpAudioPlayer(path:g_playlist[playlistIndex].fileURL!)                    
                     self.durationAudioPlayer1 = g_playlist[playlistIndex].duration
                     try self.audio1?.play()                    
-                    self.isPaused = false                            
                 }
                 else {
                     self.audio1?.stop()
                     self.audio1 = CmpAudioPlayer(path: g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer1 = g_playlist[playlistIndex].duration
                     try self.audio1?.play()
-                    self.isPaused = false
                 }                
             }
             else if player == 2 {
@@ -96,14 +108,12 @@ internal class Player {
                     self.audio2 = CmpAudioPlayer(path:g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer2 = g_playlist[playlistIndex].duration
                     try self.audio2?.play()
-                    self.isPaused = false
                 }
                 else {
                     self.audio2?.stop()
                     self.audio2 = CmpAudioPlayer(path: g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer2 = g_playlist[playlistIndex].duration
                     try self.audio2?.play()
-                    self.isPaused = false
                 }            
             }
         }
@@ -140,10 +150,6 @@ internal class Player {
             return
         }
 
-        guard self.isPaused == false else {
-            return
-        }
-
         guard self.audioPlayerActive != -1 else {
             return
         }
@@ -152,11 +158,9 @@ internal class Player {
                 
         if self.audioPlayerActive == 1 {
             audio1?.pause()            
-            self.isPaused = true
         }
         else if self.audioPlayerActive == 2 {
             audio2?.pause()
-            self.isPaused = true
         }
         
         g_lock.unlock()
@@ -169,10 +173,6 @@ internal class Player {
             return
         }
 
-        guard self.isPaused == true else {
-            return
-        }
-
         guard self.audioPlayerActive != -1 else {
             return
         }
@@ -181,11 +181,9 @@ internal class Player {
                 
         if self.audioPlayerActive == 1 {
             audio1?.resume()
-            self.isPaused = false            
         }
         else if self.audioPlayerActive == 2 {
             audio2?.resume()
-            self.isPaused = false            
         }
         
         g_lock.unlock()
@@ -244,7 +242,7 @@ internal class Player {
                         self.audio2!.stop()
                     }
                     else {
-                        //self.audio2!.setVolume(0.0, fadeDuration: Double(PlayerPreferences.crossfadeTimeInSeconds) )
+                        self.audio2!.setCrossfadeVolume(volume: 0.0, fadeDuration: UInt64(PlayerPreferences.crossfadeTimeInSeconds*1000) )
                     }
                 }
             }
@@ -259,7 +257,7 @@ internal class Player {
                         self.audio1!.stop()
                     }
                     else {
-                        //self.audio1!.setVolume(0.0, fadeDuration: Double(PlayerPreferences.crossfadeTimeInSeconds) )
+                        self.audio1!.setCrossfadeVolume(volume: 0.0, fadeDuration: UInt64(PlayerPreferences.crossfadeTimeInSeconds*1000) )
                     }
                 }
             }
