@@ -52,6 +52,8 @@ internal class AacAudioPlayer {
     private var m_targetFadeVolume: Float = 1
     private var m_targetFadeDuration: UInt64 = 0
     private var m_enableCrossfade: Bool = false
+    private var m_seekPos: UInt64 = 0
+    private var m_doSeekToPos: Bool = true
     ///
     /// get properties
     ///
@@ -324,6 +326,15 @@ internal class AacAudioPlayer {
             }
         }
     }// private func playAsync()
+    /// 
+    /// seeks playback from start to position (ms)
+    /// 
+    /// - Parameter position: ms from start
+    func seekToPos(position: UInt64)
+    {
+        self.m_seekPos = position
+        self.m_doSeekToPos = true
+    }
     /// 
     /// Adjusts volume in the sample buffer to a factor 0.0-1.0
     ///     

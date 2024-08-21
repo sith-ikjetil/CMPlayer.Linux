@@ -128,6 +128,19 @@ internal class CmpAudioPlayer {
         }
     }
     /// 
+    /// seeks playback from start to position (ms)
+    /// 
+    /// - Parameter position: ms from start
+    func seekToPos(position: UInt64)
+    {
+        if mp3Player != nil {
+            return mp3Player!.seekToPos(position: position)
+        }
+        else if aacPlayer != nil {
+            return aacPlayer!.seekToPos(position: position)
+        }
+    }
+    /// 
     /// Sets how the volume is done with crossfading enabled.
     /// - Parameters:
     ///   - volume: target volume. usually 0.

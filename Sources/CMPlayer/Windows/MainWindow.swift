@@ -783,22 +783,32 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandGoTo(parts: [String]) -> Void {
-        /*let tp = parts[0].split(separator: ":" )
+        let tp = parts[0].split(separator: ":" )
         if tp.count == 2 {
             if let time1 = Int(tp[0]) {
                 if let time2 = Int(tp[1]) {
-                    if time1 >= 0 && time2 >= 0 {
+                    if time1 >= 0 && time2 >= 0 && time2 < 60 {
                         let pos: Int = time1*60 + time2
+                        
+                        guard pos >= 0 else {
+                            return;
+                        }
+
+                        let posMs: UInt64 = UInt64(pos * 1000)
                         if g_player.audioPlayerActive == 1 {
-                            g_player.audio1?.currentTime = TimeInterval(exactly: Double(UInt64(Double(g_playlist[0].duration) / 1000.0)) - Double(pos))!
+                            if posMs < g_player.audio1!.duration {
+                                g_player.audio1?.seekToPos(position: posMs)
+                            }
                         }
                         else if g_player.audioPlayerActive == 2 {
-                            g_player.audio2?.currentTime = TimeInterval(exactly: Double(UInt64(Double(g_playlist[0].duration) / 1000.0)) - Double(pos))!
+                            if posMs < g_player.audio1!.duration {
+                                g_player.audio2?.seekToPos(position: posMs)
+                            }
                         }
                     }
                 }
             }
-        }*/
+        }
     }    
     ///
     /// Clears any search mode
