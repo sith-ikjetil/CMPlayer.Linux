@@ -51,9 +51,10 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// Handler for TerminalSizeHasChangedProtocol
     ///
     func terminalSizeHasChanged() -> Void {
-        Console.clearScreenCurrentTheme()// TODO: Test remove        
+        Console.clearScreenCurrentTheme()
         if g_rows >= 24 && g_cols >= 80 {
             self.isTooSmall = false
+            MainWindow.renderHeader(showTime: true)
             self.renderWindow()
         }
         else {
@@ -352,8 +353,10 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 
                 if !self.isShowingTopWindow {
                     if !self.isTooSmall {
-                        MainWindow.renderHeader(showTime: true)
-                        self.renderWindow()
+                        if !g_termSizeIsChanging {
+                            MainWindow.renderHeader(showTime: true)
+                            self.renderWindow()
+                        }
                     }
                 }
                 
