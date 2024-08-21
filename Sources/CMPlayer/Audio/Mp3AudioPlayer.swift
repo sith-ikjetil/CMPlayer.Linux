@@ -318,9 +318,17 @@ internal class Mp3AudioPlayer {
             //
             // find duration
             //              
-            var length: off_t = 0
-            length = mpg123_length(handle)
-            if length <= 0 {
+            if mpg123_scan(handle) != 0 {                
+                mpg123_close(handle)
+                mpg123_delete(handle)
+                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_scan failed. File: \(path.lastPathComponent)"
+                throw CmpError(message: msg)                
+            }
+
+            let length  = mpg123_length(handle)
+            if length  <= 0 {
+                mpg123_close(handle)
+                mpg123_delete(handle)
                 let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_length failed with length: \(length). File: \(path.lastPathComponent)"                
                 throw CmpError(message: msg)
             }
@@ -329,12 +337,14 @@ internal class Mp3AudioPlayer {
             var rate: CLong = 0
             var channels: Int32 = 0
             var encoding: Int32 = 0
-            mpg123_getformat(handle, &rate, &channels, &encoding)
+            mpg123_getformat(handle, &rate, &channels, &encoding)            
             
-            // Calculate duration in seconds
+            // Calculate duration
+            // Scan the file to build an accurate index of frames
+            
             let duration = Double(length) / Double(rate)
-            metadata.duration = UInt64(duration * 1000)
-            
+            metadata.duration = UInt64(duration * 1000)            
+
             // Ensure positive duration
             guard duration > 0 else {
                 let msg = "[Mp3AudioPlayer].gatherMetadata(path:). Duration was 0. File: \(path.lastPathComponent)"
