@@ -249,7 +249,9 @@ internal class Console {
             g_rows = rows
             g_cols = cols
             if g_tscpStack.count > 0 {
+                g_termSizeIsChanging = true
                 g_tscpStack.last?.terminalSizeHasChanged()
+                g_termSizeIsChanging = false
             }
         }
         sigintSrcSIGWINCH.resume()
