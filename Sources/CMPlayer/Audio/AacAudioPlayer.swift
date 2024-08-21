@@ -53,7 +53,7 @@ internal class AacAudioPlayer {
     private var m_targetFadeDuration: UInt64 = 0
     private var m_enableCrossfade: Bool = false
     private var m_seekPos: UInt64 = 0
-    private var m_doSeekToPos: Bool = true
+    private var m_doSeekToPos: Bool = false
     ///
     /// get properties
     ///

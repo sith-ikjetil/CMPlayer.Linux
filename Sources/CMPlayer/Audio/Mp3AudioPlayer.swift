@@ -38,7 +38,7 @@ internal class Mp3AudioPlayer {
     private var m_targetFadeDuration: UInt64 = 0
     private var m_enableCrossfade: Bool = false
     private var m_seekPos: UInt64 = 0
-    private var m_doSeekToPos: Bool = true
+    private var m_doSeekToPos: Bool = false
     ///
     /// get properties
     ///
@@ -113,6 +113,13 @@ internal class Mp3AudioPlayer {
         //
         // find duration
         //                      
+        if mpg123_scan(self.mpg123Handle) != 0 {                
+            mpg123_close(self.mpg123Handle)
+            mpg123_delete(self.mpg123Handle)
+            let msg = "[Mp3AudioPlayer].play(). mpg123_scan failed. File: \(self.filePath.path.lastPathComponent)"
+            throw CmpError(message: msg)                
+        }
+
         self.m_length = mpg123_length(self.mpg123Handle)
         if self.m_length <= 0 {
             let msg = "[Mp3AudioPlayer].play(). mpg123_length with invalid value: \(self.m_length)"
@@ -120,7 +127,7 @@ internal class Mp3AudioPlayer {
             throw CmpError(message: msg)
         }
 
-        // Set the output format (PCM)
+        // Get the rate and channels to calculate duration
         var rate: CLong = 0
         var channels: Int32 = 0
         var encoding: Int32 = 0
@@ -203,12 +210,23 @@ internal class Mp3AudioPlayer {
         let bufferSize = mpg123_outblock(mpg123Handle)
         var buffer = [UInt8](repeating: 0, count: bufferSize)
         var done: Int = 0
-        var total: off_t = 0
+        //var total: off_t = 0
         var timeToStartCrossfade: Bool = false
         var currentVolume: Float = 1
 
+        self.m_timeElapsed = 0
+
         // Decode and play the file        
         while !self.m_stopFlag {
+            if (self.m_doSeekToPos) {
+                self.m_doSeekToPos = false
+                
+                let seconds: UInt64 = self.m_seekPos / 1000
+                let newPos: off_t = off_t(seconds) * self.m_rate
+                if mpg123_seek(self.mpg123Handle, newPos, SEEK_SET) >= 0 {
+                    self.m_timeElapsed = (self.duration - self.m_seekPos)
+                }                                    
+            }
             let err = mpg123_read(self.mpg123Handle, &buffer, bufferSize, &done)
             if err == -12 { // MPG123_DONE
                 break;
@@ -219,10 +237,10 @@ internal class Mp3AudioPlayer {
             }
             if (done > 0) {
                 // Update time elapsed
-                total += done
-                let totalPerChannel = total / Int(self.m_channels)
+                //total += done                
+                let totalPerChannel = done / Int(self.m_channels)
                 let currentDuration = Double(totalPerChannel) / Double(self.m_rate)
-                self.m_timeElapsed = UInt64(currentDuration * Double(1000/self.m_channels))
+                self.m_timeElapsed += UInt64(currentDuration * Double(1000/self.m_channels))
 
                 // set crossfade volume
                 let timeLeft: UInt64 = (self.duration >= self.m_timeElapsed) ? self.duration - self.m_timeElapsed : self.duration
