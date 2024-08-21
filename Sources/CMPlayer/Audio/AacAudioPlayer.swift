@@ -237,14 +237,22 @@ internal class AacAudioPlayer {
         self.m_timeElapsed = 0
 
         // Main decoding and playback loop
-        while !self.m_stopFlag {                                    
-             if (self.m_doSeekToPos) {
+        while !self.m_stopFlag {    
+           if (self.m_doSeekToPos) {
                 self.m_doSeekToPos = false
 
-                let seconds: UInt64 = self.m_seekPos / 1000
-                let newPos: Int64 = Int64(seconds) / Int64(AV_TIME_BASE)                
+                // Access the stream and its time_base
+                let audioStream = self.m_audioState.formatCtx!.pointee.streams[Int(self.m_audioState.audioStreamIndex)]!
+                let timeBase = audioStream.pointee.time_base
+
+                // Convert the time_base to a human-readable format
+                let timeBaseNum = timeBase.num
+                let timeBaseDen = timeBase.den
+
+                let seconds: UInt64 = (self.duration - self.m_seekPos) / 1000                                
+                let newPos: Int64 = Int64(seconds) * Int64(timeBaseDen/timeBaseNum)
                 if av_seek_frame(self.m_audioState.formatCtx, self.m_audioState.audioStreamIndex, newPos, AVSEEK_FLAG_ANY) == 0 {                
-                    self.m_timeElapsed = (self.duration - self.m_seekPos)                                        
+                    self.m_timeElapsed = (seconds * 1000)
                 }                
             }
 
