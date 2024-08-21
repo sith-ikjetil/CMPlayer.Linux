@@ -382,6 +382,10 @@ internal class AacAudioPlayer {
                             if metadata.recordingYear == 0 {
                                 metadata.recordingYear = extractMetadataYear(text: String(cString: value))
                             }
+                        case "time":
+                            if metadata.recordingYear == 0 {
+                                metadata.recordingYear = extractMetadataYear(text: String(cString: value))
+                            }
                         default:
                             tag = nextTag
                             continue;
