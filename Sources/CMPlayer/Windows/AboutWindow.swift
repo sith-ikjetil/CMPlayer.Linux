@@ -25,7 +25,7 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
     private let aboutText: [String] = ["   CMPlayer (Console Music Player) is a clone and improvement over the",
                                        "   Interactive DJ software written in summer 1997 running on DOS.",
                                        "   ",
-                                       "   The CMPlayer software runs on macOS as a console application.",
+                                       "   The CMPlayer software runs on Linux/macOS as a console application.",
                                        "   ",
                                        "   CMPlayer is a different kind of music player. It selects random songs",
                                        "   from your library and runs to play continually. You choose music",
