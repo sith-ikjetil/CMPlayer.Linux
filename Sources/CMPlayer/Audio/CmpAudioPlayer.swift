@@ -87,8 +87,8 @@ internal class CmpAudioPlayer {
     /// initiates playback of the audio file from init(path)
     /// 
     func play() throws {
-        if mp3Player != nil {
-            return try mp3Player!.play()
+        if self.mp3Player != nil {
+            return try self.mp3Player!.play()
         }
         else if self.m4aPlayer != nil {
             return try self.m4aPlayer!.play()
