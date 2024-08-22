@@ -88,10 +88,10 @@ internal class CmpAudioPlayer {
     /// 
     func play() throws {
         if self.mp3Player != nil {
-            return try self.mp3Player!.play()
+            try self.mp3Player!.play()
         }
         else if self.m4aPlayer != nil {
-            return try self.m4aPlayer!.play()
+            try self.m4aPlayer!.play()
         }        
     }
     ///
@@ -99,10 +99,10 @@ internal class CmpAudioPlayer {
     /// 
     func stop() {
         if self.mp3Player != nil {
-            return self.mp3Player!.stop()
+            self.mp3Player!.stop()
         }
         else if self.m4aPlayer != nil {
-            return self.m4aPlayer!.stop()
+            self.m4aPlayer!.stop()
         }
     }
     ///
@@ -110,10 +110,10 @@ internal class CmpAudioPlayer {
     /// 
     func pause() {
         if self.mp3Player != nil {
-            return self.mp3Player!.pause()
+            self.mp3Player!.pause()
         }
         else if self.m4aPlayer != nil {
-            return self.m4aPlayer!.pause()
+            self.m4aPlayer!.pause()
         }
     }
     ///
@@ -121,10 +121,10 @@ internal class CmpAudioPlayer {
     ///
     func resume() {
         if self.mp3Player != nil {
-            return self.mp3Player!.resume()
+            self.mp3Player!.resume()
         }
         else if self.m4aPlayer != nil {
-            return self.m4aPlayer!.resume()
+            self.m4aPlayer!.resume()
         }
     }
     /// 
@@ -134,10 +134,10 @@ internal class CmpAudioPlayer {
     func seekToPos(position: UInt64)
     {
         if self.mp3Player != nil {
-            return self.mp3Player!.seekToPos(position: position)
+            self.mp3Player!.seekToPos(position: position)
         }
         else if self.m4aPlayer != nil {
-            return self.m4aPlayer!.seekToPos(position: position)
+            self.m4aPlayer!.seekToPos(position: position)
         }
     }
     /// 
@@ -147,10 +147,10 @@ internal class CmpAudioPlayer {
     ///   - duration: time from end of song, fading should be done.
     func setCrossfadeVolume(volume: Float, fadeDuration: UInt64) {
         if self.mp3Player != nil {
-            return self.mp3Player!.setCrossfadeVolume(volume: volume, fadeDuration: fadeDuration)
+            self.mp3Player!.setCrossfadeVolume(volume: volume, fadeDuration: fadeDuration)
         }
         else if self.m4aPlayer != nil {
-            return self.m4aPlayer!.setCrossfadeVolume(volume: volume, fadeDuration: fadeDuration)
+            self.m4aPlayer!.setCrossfadeVolume(volume: volume, fadeDuration: fadeDuration)
         }
     }
     ///
