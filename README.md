@@ -4,12 +4,18 @@ This is a console music player for Linux.
 
 The following commands are possible as of this writing:
 ```
+<song no>
+:: adds song to playlist
 exit, quit, q                                                                   
 :: exits application                                                            
-next, skip, 'TAB'-key                                                           
+next, skip, n, s, 'TAB'-key                                                           
 :: plays next song                                                              
-play, pause, resume                                                             
+play, p
 :: plays, pauses or resumes playback                                            
+pause, p
+:: pauses music
+resume
+:: resumes music playback
 search [<words>]                                                                
 :: searches artist and title for a match. case insensitive                      
 search artist [<words>]                                                         
@@ -44,10 +50,14 @@ remove mrp <path>
 :: removes the path from music root folders                                     
 clear mrp                                                                       
 :: clears all paths from music root folders                                     
+add exp <path>
+:: adds the path to exclusion paths
+remove exp <path>
+:: removes the path from exclusion paths
+clear exp
+:: clears all paths from exclusion paths
 set cft <seconds>                                                               
 :: sets the crossfade time in seconds (1-10 seconds)                            
-set mf <formats>                                                                
-:: sets the supported music formats (separated by ;)                            
 enable crossfade                                                                
 :: enables crossfade                                                            
 disable crossfade                                                               
@@ -68,8 +78,6 @@ info
 :: shows information about first song in playlist                               
 info <song no>                                                                  
 :: show information about song with given song number                           
-update cmplayer                                                                 
-:: updates cmplayer if new version is found online                              
 set viewtype <type>                                                             
 :: sets view type. can be 'default' or 'details'
 set theme <color>                                                               
