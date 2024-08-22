@@ -448,18 +448,22 @@ internal class M4aAudioPlayer {
             // Calculate duration in seconds
             if let formatCtx = formatContext, formatCtx.pointee.duration != 0x00 { // AV_NOPTS_VALUE {
                 let durationInSeconds = Double(formatCtx.pointee.duration) / Double(AV_TIME_BASE)                
+                if durationInSeconds <= 0 {                    
+                    let msg = "[M4aAudioPlayer].gatherMetadata(). duration <= 0. \(durationInSeconds) seconds"
+                    throw CmpError(message: msg)
+                }
                 metadata.duration = UInt64(durationInSeconds * 1000)
             }      
 
-            if formatContext == nil {
+            if formatContext == nil || formatContext?.pointee.metadata == nil {
                 // Handle the nil case appropriately
-                let msg = "[M4aAudioPlayer].gatherMetadata(). formatContext is nil."
+                let msg = "[M4aAudioPlayer].gatherMetadata(). formatContext/metadata is nil."
                 throw CmpError(message: msg)
             }
 
             // Print metadata
             var tag: UnsafeMutablePointer<AVDictionaryEntry>? = nil
-            while let nextTag = av_dict_get(formatContext?.pointee.metadata, "", tag, AV_DICT_IGNORE_SUFFIX) {
+            while let nextTag = av_dict_get(formatContext?.pointee.metadata, nil, tag, AV_DICT_IGNORE_SUFFIX) {
                 if let key = nextTag.pointee.key, let value = nextTag.pointee.value {
                     let checkKey = String(cString: key).lowercased()
                     switch checkKey {
