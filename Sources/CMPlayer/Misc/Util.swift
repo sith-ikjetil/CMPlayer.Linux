@@ -34,6 +34,8 @@ internal enum ExitCodes: Int32 {
     case ERROR_FINDING_FILES = 2
     case ERROR_PLAYING_FILE = 3
     case ERROR_CONSOLE = 4
+    case ERROR_INIT_LIBMPG = 5
+    case ERROR_REDIRECT = 6
 }
 ///
 /// SearchType, type of search

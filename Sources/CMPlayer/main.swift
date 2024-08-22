@@ -22,29 +22,28 @@ internal let g_fieldWidthSongNo: Int = 8   // fixed
 internal let g_fieldWidthArtist: Int = 33  // min
 internal let g_fieldWidthTitle: Int = 33   // min
 internal let g_fieldWidthDuration: Int = 5 // fixed
-internal let g_player: Player = Player()
+internal let g_player: Player = Player()   // main application object
 internal let g_versionString: String = "1.1.0.1"
-internal let g_lock = NSLock()
-//internal let g_windowContentLineCount = 17
-internal let g_crossfadeMinTime: Int = 1  // seconds
-internal let g_crossfadeMaxTime: Int = 20 // seconds
+internal let g_lock = NSLock()     // global lock 
+internal let g_crossfadeMinTime: Int = 1   // seconds
+internal let g_crossfadeMaxTime: Int = 20  // seconds
 //
 // Global variables/properties
 //
-internal var g_songs: [SongEntry] = []
-internal var g_playedSongs: [SongEntry] = []
-internal var g_playlist: [SongEntry] = []
-internal var g_genres: [String: [SongEntry]] = [:]
-internal var g_artists: [String: [SongEntry]] = [:]
-internal var g_recordingYears: [Int: [SongEntry]] = [:]
-internal var g_searchResult: [SongEntry] = []
-internal var g_searchType: [SearchType] = []    // One SearchType for search, and n more for n search+ searches, no duplicates
-internal var g_modeSearch: [[String]] = []      // Search terms for each element in g_searchType
-internal var g_modeSearchStats: [[Int]] = []    // Search stats for each element in g_searchType matching g_modeSearch
-internal var g_library: PlayerLibrary = PlayerLibrary()
-internal var g_mainWindow: MainWindow?
-internal var g_tscpStack: [TerminalSizeHasChangedProtocol] = []
-internal var g_termSizeIsChanging: Bool = false // Terminal size is changing
+internal var g_songs: [SongEntry] = []                  // all songs
+internal var g_playedSongs: [SongEntry] = []            // previously played songs
+internal var g_playlist: [SongEntry] = []               // main playlist
+internal var g_genres: [String: [SongEntry]] = [:]      // songs belonging to each genre
+internal var g_artists: [String: [SongEntry]] = [:]     // songs belonging to each artist
+internal var g_recordingYears: [Int: [SongEntry]] = [:] // songs belonging to each recording year
+internal var g_searchResult: [SongEntry] = []           // songs in mode (search result)
+internal var g_searchType: [SearchType] = []            // One SearchType for search, and n more for n search+ searches, no duplicates
+internal var g_modeSearch: [[String]] = []              // Search terms for each element in g_searchType
+internal var g_modeSearchStats: [[Int]] = []            // Search stats for each element in g_searchType matching g_modeSearch
+internal var g_library: PlayerLibrary = PlayerLibrary() // library
+internal var g_mainWindow: MainWindow?                  // main window
+internal var g_tscpStack: [TerminalSizeHasChangedProtocol] = [] // each window as they appear is added, then when close removed
+internal var g_termSizeIsChanging: Bool = false         // Terminal size is changing
 internal var g_rows: Int = -1
 internal var g_cols: Int = -1
 
@@ -54,7 +53,7 @@ internal var g_cols: Int = -1
 // initialize libmpg123
 guard mpg123_init() == 0 else {
     print("Failed to initialize libmpg123")
-    exit(1)
+    exit(ExitCodes.ERROR_INIT_LIBMPG.rawValue)
 }
 
 // initialize libao
@@ -71,7 +70,7 @@ defer {
 let stderr_old = redirect_stderr()
 guard stderr_old != -1 else {
     print("Failed to redirect stderr to /dev/null")
-    exit(1)
+    exit(ExitCodes.ERROR_REDIRECT.rawValue)
 }
 
 do {
@@ -94,7 +93,7 @@ do {
     
     // log exit
     PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Exited Normally.")        
-
+    
     // exit with exit code
     exit(ExitCodes.SUCCESS.rawValue)
 } catch let error as CmpError {
@@ -103,6 +102,8 @@ do {
     wnd.message = msg
     wnd.showWindow()
     system("clear")
+    
+    print(msg)
 
     PlayerLog.ApplicationLog?.logError(title: "CMPlayer", text: msg.trimmingCharacters(in: .newlines))        
     exit(ExitCodes.ERROR_UNKNOWN.rawValue)
@@ -112,6 +113,8 @@ do {
     wnd.message = msg
     wnd.showWindow()
     system("clear")
+    
+    print(msg) 
 
     PlayerLog.ApplicationLog?.logError(title: "CMPlayer", text: msg.trimmingCharacters(in: .newlines))        
     exit(ExitCodes.ERROR_UNKNOWN.rawValue)
