@@ -22,7 +22,8 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     /// private constants
     /// 
-    private let helpText: [String] = [" exit, quit, q", " :: exits application",
+    private let helpText: [String] = [" <song no>", " :: adds song no to playlist",
+                                      " exit, quit, q", " :: exits application",
                                       " next, skip, n, s, 'TAB'-key", " :: plays next song",
                                       " play, p", " :: plays music",
                                       " pause", " :: pauses music",
