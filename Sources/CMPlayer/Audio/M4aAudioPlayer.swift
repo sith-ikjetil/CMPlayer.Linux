@@ -106,7 +106,7 @@ internal class M4aAudioPlayer {
             let msg = "[M4aAudioPlayer].play(). avformat_open_input failed with value \(err). Could not open file \(self.filePath.path)"            
             throw CmpError(message: msg)
         }
-
+        
         if self.m_audioState.formatCtx == nil {
             // Handle the nil case appropriately
             let msg = "[M4aAudioPlayer].play(). m_audioState.formatCtx is nil."
