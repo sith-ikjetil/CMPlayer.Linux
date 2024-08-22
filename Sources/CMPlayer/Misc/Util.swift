@@ -771,20 +771,22 @@ func PrintSoundCheck() {
         else {
             print("Found no audio output devices. Sound should not be possible.")
         }
+        print("")
+        print("Drivers")
         for i in 0..<Int(driverCount) {
             if let driverInfoPointer = driverInfoList[i] {
                 let driverInfo = driverInfoPointer.pointee
-                print("Driver: \(String(cString: driverInfo.name))")            
-                if driverInfo.type == AO_TYPE_LIVE {
-                    print("  Description: \(String(cString: driverInfo.short_name))")
-                    print("  Comment: \(String(cString: driverInfo.comment))\n")                    
-                }
+                print(" \(String(cString: driverInfo.name))")            
+                //if driverInfo.type == AO_TYPE_LIVE {
+                //    print("  Description: \(String(cString: driverInfo.short_name))")
+                //    print("  Comment: \(String(cString: driverInfo.comment))\n")                    
+                //}
             }             
         }
     } 
     else {
         print("An error occurred.")
-        print("Message: Failed to retrieve driver information.")
+        print("Message: Failed to retrieve audio driver information.")
     }
     print("")
 }
