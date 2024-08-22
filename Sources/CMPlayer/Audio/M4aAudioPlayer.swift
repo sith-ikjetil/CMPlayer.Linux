@@ -259,17 +259,17 @@ internal class M4aAudioPlayer {
                 }            
             }
 
-            let read: Int32 = av_read_frame(self.m_audioState.formatCtx, &self.m_audioState.packet)
-            if read < 0 { // ERROR OR EOF < 0
+            var retVal: Int32 = av_read_frame(self.m_audioState.formatCtx, &self.m_audioState.packet)
+            if retVal < 0 { // ERROR OR EOF < 0
                 return
             }
             
             if self.m_audioState.packet.stream_index == self.m_audioState.audioStreamIndex {
-                let err = avcodec_send_packet(self.m_audioState.codecCtx, &self.m_audioState.packet)
-                if err < 0 {
-                    let msg = "[AacAudioPlayer].playAsync(). avcodec_send_packet failed with value: \(err). Error sending packet to decoder."
+                retVal = avcodec_send_packet(self.m_audioState.codecCtx, &self.m_audioState.packet)
+                if retVal < 0 {
+                    let msg = "[AacAudioPlayer].playAsync(). avcodec_send_packet failed with value: \(retVal). Error sending packet to decoder."
                     PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].playAsync()", text: msg)
-                    break
+                    return
                 }
                                     
                 while avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame) >= 0 {                        
