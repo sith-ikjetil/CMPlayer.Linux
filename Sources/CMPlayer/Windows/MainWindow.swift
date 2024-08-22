@@ -352,7 +352,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 
                 if !self.isShowingTopWindow {
                     if !self.isTooSmall {
-                        if !g_termSizeIsChanging && !g_noPaint {
+                        if !g_termSizeIsChanging && !g_doNotPaint {
                             MainWindow.renderHeader(showTime: true)
                             self.renderWindow()
                         }

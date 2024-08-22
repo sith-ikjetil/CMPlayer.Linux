@@ -47,7 +47,7 @@ internal var g_termSizeIsChanging: Bool = false         // Terminal size is chan
 internal var g_rows: Int = -1
 internal var g_cols: Int = -1
 internal var g_quit: Bool = false
-internal var g_noPaint: Bool = false
+internal var g_doNotPaint: Bool = false
 
 //
 // Startup code

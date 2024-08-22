@@ -198,7 +198,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     func run() -> Void {
         Console.clearScreenCurrentTheme()
         while !self.isFinished {
-            if !g_noPaint {
+            if !g_doNotPaint {
                 self.renderWindow()
             }
     
