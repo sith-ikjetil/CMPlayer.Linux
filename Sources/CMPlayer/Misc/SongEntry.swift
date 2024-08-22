@@ -162,17 +162,7 @@ internal class SongEntry {
                 self.duration = metadata.duration    
                 self.trackNo = metadata.trackNo    
 
-                if self.duration == 0 {                    
-                    //print("## DURATION 0 ERROR ##")
-                    //print("Artist: \(self.artist)")
-                    //print("AlbumName: \(self.albumName)")
-                    //print("Title: \(self.title)")
-                    //print("Duration: \(self.duration)")
-                    //print("Track: \(self.trackNo)")
-                    //print("Year: \(self.recordingYear)")
-                    //print("path: \(path!.path)")
-                    //exit(1)
-
+                if self.duration == 0 {
                     let msg = "[SongEntry].init(path,songNo). Duration from CmpAudioPlayer.gatherMetadata was 0."
                     throw CmpError(message: msg)
                 }

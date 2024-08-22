@@ -124,9 +124,13 @@ internal class Player {
             let wnd: ErrorWindow = ErrorWindow()
             wnd.message = msg
             wnd.showWindow()
+
             Console.clearScreen()
-            Console.gotoXY(1,1)
+            Console.gotoXY(1, 1)
             system("clear")
+            
+            print(msg) 
+
             exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
         }
         catch {
@@ -135,10 +139,14 @@ internal class Player {
             
             let wnd: ErrorWindow = ErrorWindow()
             wnd.message = msg
-            wnd.showWindow()
+            wnd.showWindow()  
+
             Console.clearScreen()
-            Console.gotoXY(1,1)
+            Console.gotoXY(1, 1)            
             system("clear")
+
+            print(msg) 
+
             exit(ExitCodes.ERROR_UNKNOWN.rawValue)
         }
     }    

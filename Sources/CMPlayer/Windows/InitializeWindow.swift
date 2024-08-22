@@ -139,9 +139,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
             }
         }
         catch {
-            print("\(error)")            
-            exit(0)
-            //results.removeAll()
+            results.removeAll()
         }
         
         return results

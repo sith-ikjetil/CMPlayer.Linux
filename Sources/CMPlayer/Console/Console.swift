@@ -132,9 +132,12 @@ internal class Console {
             let wnd: ErrorWindow = ErrorWindow()
             wnd.message = msg
             wnd.showWindow()
+            
             Console.clearScreen()
-            Console.gotoXY(1,1)
+            Console.gotoXY(1, 1)
             system("clear")
+            
+            print(msg)
 
             PlayerLog.ApplicationLog?.logError(title: "[Console].echoOff()", text: msg.trimmingCharacters(in: .newlines))
             exit(ExitCodes.ERROR_CONSOLE.rawValue)
@@ -156,9 +159,12 @@ internal class Console {
             let wnd: ErrorWindow = ErrorWindow()
             wnd.message = msg
             wnd.showWindow()
+            
             Console.clearScreen()
-            Console.gotoXY(1,1)
+            Console.gotoXY(1, 1)
             system("clear")
+            
+            print(msg)
 
             PlayerLog.ApplicationLog?.logError(title: "[Console].echoOn()", text: msg.trimmingCharacters(in: .newlines))
             exit(ExitCodes.ERROR_CONSOLE.rawValue)
