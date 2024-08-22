@@ -221,7 +221,7 @@ internal class M4aAudioPlayer {
         // Open libao device
         self.m_audioState.device = ao_open_live(ao_default_driver_id(), &self.m_audioState.aoFormat, nil)
         if self.m_audioState.device == nil {
-            let msg = "[M4aAudioPlayer].play().  ao_open_live failed with value: nil. Error opening audio device."
+            let msg = "[M4aAudioPlayer].play(). ao_open_live failed with value: nil. Error opening audio device."
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)
             throw CmpError(message: msg)
