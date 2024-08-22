@@ -79,6 +79,9 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
                     do {
                         g_songs.append(try SongEntry(path: URL(fileURLWithPath: r),songNo: nasno))
                     }
+                    catch _ as CmpError {
+                        g_library.setNextAvailableSongNo(nasno)
+                    }
                     catch  {
                         g_library.setNextAvailableSongNo(nasno)
                     }
