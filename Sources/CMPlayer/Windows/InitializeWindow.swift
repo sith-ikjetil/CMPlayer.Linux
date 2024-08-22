@@ -198,7 +198,9 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     func run() -> Void {
         Console.clearScreenCurrentTheme()
         while !self.isFinished {
-            self.renderWindow()
+            if !g_noPaint {
+                self.renderWindow()
+            }
     
             let second: Double = 1_000_000
             usleep(useconds_t(0.050 * second))

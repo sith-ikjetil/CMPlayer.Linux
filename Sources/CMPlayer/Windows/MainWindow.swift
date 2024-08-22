@@ -21,11 +21,10 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     static private var timeElapsedMs: UInt64 = 0
     //
     // private variables
-    //    
-    private var quit: Bool = false
+    //        
     private var currentCommand: String = ""
     private var commands: [PlayerCommand] = []
-    private var commandReturnValue: Bool = false
+    //private var commandReturnValue: Bool = false
     private var isShowingTopWindow = false
     private var addendumText: String = ""
     private var updateFileName: String = ""
@@ -349,11 +348,11 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         // Count down and render songs
         //
         concurrentQueue1.async {
-            while !self.quit {
+            while !g_quit {
                 
                 if !self.isShowingTopWindow {
                     if !self.isTooSmall {
-                        if !g_termSizeIsChanging {
+                        if !g_termSizeIsChanging && !g_noPaint {
                             MainWindow.renderHeader(showTime: true)
                             self.renderWindow()
                         }
@@ -416,7 +415,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         // Keep up-time in header and blink the cursor.
         //
         concurrentQueue2.async {
-            while !self.quit {
+            while !g_quit {
                 let second: Double = 1_000_000
                 usleep(useconds_t(0.150 * second))
                 MainWindow.timeElapsedMs += 150
@@ -445,25 +444,23 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_HTAB.rawValue, closure: { () -> Bool in
-            _ = self.processCommand(command: "skip")
+            self.processCommand(command: "skip")
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_SHIFT_HTAB.rawValue, closure: { () -> Bool in
-            _ = self.processCommand(command: "prev")
+            self.processCommand(command: "prev")
             return false
         })
-        keyHandler.addKeyHandler(key: ConsoleKey.KEY_ENTER.rawValue, closure: { () -> Bool in
-            var returnValue: Bool = false
+        keyHandler.addKeyHandler(key: ConsoleKey.KEY_ENTER.rawValue, closure: { () -> Bool in            
             if self.currentCommand.count > 0 {
-                returnValue = self.processCommand(command: self.currentCommand)
-                self.quit = returnValue
+                self.processCommand(command: self.currentCommand)                
             }
             self.currentCommand.removeAll()
             
             self.renderCommandLine()
             self.renderStatusLine()
             
-            return returnValue
+            return g_quit
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_BACKSPACE.rawValue, closure: { () -> Bool in
             if self.currentCommand.count > 0 {
@@ -492,7 +489,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     /// returns: Bool true if application should exit. False otherwise.
     ///
-    func processCommand(command: String) -> Bool {
+    func processCommand(command: String) -> Void {
         PlayerLog.ApplicationLog?.logInformation(title: "[MainWindow].processCommand(command:)", text: "Command: \(command)")
         
         let parts = command.components(separatedBy: " ")
@@ -507,9 +504,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     
         if !isHandled {
             PlayerLog.ApplicationLog?.logInformation(title: "[MainWindow].processCommand(command:)", text: "Command NOT Reckognized: \(command)")
-        }
-        
-        return self.commandReturnValue
+        }           
     }    
     ///
     /// Exits the application
@@ -517,7 +512,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandExit(parts: [String]) -> Void {
-        self.commandReturnValue = true
+        g_quit = true
     }    
     ///
     /// Restarts the application
