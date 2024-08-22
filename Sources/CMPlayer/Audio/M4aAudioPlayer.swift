@@ -451,6 +451,12 @@ internal class M4aAudioPlayer {
                 metadata.duration = UInt64(durationInSeconds * 1000)
             }      
 
+            if formatContext == nil {
+                // Handle the nil case appropriately
+                let msg = "[M4aAudioPlayer].gatherMetadata(). formatContext is nil."
+                throw CmpError(message: msg)
+            }
+
             // Print metadata
             var tag: UnsafeMutablePointer<AVDictionaryEntry>? = nil
             while let nextTag = av_dict_get(formatContext?.pointee.metadata, "", tag, AV_DICT_IGNORE_SUFFIX) {
