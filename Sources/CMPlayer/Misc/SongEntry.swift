@@ -173,10 +173,10 @@ internal class SongEntry {
             }   
         } catch let error as CmpError {
             PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path,songNo)", text: "Error gathering metadata from file: \(path!.lastPathComponent). Message: \(error.message)")
-            throw error
+            //throw error
         } catch {
             PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path,songNo)", text: "Unknown error gathering metadata from file: \(path!.lastPathComponent). Message: \(error)")
-            throw error
+            //throw error
         }
         
         //
