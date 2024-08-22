@@ -126,8 +126,16 @@ internal class M4aAudioPlayer {
         // Calculate duration in seconds
         if let formatCtx = self.m_audioState.formatCtx, formatCtx.pointee.duration != 0x00 { // AV_NOPTS_VALUE {
             let durationInSeconds = Double(formatCtx.pointee.duration) / Double(AV_TIME_BASE)                
+            if durationInSeconds <= 0 {                    
+                let msg = "[M4aAudioPlayer].play(). duration <= 0. \(durationInSeconds) seconds"
+                throw CmpError(message: msg)
+            }
             self.m_duration = UInt64(durationInSeconds * 1000)
-        }     
+        }
+        else {
+            let msg = "[M4aAudioPlayer].play(). Cannot find duration."
+            throw CmpError(message: msg)
+        }      
         
         if self.m_audioState.audioStreamIndex == -1 {
             let msg = "[M4aAudioPlayer].play(). Could not find an audio stream."
@@ -453,6 +461,10 @@ internal class M4aAudioPlayer {
                     throw CmpError(message: msg)
                 }
                 metadata.duration = UInt64(durationInSeconds * 1000)
+            }
+            else {
+                let msg = "[M4aAudioPlayer].gatherMetadata(). Cannot find duration."
+                throw CmpError(message: msg)
             }      
 
             if formatContext == nil || formatContext?.pointee.metadata == nil {
