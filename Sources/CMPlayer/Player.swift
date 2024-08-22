@@ -118,36 +118,28 @@ internal class Player {
             }
         }
         catch let error as CmpError {
-            let msg = "Error playing player \(player) on index \(playlistIndex).\n Message: \(error.message)"
-            PlayerLog.ApplicationLog?.logError(title: "[Player].play(player,playlistIndex)", text: msg.trimmingCharacters(in: .newlines))
-
-            let wnd: ErrorWindow = ErrorWindow()
-            wnd.message = msg
-            wnd.showWindow()
-
+            let msg = "CMPlayer ABEND.\n[Player].play(player,playlistIndex).\nError playing player \(player) on index \(playlistIndex).\nMessage: \(error.message)"            
+            
             Console.clearScreen()
             Console.gotoXY(1, 1)
             system("clear")
             
             print(msg) 
 
+            PlayerLog.ApplicationLog?.logError(title: "[Player].play(player,playlistIndex)", text: msg)
             exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
         }
         catch {
-            let msg = "Unknown Error.\n Error playing player \(player) on index \(playlistIndex).\n\(error)"
-            PlayerLog.ApplicationLog?.logError(title: "[Player].play(player,playlistIndex)", text: msg)
+            let msg = "CMPlayer ABEND.\n[Player].play(player,playlistIndex).\nUnknown error playing player \(player) on index \(playlistIndex).\nMessage: \(error)"            
             
-            let wnd: ErrorWindow = ErrorWindow()
-            wnd.message = msg
-            wnd.showWindow()  
-
             Console.clearScreen()
             Console.gotoXY(1, 1)            
             system("clear")
 
             print(msg) 
 
-            exit(ExitCodes.ERROR_UNKNOWN.rawValue)
+            PlayerLog.ApplicationLog?.logError(title: "[Player].play(player,playlistIndex)", text: msg)
+            exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
         }
     }    
     ///

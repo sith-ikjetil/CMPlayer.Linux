@@ -36,6 +36,7 @@ internal enum ExitCodes: Int32 {
     case ERROR_CONSOLE = 4
     case ERROR_INIT_LIBMPG = 5
     case ERROR_REDIRECT = 6
+    case ERROR_CANCEL = 7
 }
 ///
 /// SearchType, type of search

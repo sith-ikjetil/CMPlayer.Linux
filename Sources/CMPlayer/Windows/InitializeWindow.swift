@@ -39,7 +39,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
         Console.clearScreenCurrentTheme()
         self.renderWindow()
         
-        concurrentQueue1.async {
+        concurrentQueue1.async {            
             self.initialize()
             self.isFinished = true
         }
@@ -164,7 +164,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     func terminalSizeHasChanged() -> Void {
         Console.clearScreenCurrentTheme()
         self.renderWindow()
-    }    
+    }        
     ///
     /// Renders screen output. Does clear screen first.
     ///

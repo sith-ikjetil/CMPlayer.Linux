@@ -91,7 +91,7 @@ do {
     Console.gotoXY(1, 1)    
     system("clear") 
     
-    print("CMPlayer Exited Normally.")
+    print("CMPlayer exited normally.")
 
     // log exit
     PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Exited Normally.")        
@@ -99,11 +99,7 @@ do {
     // exit with exit code
     exit(ExitCodes.SUCCESS.rawValue)
 } catch let error as CmpError {
-    let msg = "Application exited abnormally.\n Exception caught.\n Message: \(error.message)"
-    
-    let wnd = ErrorWindow()
-    wnd.message = msg
-    wnd.showWindow()
+    let msg = "CMPlayer ABEND.\nException caught.\nMessage: \(error.message)"    
 
     Console.clearScreen()
     Console.gotoXY(1, 1)
@@ -111,20 +107,16 @@ do {
     
     print(msg)
 
-    PlayerLog.ApplicationLog?.logError(title: "CMPlayer", text: msg.trimmingCharacters(in: .newlines))        
+    PlayerLog.ApplicationLog?.logError(title: "CMPlayer", text: msg)
     exit(ExitCodes.ERROR_UNKNOWN.rawValue)
 } catch {        
-    let msg = "Application exited abnormally.\n Unknown exception caught.\n Message: \(error)"
-    
-    let wnd = ErrorWindow()
-    wnd.message = msg
-    wnd.showWindow()
+    let msg = "CMPlayer ABEND.\nUnknown exception caught.\nMessage: \(error)"
 
     Console.clearScreen()
     Console.gotoXY(1, 1)
     system("clear")    
     print(msg) 
 
-    PlayerLog.ApplicationLog?.logError(title: "CMPlayer", text: msg.trimmingCharacters(in: .newlines))        
+    PlayerLog.ApplicationLog?.logError(title: "CMPlayer", text: msg)
     exit(ExitCodes.ERROR_UNKNOWN.rawValue)
 }

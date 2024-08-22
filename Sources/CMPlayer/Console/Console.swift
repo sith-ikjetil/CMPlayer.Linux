@@ -42,7 +42,7 @@ internal class Console {
     //
     static private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.linux.console.1", attributes: .concurrent)
     //static private let concurrentQueue2 = DispatchQueue(label: "cqueue.console.music.player.macos.2.console", attributes: .concurrent)
-    //static private let sigintSrcSIGINT = DispatchSource.makeSignalSource(signal: Int32(SIGINT), queue: Console.concurrentQueue1)
+    static private let sigintSrcSIGINT = DispatchSource.makeSignalSource(signal: Int32(SIGINT), queue: Console.concurrentQueue1)
     //static private let sigintSrcSIGQUIT = DispatchSource.makeSignalSource(signal: Int32(SIGQUIT), queue: Console.concurrentQueue1)
     //static private let sigintSrcSIGILL = DispatchSource.makeSignalSource(signal: Int32(SIGILL), queue: Console.concurrentQueue1)
     //static private let sigintSrcSIGTRAP = DispatchSource.makeSignalSource(signal: Int32(SIGTRAP), queue: Console.concurrentQueue1)
@@ -127,11 +127,7 @@ internal class Console {
             try newt.update(fd: STDIN_FILENO)
         }
         catch {
-            let msg = "[Console].echoOff().\n Unknown error.\n Message: \(error)"
-            
-            let wnd: ErrorWindow = ErrorWindow()
-            wnd.message = msg
-            wnd.showWindow()
+            let msg = "CMPlayer ABEND.\n[Console].echoOff().\nUnknown error.\nMessage: \(error)"               
             
             Console.clearScreen()
             Console.gotoXY(1, 1)
@@ -154,11 +150,7 @@ internal class Console {
             try newt.update(fd: STDIN_FILENO)
         }
         catch {
-            let msg = "[Console].echoOn().\n Unknown error.\n Message: \(error)"
-
-            let wnd: ErrorWindow = ErrorWindow()
-            wnd.message = msg
-            wnd.showWindow()
+            let msg = "CMPlayer ABEND.\n[Console].echoOn().\nUnknown error.\nMessage: \(error)"            
             
             Console.clearScreen()
             Console.gotoXY(1, 1)
@@ -246,6 +238,22 @@ internal class Console {
             Console.showCursor()
             Console.echoOn()
         })
+
+        //
+        // Respond to Ctrl+C
+        //
+        sigintSrcSIGINT.setEventHandler {
+            let msg: String = "CMPlayer exited due to Ctrl+C"
+
+            Console.clearScreen()
+            Console.gotoXY(1, 1)
+            system("clear")
+            
+            print(msg)
+
+            exit(ExitCodes.ERROR_CANCEL.rawValue)
+        }
+        sigintSrcSIGINT.resume()
         
         //
         // Respond to window resize
