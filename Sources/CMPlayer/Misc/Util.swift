@@ -10,7 +10,7 @@
 // import.
 //
 import Foundation
-
+import Cao
 ///
 /// CmpMetadata
 /// Container for metadata.
@@ -755,4 +755,36 @@ func extractMetadataYear(text: String) -> Int {
     }
     
     return 0
+}
+
+func PrintSoundCheck() {
+    print("CMPlayer Sound Check")
+    print("====================")
+
+    // Get the list of available drivers
+    var driverCount: Int32 = 0
+    if let driverInfoList = ao_driver_info_list(&driverCount) {
+        // Iterate through the available drivers and print them
+        if driverCount > 0 {
+            print("Found audio output devices. Sound should be possible.")
+        }
+        else {
+            print("Found no audio output devices. Sound should not be possible.")
+        }
+        for i in 0..<Int(driverCount) {
+            if let driverInfoPointer = driverInfoList[i] {
+                let driverInfo = driverInfoPointer.pointee
+                print("Driver: \(String(cString: driverInfo.name))")            
+                if driverInfo.type == AO_TYPE_LIVE {
+                    print("  Description: \(String(cString: driverInfo.short_name))")
+                    print("  Comment: \(String(cString: driverInfo.comment))\n")                    
+                }
+            }             
+        }
+    } 
+    else {
+        print("An error occurred.")
+        print("Message: Failed to retrieve driver information.")
+    }
+    print("")
 }

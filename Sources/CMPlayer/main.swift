@@ -48,10 +48,27 @@ internal var g_rows: Int = -1
 internal var g_cols: Int = -1
 internal var g_quit: Bool = false
 internal var g_doNotPaint: Bool = false
-
+internal var g_doSoundCheck: Bool = false
 //
 // Startup code
 //
+// Check for command line arguments.
+if CommandLine.argc >= 2 {
+    if CommandLine.arguments[1].lowercased() == "--help" {
+        print("CMPlayer")
+        print("=========================")
+        print("Usage: cmplayer <options>")
+        print("<option>")
+        print(" --help        = show this help screen")
+        print(" --sound-check = do a check for sound output")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    if CommandLine.arguments[1].lowercased() == "--sound-check" {
+        g_doSoundCheck = true
+    }
+}
+
 // initialize libmpg123
 guard mpg123_init() == 0 else {
     print("Failed to initialize libmpg123")
@@ -62,11 +79,18 @@ guard mpg123_init() == 0 else {
 ao_initialize()
 
 // ensure we exit/close libmpg123/libao
-defer {
+atexit( {
     mpg123_exit()
     ao_shutdown()
+})
+
+// if do sound check, print out and exit
+if g_doSoundCheck {
+    PrintSoundCheck()
+    exit(ExitCodes.SUCCESS.rawValue)
 }
 
+// we have normal startup
 // redirect stderr
 // we do this to remove process_comment messages
 let stderr_old = redirect_stderr()
@@ -75,6 +99,8 @@ guard stderr_old != -1 else {
     exit(ExitCodes.ERROR_REDIRECT.rawValue)
 }
 
+// stderr redirect successfull
+// normal startup and normal execution continue
 do {
     // set log system
     PlayerLog.ApplicationLog = PlayerLog(autoSave: true, loadOldLog: false)
