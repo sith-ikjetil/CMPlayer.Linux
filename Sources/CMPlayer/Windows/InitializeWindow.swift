@@ -77,7 +77,11 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
                 else {
                     let nasno = g_library.nextAvailableSongNo()
                     do {
-                        g_songs.append(try SongEntry(path: URL(fileURLWithPath: r),songNo: nasno))
+                        // Attempt to create a song entry object
+                        let songEntry = try SongEntry(path: URL(fileURLWithPath: r),songNo: nasno)
+                        
+                        // If successfull add to g_songs
+                        g_songs.append(songEntry)
                     }
                     catch _ as CmpError {
                         g_library.setNextAvailableSongNo(nasno)
