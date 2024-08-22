@@ -231,6 +231,7 @@ internal class M4aAudioPlayer {
             avformat_close_input(&self.m_audioState.formatCtx)
             self.m_isPlaying = false
             self.m_isPaused = false
+            self.m_stopFlag = true
         }
 
         var timeToStartCrossfade: Bool = false
@@ -255,91 +256,94 @@ internal class M4aAudioPlayer {
                 let newPos: Int64 = Int64(seconds) * Int64(timeBaseDen/timeBaseNum)
                 if av_seek_frame(self.m_audioState.formatCtx, self.m_audioState.audioStreamIndex, newPos, AVSEEK_FLAG_ANY) == 0 {                
                     self.m_timeElapsed = (seconds * 1000)
-                }                
+                }            
             }
 
-            if av_read_frame(self.m_audioState.formatCtx, &self.m_audioState.packet) >= 0 {            
-                if self.m_audioState.packet.stream_index == self.m_audioState.audioStreamIndex {
-                    let err = avcodec_send_packet(self.m_audioState.codecCtx, &self.m_audioState.packet)
-                    if err < 0 {
-                        let msg = "[AacAudioPlayer].playAsync(). avcodec_send_packet failed with value: \(err). Error sending packet to decoder."
+            let read: Int32 = av_read_frame(self.m_audioState.formatCtx, &self.m_audioState.packet)
+            if read < 0 { // ERROR OR EOF < 0
+                return
+            }
+            
+            if self.m_audioState.packet.stream_index == self.m_audioState.audioStreamIndex {
+                let err = avcodec_send_packet(self.m_audioState.codecCtx, &self.m_audioState.packet)
+                if err < 0 {
+                    let msg = "[AacAudioPlayer].playAsync(). avcodec_send_packet failed with value: \(err). Error sending packet to decoder."
+                    PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].playAsync()", text: msg)
+                    break
+                }
+                                    
+                while avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame) >= 0 {                        
+                    // Allocate buffer for resampled audio
+                    var outputBuffer: UnsafeMutablePointer<UInt8>? = nil
+                    let bufferSize = av_samples_alloc(&outputBuffer, nil, 2, self.m_audioState.frame!.pointee.nb_samples, AV_SAMPLE_FMT_S16, 0)
+                    
+                    // Ensure the buffer is allocated properly
+                    guard bufferSize >= 0 else {
+                        let msg = "Error allocating buffer for resampled audio."
                         PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].playAsync()", text: msg)
                         break
                     }
-                                        
-                    while avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame) >= 0 {                        
-                        // Allocate buffer for resampled audio
-                        var outputBuffer: UnsafeMutablePointer<UInt8>? = nil
-                        let bufferSize = av_samples_alloc(&outputBuffer, nil, 2, self.m_audioState.frame!.pointee.nb_samples, AV_SAMPLE_FMT_S16, 0)
+
+                    // Cast frame data pointers
+                    // Manually create an array from the tuple
+                    let inputData: [UnsafePointer<UInt8>?] = [
+                        UnsafePointer(self.m_audioState.frame!.pointee.data.0),
+                        UnsafePointer(self.m_audioState.frame!.pointee.data.1),
+                        UnsafePointer(self.m_audioState.frame!.pointee.data.2),
+                        UnsafePointer(self.m_audioState.frame!.pointee.data.3),
+                        UnsafePointer(self.m_audioState.frame!.pointee.data.4),
+                        UnsafePointer(self.m_audioState.frame!.pointee.data.5),
+                        UnsafePointer(self.m_audioState.frame!.pointee.data.6),
+                        UnsafePointer(self.m_audioState.frame!.pointee.data.7)
+                    ]
+                    
+                    // Use withUnsafeBufferPointer to pass the array as a pointer
+                    inputData.withUnsafeBufferPointer { bufferPointer in
+                        let samples = swr_convert(self.m_audioState.swrCtx, &outputBuffer, self.m_audioState.frame!.pointee.nb_samples, UnsafeMutablePointer(mutating: bufferPointer.baseAddress), self.m_audioState.frame!.pointee.nb_samples)                            
                         
-                        // Ensure the buffer is allocated properly
-                        guard bufferSize >= 0 else {
-                            let msg = "Error allocating buffer for resampled audio."
+                        // Ensure resampling was successful
+                        guard samples >= 0 else {
+                            let msg = "swr_convert filed with value: \(samples). Error resampling audio."
                             PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].playAsync()", text: msg)
-                            break
-                        }
-
-                        // Cast frame data pointers
-                        // Manually create an array from the tuple
-                        let inputData: [UnsafePointer<UInt8>?] = [
-                            UnsafePointer(self.m_audioState.frame!.pointee.data.0),
-                            UnsafePointer(self.m_audioState.frame!.pointee.data.1),
-                            UnsafePointer(self.m_audioState.frame!.pointee.data.2),
-                            UnsafePointer(self.m_audioState.frame!.pointee.data.3),
-                            UnsafePointer(self.m_audioState.frame!.pointee.data.4),
-                            UnsafePointer(self.m_audioState.frame!.pointee.data.5),
-                            UnsafePointer(self.m_audioState.frame!.pointee.data.6),
-                            UnsafePointer(self.m_audioState.frame!.pointee.data.7)
-                        ]
-                        
-                        // Use withUnsafeBufferPointer to pass the array as a pointer
-                        inputData.withUnsafeBufferPointer { bufferPointer in
-                            let samples = swr_convert(self.m_audioState.swrCtx, &outputBuffer, self.m_audioState.frame!.pointee.nb_samples, UnsafeMutablePointer(mutating: bufferPointer.baseAddress), self.m_audioState.frame!.pointee.nb_samples)                            
-                            
-                            // Ensure resampling was successful
-                            guard samples >= 0 else {
-                                let msg = "swr_convert filed with value: \(samples). Error resampling audio."
-                                PlayerLog.ApplicationLog?.logError(title: "[AacAudioPlayer].playAsync()", text: msg)
-                                return
-                            }
-
-                            // Update time elapsed                            
-                            let totalPerChannel = UInt64(bufferSize) / UInt64(self.m_audioState.aoFormat.channels)
-                            let currentDuration = Double(totalPerChannel) / Double(self.m_audioState.aoFormat.rate)
-                            self.m_timeElapsed += UInt64(currentDuration * Double(1000/self.m_audioState.aoFormat.channels))
-                            
-                            // set crossfade volume
-                            let timeLeft: UInt64 = (self.duration >= self.m_timeElapsed) ? self.duration - self.m_timeElapsed : self.duration
-                            if timeLeft > 0 && timeLeft <= self.m_targetFadeDuration {
-                                timeToStartCrossfade = true
-
-                                currentVolume = Float(Float(timeLeft)/Float(self.m_targetFadeDuration))                    
-                            }
-
-                            // adjust crossfade volume
-                            if self.m_enableCrossfade && timeToStartCrossfade {
-                                adjustVolume(buffer: UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), size: Int(bufferSize), volume: currentVolume)                        
-                            }
-
-                            // Write audio data to device
-                            ao_play(self.m_audioState.device, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), UInt32(UInt32(samples) * UInt32(2) * UInt32(MemoryLayout<Int16>.size)))                            
-                        }
-                                                    
-                        // Free the output buffer
-                        av_freep(&outputBuffer)
-
-                        guard self.m_stopFlag == false else {
                             return
                         }
 
-                        while self.m_isPaused {
-                            usleep(100_000)
-                            if self.m_stopFlag {
-                                return
-                            }
-                        }                                                                       
-                    }// while 
-                }                
+                        // Update time elapsed                            
+                        let totalPerChannel = UInt64(bufferSize) / UInt64(self.m_audioState.aoFormat.channels)
+                        let currentDuration = Double(totalPerChannel) / Double(self.m_audioState.aoFormat.rate)
+                        self.m_timeElapsed += UInt64(currentDuration * Double(1000/self.m_audioState.aoFormat.channels))
+                        
+                        // set crossfade volume
+                        let timeLeft: UInt64 = (self.duration >= self.m_timeElapsed) ? self.duration - self.m_timeElapsed : self.duration
+                        if timeLeft > 0 && timeLeft <= self.m_targetFadeDuration {
+                            timeToStartCrossfade = true
+
+                            currentVolume = Float(Float(timeLeft)/Float(self.m_targetFadeDuration))                    
+                        }
+
+                        // adjust crossfade volume
+                        if self.m_enableCrossfade && timeToStartCrossfade {
+                            adjustVolume(buffer: UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), size: Int(bufferSize), volume: currentVolume)                        
+                        }
+
+                        // Write audio data to device
+                        ao_play(self.m_audioState.device, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), UInt32(UInt32(samples) * UInt32(2) * UInt32(MemoryLayout<Int16>.size)))                            
+                    }
+                                                
+                    // Free the output buffer
+                    av_freep(&outputBuffer)
+
+                    guard self.m_stopFlag == false else {
+                        return
+                    }
+
+                    while self.m_isPaused {
+                        usleep(100_000)
+                        if self.m_stopFlag {
+                            return
+                        }
+                    }                                                                       
+                }// while    
                 av_packet_unref(&self.m_audioState.packet)                
             }// if av_read_frame
             

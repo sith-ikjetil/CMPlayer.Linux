@@ -138,7 +138,7 @@ internal class Mp3AudioPlayer {
             mpg123_close(self.mpg123Handle)
             mpg123_delete(self.mpg123Handle)
             self.mpg123Handle = nil
-                        
+            
             throw CmpError(message: msg)
         }        
 
@@ -150,7 +150,7 @@ internal class Mp3AudioPlayer {
         self.m_duration = UInt64(duration * 1000)
         
         guard self.m_duration > 0 else {
-            let msg = "[Mp3AudioPlayer].play(). Duration was invalid with value: \(self.m_duration)"            
+            let msg = "[Mp3AudioPlayer].play(). Duration was invalid with value: \(self.m_duration)"                        
             throw CmpError(message: msg)
         }
 
@@ -177,7 +177,7 @@ internal class Mp3AudioPlayer {
             mpg123_close(self.mpg123Handle)
             mpg123_delete(self.mpg123Handle)
             self.mpg123Handle = nil
-                        
+              
             throw CmpError(message:msg)
         }
 
@@ -203,7 +203,8 @@ internal class Mp3AudioPlayer {
             mpg123_delete(self.mpg123Handle)
             self.mpg123Handle = nil
             self.m_isPlaying = false
-            self.m_isPaused = false            
+            self.m_isPaused = false   
+            self.m_stopFlag = true         
         }
 
         // Buffer for audio output
@@ -231,39 +232,42 @@ internal class Mp3AudioPlayer {
             }
             let err = mpg123_read(self.mpg123Handle, &buffer, bufferSize, &done)
             if err == -12 { // MPG123_DONE
-                break;
+                return
             }
             if (err != 0) { // MPG123_OK
-                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: "mpg123_read return failure code: \(err). File: \(self.filePath.lastPathComponent)")
-                break;
+                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: "mpg123_read return failure code: \(err). File: \(self.filePath.lastPathComponent)")                                
+                return
             }
-            if (done > 0) {
-                // Update time elapsed                
-                let totalPerChannel = done / Int(self.m_channels)
-                let currentDuration = Double(totalPerChannel) / Double(self.m_rate)
-                self.m_timeElapsed += UInt64(currentDuration * Double(1000/self.m_channels))
+            if done <= 0 {                 
+                return;
+            }
 
-                // set crossfade volume
-                let timeLeft: UInt64 = (self.duration >= self.m_timeElapsed) ? self.duration - self.m_timeElapsed : self.duration
-                if timeLeft > 0 && timeLeft <= self.m_targetFadeDuration {
-                    timeToStartCrossfade = true
+            // Update time elapsed                
+            let totalPerChannel = done / Int(self.m_channels)
+            let currentDuration = Double(totalPerChannel) / Double(self.m_rate)
+            self.m_timeElapsed += UInt64(currentDuration * Double(1000/self.m_channels))
 
-                    currentVolume = Float(Float(timeLeft)/Float(self.m_targetFadeDuration))                    
+            // set crossfade volume
+            let timeLeft: UInt64 = (self.duration >= self.m_timeElapsed) ? self.duration - self.m_timeElapsed : self.duration
+            if timeLeft > 0 && timeLeft <= self.m_targetFadeDuration {
+                timeToStartCrossfade = true
+
+                currentVolume = Float(Float(timeLeft)/Float(self.m_targetFadeDuration))                    
+            }
+
+            // play samples
+            buffer.withUnsafeMutableBytes { bufferPointer in
+                let pointer = bufferPointer.baseAddress!.assumingMemoryBound(to: Int8.self)
+
+                // adjust crossfade volume
+                if self.m_enableCrossfade && timeToStartCrossfade {
+                    adjustVolume(buffer: pointer, size: Int(done), volume: currentVolume)                        
                 }
 
-                // play samples
-                buffer.withUnsafeMutableBytes { bufferPointer in
-                    let pointer = bufferPointer.baseAddress!.assumingMemoryBound(to: Int8.self)
+                // play audio samples
+                ao_play(device, pointer, UInt32(done))
+            }            
 
-                    // adjust crossfade volume
-                    if self.m_enableCrossfade && timeToStartCrossfade {
-                        adjustVolume(buffer: pointer, size: Int(done), volume: currentVolume)                        
-                    }
-
-                    // play audio samples
-                    ao_play(device, pointer, UInt32(done))
-                }
-            }
             while (self.m_isPaused && !self.m_stopFlag) {
                 usleep(100_000)
             }
@@ -317,7 +321,7 @@ internal class Mp3AudioPlayer {
     /// stops playback if we are playing.
     /// 
     func stop() {
-        self.m_stopFlag = true
+        self.m_stopFlag = true        
     }
     ///
     /// pauses playback if we are playing
