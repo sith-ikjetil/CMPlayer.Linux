@@ -54,7 +54,10 @@ internal var g_doSoundCheck: Bool = false
 //
 // Check for command line arguments.
 if CommandLine.argc >= 2 {
-    if CommandLine.arguments[1].lowercased() == "--help" {
+    if CommandLine.arguments[1].lowercased() == "--sound-check" {
+        g_doSoundCheck = true
+    }
+    else {
         print("CMPlayer")
         print("=========================")
         print("Usage: cmplayer <options>")
@@ -63,10 +66,7 @@ if CommandLine.argc >= 2 {
         print(" --sound-check = do a check for sound output")
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
-    }
-    if CommandLine.arguments[1].lowercased() == "--sound-check" {
-        g_doSoundCheck = true
-    }
+    }    
 }
 
 // initialize libmpg123
