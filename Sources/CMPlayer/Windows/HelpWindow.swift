@@ -55,7 +55,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                                       " disable aos", " :: disables playing on application startup",
                                       " rebuild songno"," :: rebuilds song numbers",
                                       " goto <mm:ss>", " :: moves playback point to minutes (mm) and seconds (ss) of current song",
-                                      //" replay", " :: starts playing current song from beginning again",
+                                      " replay", " :: starts playing current song from beginning again",
                                       " reinitialize", " :: reinitializes library and should be called after mrp paths are changed",
                                       " info", " :: shows information about first song in playlist",
                                       " info <song no>", " :: show information about song with given song number",

@@ -279,7 +279,7 @@ internal class Mp3AudioPlayer {
     /// - Parameter position: ms from start
     func seekToPos(position: UInt64)
     {
-        guard position < self.duration else {
+        guard position <= self.duration else {
             return
         }
 

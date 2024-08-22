@@ -361,7 +361,7 @@ internal class M4aAudioPlayer {
     /// - Parameter position: ms from start
     func seekToPos(position: UInt64)
     {
-        guard position < self.duration else {
+        guard position <= self.duration else {
             return
         }
 

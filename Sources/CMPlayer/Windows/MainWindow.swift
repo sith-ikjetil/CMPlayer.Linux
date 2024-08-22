@@ -567,18 +567,18 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandReplay(parts: [String]) -> Void {
-        /*if g_player.audioPlayerActive == 1 {
+        if g_player.audioPlayerActive == 1 {
             if ( !g_player.audio1!.isPlaying ) {
                 g_player.resume()
-            }
-            g_player.audio1?.currentTime = TimeInterval(exactly: 0.0)!
+            }            
+            g_player.audio1?.seekToPos(position: g_player.audio1!.duration)
         }
         else if g_player.audioPlayerActive == 2 {
             if ( !g_player.audio1!.isPlaying ) {
                 g_player.resume()
             }
-            g_player.audio2?.currentTime = TimeInterval(exactly: 0.0)!
-        }*/
+            g_player.audio2?.seekToPos(position: g_player.audio2!.duration)
+        }
     }    
     ///
     /// Play next song
