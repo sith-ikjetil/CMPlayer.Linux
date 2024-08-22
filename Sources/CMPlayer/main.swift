@@ -65,6 +65,10 @@ if CommandLine.argc >= 2 {
         print(" --help        = show this help screen")
         print(" --sound-check = do a check for sound output")
         print("")
+        print("Built and tested with libraries:")
+        print(" libmpg123 1.29.3")
+        print(" ffmpeg    4.4")
+        print(" libao     1.2.2")
         exit(ExitCodes.SUCCESS.rawValue)
     }    
 }
