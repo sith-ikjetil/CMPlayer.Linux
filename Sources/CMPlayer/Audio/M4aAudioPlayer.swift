@@ -16,7 +16,7 @@ import Cao
 ///
 /// Audio state variables.
 ///
-internal struct AacAudioState {
+internal struct M4aAudioState {
     var formatCtx: UnsafeMutablePointer<AVFormatContext>?
     var codecCtx: UnsafeMutablePointer<AVCodecContext>?
     var codec: UnsafeMutablePointer<AVCodec>?
@@ -31,7 +31,7 @@ internal struct AacAudioState {
 //
 // Represents CMPlayer AudioPlayer.
 //
-internal class AacAudioPlayer {
+internal class M4aAudioPlayer {
     ///
     /// constants
     ///
@@ -48,7 +48,7 @@ internal class AacAudioPlayer {
     private var m_timeElapsed: UInt64 = 0
     private var m_duration: UInt64 = 0
     private var m_channels: Int32 = 2
-    private var m_audioState: AacAudioState = AacAudioState()
+    private var m_audioState: M4aAudioState = M4aAudioState()
     private var m_targetFadeVolume: Float = 1
     private var m_targetFadeDuration: UInt64 = 0
     private var m_enableCrossfade: Bool = false
@@ -355,6 +355,10 @@ internal class AacAudioPlayer {
     /// - Parameter position: ms from start
     func seekToPos(position: UInt64)
     {
+        guard position < self.duration else {
+            return
+        }
+
         self.m_seekPos = position
         self.m_doSeekToPos = true
     }
@@ -377,6 +381,14 @@ internal class AacAudioPlayer {
     ///   - volume: target volume. usually 0.
     ///   - duration: time from end of song, fading should be done.
     func setCrossfadeVolume(volume: Float, fadeDuration: UInt64) {
+        guard volume >= 0 && volume <= 1 else {
+            return
+        }
+        
+        guard isCrossfadeTimeValid(seconds: Int(fadeDuration / 1000)) else {
+            return
+        }
+
         self.m_targetFadeVolume = volume
         self.m_targetFadeDuration = fadeDuration
         self.m_enableCrossfade = true

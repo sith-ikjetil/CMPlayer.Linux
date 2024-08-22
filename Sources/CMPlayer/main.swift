@@ -18,15 +18,16 @@ import Glibc
 //
 // Global constants.
 //
-internal let g_fieldWidthSongNo: Int = 8
-internal let g_fieldWidthArtist: Int = 33
-internal let g_fieldWidthTitle: Int = 33
-internal let g_fieldWidthDuration: Int = 5
+internal let g_fieldWidthSongNo: Int = 8   // fixed
+internal let g_fieldWidthArtist: Int = 33  // min
+internal let g_fieldWidthTitle: Int = 33   // min
+internal let g_fieldWidthDuration: Int = 5 // fixed
 internal let g_player: Player = Player()
 internal let g_versionString: String = "1.1.0.1"
 internal let g_lock = NSLock()
-internal let g_windowContentLineCount = 17
-
+//internal let g_windowContentLineCount = 17
+internal let g_crossfadeMinTime: Int = 1  // seconds
+internal let g_crossfadeMaxTime: Int = 20 // seconds
 //
 // Global variables/properties
 //

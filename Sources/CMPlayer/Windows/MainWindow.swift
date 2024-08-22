@@ -762,7 +762,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     func onCommandSetCrossfadeTimeInSeconds(parts: [String]) -> Void {
         if let ctis = Int(parts[0]) {
-            if isCrossfadeTimeValid(ctis) {
+            if isCrossfadeTimeValid(seconds: ctis) {
                 PlayerPreferences.crossfadeTimeInSeconds = ctis
                 PlayerPreferences.savePreferences()
             }

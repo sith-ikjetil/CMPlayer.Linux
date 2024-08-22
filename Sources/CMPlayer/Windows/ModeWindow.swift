@@ -179,29 +179,7 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         Console.gotoXY(g_cols,1)
         print("")
-    }    
-    ///
-    /// Returns content line count
-    ///
-    func getSongsLineCount() -> Int {
-        if PlayerPreferences.viewType == ViewType.Default {
-            return g_windowContentLineCount
-        }
-        else {
-            return g_windowContentLineCount / 2
-        }
-    }    
-    ///
-    /// Returns song content line count
-    ///
-    func getSongsContentLineCount() -> Int {
-        if PlayerPreferences.viewType == ViewType.Default {
-            return 1
-        }
-        else {
-            return 2
-        }
-    }
+    }          
     ///
     /// Runs AboutWindow keyboard input and feedback.
     ///

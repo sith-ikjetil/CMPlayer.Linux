@@ -25,27 +25,27 @@ internal class CmpAudioPlayer {
     /// private variables
     /// 
     private var mp3Player: Mp3AudioPlayer? = nil
-    private var aacPlayer: AacAudioPlayer? = nil
+    private var m4aPlayer: M4aAudioPlayer? = nil
     ///
     /// get properties
     ///
     var isPlaying: Bool {
         get {
-            if mp3Player != nil {
-                return mp3Player!.isPlaying
+            if self.mp3Player != nil {
+                return self.mp3Player!.isPlaying
             }
-            else if aacPlayer != nil {
-                return aacPlayer!.isPlaying
+            else if self.m4aPlayer != nil {
+                return self.m4aPlayer!.isPlaying
             }
             return false
         }
     }
     var isPaused: Bool {
-        if mp3Player != nil {
-            return mp3Player!.isPaused
+        if self.mp3Player != nil {
+            return self.mp3Player!.isPaused
         }
-        else if aacPlayer != nil {
-            return aacPlayer!.isPaused
+        else if self.m4aPlayer != nil {
+            return self.m4aPlayer!.isPaused
         }
         return false
     }    
@@ -54,19 +54,19 @@ internal class CmpAudioPlayer {
             if mp3Player != nil {
                 return mp3Player!.timeElapsed
             }
-            else if aacPlayer != nil {
-                return aacPlayer!.timeElapsed
+            else if self.m4aPlayer != nil {
+                return self.m4aPlayer!.timeElapsed
             }
             return 0
         }
     }
     var duration: UInt64 {
         get {
-            if mp3Player != nil {
-                return mp3Player!.duration
+            if self.mp3Player != nil {
+                return self.mp3Player!.duration
             }
-            else if aacPlayer != nil {
-                return aacPlayer!.duration
+            else if self.m4aPlayer != nil {
+                return self.m4aPlayer!.duration
             }
             return 0
         }
@@ -80,7 +80,7 @@ internal class CmpAudioPlayer {
             self.mp3Player = Mp3AudioPlayer(path: path);            
         }
         else if path.path.lowercased().hasSuffix(".m4a") {
-            self.aacPlayer = AacAudioPlayer(path: path);            
+            self.m4aPlayer = M4aAudioPlayer(path: path);            
         }
     }
     ///
@@ -90,41 +90,41 @@ internal class CmpAudioPlayer {
         if mp3Player != nil {
             return try mp3Player!.play()
         }
-        else if aacPlayer != nil {
-            return try aacPlayer!.play()
+        else if self.m4aPlayer != nil {
+            return try self.m4aPlayer!.play()
         }        
     }
     ///
     /// stops playback if we are playing.
     /// 
     func stop() {
-        if mp3Player != nil {
-            return mp3Player!.stop()
+        if self.mp3Player != nil {
+            return self.mp3Player!.stop()
         }
-        else if aacPlayer != nil {
-            return aacPlayer!.stop()
+        else if self.m4aPlayer != nil {
+            return self.m4aPlayer!.stop()
         }
     }
     ///
     /// pauses playback if we are playing
     /// 
     func pause() {
-        if mp3Player != nil {
-            return mp3Player!.pause()
+        if self.mp3Player != nil {
+            return self.mp3Player!.pause()
         }
-        else if aacPlayer != nil {
-            return aacPlayer!.pause()
+        else if self.m4aPlayer != nil {
+            return self.m4aPlayer!.pause()
         }
     }
     ///
     /// resumes playback if we are playing.
     ///
     func resume() {
-        if mp3Player != nil {
-            return mp3Player!.resume()
+        if self.mp3Player != nil {
+            return self.mp3Player!.resume()
         }
-        else if aacPlayer != nil {
-            return aacPlayer!.resume()
+        else if self.m4aPlayer != nil {
+            return self.m4aPlayer!.resume()
         }
     }
     /// 
@@ -133,11 +133,11 @@ internal class CmpAudioPlayer {
     /// - Parameter position: ms from start
     func seekToPos(position: UInt64)
     {
-        if mp3Player != nil {
-            return mp3Player!.seekToPos(position: position)
+        if self.mp3Player != nil {
+            return self.mp3Player!.seekToPos(position: position)
         }
-        else if aacPlayer != nil {
-            return aacPlayer!.seekToPos(position: position)
+        else if self.m4aPlayer != nil {
+            return self.m4aPlayer!.seekToPos(position: position)
         }
     }
     /// 
@@ -146,11 +146,11 @@ internal class CmpAudioPlayer {
     ///   - volume: target volume. usually 0.
     ///   - duration: time from end of song, fading should be done.
     func setCrossfadeVolume(volume: Float, fadeDuration: UInt64) {
-        if mp3Player != nil {
-            return mp3Player!.setCrossfadeVolume(volume: volume, fadeDuration: fadeDuration)
+        if self.mp3Player != nil {
+            return self.mp3Player!.setCrossfadeVolume(volume: volume, fadeDuration: fadeDuration)
         }
-        else if aacPlayer != nil {
-            return aacPlayer!.setCrossfadeVolume(volume: volume, fadeDuration: fadeDuration)
+        else if self.m4aPlayer != nil {
+            return self.m4aPlayer!.setCrossfadeVolume(volume: volume, fadeDuration: fadeDuration)
         }
     }
     ///
@@ -164,7 +164,7 @@ internal class CmpAudioPlayer {
             return try Mp3AudioPlayer.gatherMetadata(path: path);
         }
         else if path.path.lowercased().hasSuffix(".m4a") {            
-            return try AacAudioPlayer.gatherMetadata(path: path);            
+            return try M4aAudioPlayer.gatherMetadata(path: path);            
         }
 
         throw CmpError(message: "Error trying to gather metadata on unknown file format. File: \(path.path)")

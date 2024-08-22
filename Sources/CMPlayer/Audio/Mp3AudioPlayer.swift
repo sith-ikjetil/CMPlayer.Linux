@@ -275,6 +275,10 @@ internal class Mp3AudioPlayer {
     /// - Parameter position: ms from start
     func seekToPos(position: UInt64)
     {
+        guard position < self.duration else {
+            return
+        }
+
         self.m_seekPos = position
         self.m_doSeekToPos = true
     }
@@ -297,6 +301,14 @@ internal class Mp3AudioPlayer {
     ///   - volume: target volume. usually 0.
     ///   - duration: time from end of song, fading should be done.
     func setCrossfadeVolume(volume: Float, fadeDuration: UInt64) {
+        guard volume >= 0 && volume <= 1 else {
+            return
+        }
+        
+        guard isCrossfadeTimeValid(seconds: Int(fadeDuration / 1000)) else {
+            return
+        }
+        
         self.m_targetFadeVolume = volume
         self.m_targetFadeDuration = fadeDuration
         self.m_enableCrossfade = true

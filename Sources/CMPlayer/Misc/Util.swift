@@ -96,8 +96,8 @@ internal func isCommandInCommands(_ command: String, _ commands: [String]) -> Bo
 ///
 /// returns: True if crossfade time is valid. False otherwise.
 ///
-internal func isCrossfadeTimeValid(_ ctis: Int) -> Bool {
-    if ctis >= 1 && ctis <= 20 {
+internal func isCrossfadeTimeValid(seconds: Int) -> Bool {    
+    if seconds >= g_crossfadeMinTime && seconds <= g_crossfadeMaxTime {
         return true
     }
     return false
