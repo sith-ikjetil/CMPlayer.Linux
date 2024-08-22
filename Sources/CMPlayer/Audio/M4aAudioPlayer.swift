@@ -229,6 +229,8 @@ internal class M4aAudioPlayer {
             av_frame_free(&self.m_audioState.frame)
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)
+            self.m_isPlaying = false
+            self.m_isPaused = false
         }
 
         var timeToStartCrossfade: Bool = false
