@@ -18,8 +18,10 @@ execute the following commands:
  - sudo apt install ffmpeg
  - sudo apt install libavcodec-dev
  - sudo apt install libavformat-dev
- - sudo apt install libao-common libao-dev
+ - sudo apt install libmpg123
  - sudo apt install libmpg123-dev
+ - sudo apt install libao-common 
+ - sudo apt install libao-dev
  - On WSL: sudo apt install pulseaudio (Doesn't always work)
 
 ## Fedora
@@ -31,6 +33,7 @@ execute the following commands:
  - sudo dnf install --allowerasing libswresample-free-devel
  - sudo dnf install libmpg123-devel
  - sudo dnf install libao
+ - sudo dnf install libao-devel
 
 ## LD_LIBRARY_PATH
 After installing Swift, remember to update LD_LIBRARY_PATH. Set 
