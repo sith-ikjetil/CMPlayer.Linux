@@ -129,8 +129,8 @@ internal class M4aAudioPlayer {
             }
         }
 
-        if self.m_audioState.audioStreamIndex < 0 {
-            let msg = "[M4aAudioPlayer].play(). m_audioState.audioStreamIndex invalid with value: \(self.m_audioState.audioStreamIndex)."
+        if self.m_audioState.audioStreamIndex == -1 {
+            let msg = "[M4aAudioPlayer].play(). m_audioState.audioStreamIndex invalid with value: -1."
             avformat_close_input(&m_audioState.formatCtx)
             throw CmpError(message: msg)
         }
@@ -501,21 +501,12 @@ internal class M4aAudioPlayer {
                             metadata.genre = String(cString: value)
                         case "track":
                             metadata.trackNo =  extractMetadataTrackNo(text: String(cString: value))
-                        case "date":
+                        case "date", "year", "time":
                             if metadata.recordingYear == 0 {
                                 metadata.recordingYear = extractMetadataYear(text: String(cString: value))
-                            }
-                        case "year":
-                            if metadata.recordingYear == 0 {
-                                metadata.recordingYear = extractMetadataYear(text: String(cString: value))
-                            }
-                        case "time":
-                            if metadata.recordingYear == 0 {
-                                metadata.recordingYear = extractMetadataYear(text: String(cString: value))
-                            }
+                            }                
                         default:
-                            tag = nextTag
-                            continue;
+                            tag = nextTag                            
                     }                    
                 }
                 tag = nextTag
