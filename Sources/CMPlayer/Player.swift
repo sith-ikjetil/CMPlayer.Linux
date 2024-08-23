@@ -245,6 +245,9 @@ internal class Player {
                         self.audio2!.setCrossfadeVolume(volume: 0.0, fadeDuration: UInt64(PlayerPreferences.crossfadeTimeInSeconds*1000) )
                     }
                 }
+                else {
+                    self.audio2!.stop()
+                }
             }
             if play {
                 self.play(player: 1, playlistIndex: 0)
@@ -259,6 +262,9 @@ internal class Player {
                     else {
                         self.audio1!.setCrossfadeVolume(volume: 0.0, fadeDuration: UInt64(PlayerPreferences.crossfadeTimeInSeconds*1000) )
                     }
+                }
+                else {
+                    self.audio1!.stop()
                 }
             }
             if play {
