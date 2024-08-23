@@ -129,8 +129,8 @@ internal class M4aAudioPlayer {
             }
         }
 
-        if self.m_audioState.audioStreamIndex == -1 {
-            let msg = "[M4aAudioPlayer].play(). m_audioState.audioStreamIndex invalid with value: -1."
+        if self.m_audioState.audioStreamIndex < 0 {
+            let msg = "[M4aAudioPlayer].play(). m_audioState.audioStreamIndex invalid with value: \(self.m_audioState.audioStreamIndex)."
             avformat_close_input(&m_audioState.formatCtx)
             throw CmpError(message: msg)
         }
