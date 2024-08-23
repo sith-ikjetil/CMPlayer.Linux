@@ -289,7 +289,6 @@ internal class M4aAudioPlayer {
                 PlayerLog.ApplicationLog?.logError(title: "[M4aPlayer].playAsync()", text: msg)
                 return
             }
-
             
             if self.m_audioState.packet.stream_index == self.m_audioState.audioStreamIndex {
                 retVal = avcodec_send_packet(self.m_audioState.codecCtx, &self.m_audioState.packet)
