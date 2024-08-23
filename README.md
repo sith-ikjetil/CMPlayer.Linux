@@ -2,7 +2,62 @@
 License: **GPL-3.0-or-later**  
 This is a console music player for Linux. 
 
-The following commands are possible as of this writing:
+## Libraries
+The player uses the following tools and libraries:
+ - Swift
+ - libmpg123 (libmpg123.so)
+ - ffmpeg
+ - libao (libao.so)
+ - libavcodec (libavcodec.so)
+ - libavformat (libavformat.so)
+ - libavutil (libavutil.so)
+
+## Ubuntu
+In order to get these libraries onto your Ubuntu distro, you can 
+execute the following commands:
+ - sudo apt install ffmpeg
+ - sudo apt install libavcodec-dev
+ - sudo apt install libavformat-dev
+ - sudo apt install libao-common libao-dev
+ - sudo apt install libmpg123-dev
+ - On WSL: sudo apt install pulseaudio (Doesn't always work)
+
+## Fedora
+In order to get these libraries onto you Fedora distro, you can 
+execute the following commands:
+ - sudo dnf install ffmpeg
+ - sudo dnf install --allowerasing libavcodec-free-devel
+ - sudo dnf install --allowerasing libavformat-free-devel
+ - sudo dnf install --allowerasing libswresample-free-devel
+ - sudo dnf install libmpg123-devel
+ - sudo dnf install libao
+
+## LD_LIBRARY_PATH
+After installing Swift, remember to update LD_LIBRARY_PATH. Set 
+the following into your .bashrc and .bash_profile.
+export LD_LIBRARY_PATH=/opt/swift-5.10.1/usr/lib/swift/linux:$LD_LIBRARY_PATH
+(the path is ofcourse up to you where you put swift)
+
+## PATH
+You must put swift binaries in you path. An example would be to 
+put them into your .bashrc and .bash_profile using the following:
+PATH=/opt/swift-5.10.1/usr/bin:$PATH
+(the path is ofcourse up to you where you put swift)
+
+## Header files for Cffmpeg
+So there are not preprocessor tags in swift which makes it difficult to 
+create projects across many api versions and platforms.
+
+### Ubuntu
+Are located at:
+ - /usr/include/x86_64-linux-gnu/<library>
+
+### Fedora
+Are located at:
+ - /usr/include/ffmpeg/<library>
+
+
+## CMPlayer (in app) Help Text
 ```
 <song no>
 :: adds song to playlist

@@ -48,11 +48,7 @@ import PackageDescription
                 name: "Cffmpeg",
                 dependencies: [],
                 cSettings: [
-                    .headerSearchPath("include"),
-                    //.headerSearchPath("include/libavcodec"),
-                    //.headerSearchPath("include/libavformat"),
-                    //.headerSearchPath("include/libavutil"),
-                    //.headerSearchPath("include/libswresample"),
+                    .headerSearchPath("include"),                    
                     .define("CMP_FFMPEG_LIBRARY", to: "1")
                 ],
                 linkerSettings: [
