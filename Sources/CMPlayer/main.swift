@@ -66,9 +66,9 @@ if CommandLine.argc >= 2 {
         print(" --sound-check = do a check for sound output")
         print("")
         print("Built and tested:")
-        print(" v1.5.5.0 = libmpg123, libao, libavformat, libavcodec")
-        print(" ffmpeg    4.4")
-        print(" libao     1.2.2")
+        print(" v1.5.5.0 = swift-5.10.1, libmpg123, ffmpeg, libao, libavcodec, libavutil")
+        print("            libavformat")
+        print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }    
 }

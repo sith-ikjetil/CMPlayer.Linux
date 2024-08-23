@@ -119,8 +119,8 @@ internal class M4aAudioPlayer {
             let msg = "[M4aAudioPlayer].play(). avformat_find_stream_info failed with value: \(err). Could not find stream information."
             avformat_close_input(&m_audioState.formatCtx)
             throw CmpError(message: msg)
-        }
-        
+        }                
+
         // Find the audio stream
         for i in 0..<Int32(self.m_audioState.formatCtx!.pointee.nb_streams) {
             if self.m_audioState.formatCtx!.pointee.streams![Int(i)]!.pointee.codecpar.pointee.codec_type == AVMEDIA_TYPE_AUDIO {
