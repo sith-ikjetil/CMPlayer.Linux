@@ -65,8 +65,8 @@ if CommandLine.argc >= 2 {
         print(" --help        = show this help screen")
         print(" --sound-check = do a check for sound output")
         print("")
-        print("Built and tested with libraries:")
-        print(" libmpg123 1.29.3")
+        print("Built and tested:")
+        print(" v1.5.5.0 = libmpg123, libao, libavformat, libavcodec")
         print(" ffmpeg    4.4")
         print(" libao     1.2.2")
         exit(ExitCodes.SUCCESS.rawValue)
@@ -84,6 +84,9 @@ ao_initialize()
 
 // ensure we exit/close libmpg123/libao
 atexit( {
+    // let all players stop playing and clean up
+    Thread.sleep(forTimeInterval: TimeInterval(200) / 1000)
+    // close libraries
     mpg123_exit()
     ao_shutdown()
 })

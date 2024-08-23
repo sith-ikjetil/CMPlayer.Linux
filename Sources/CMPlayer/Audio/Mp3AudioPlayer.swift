@@ -197,14 +197,14 @@ internal class Mp3AudioPlayer {
         PlayerLog.ApplicationLog?.logInformation(title: "[Mp3AudioPlayer].playAsync()", text: "Started playing file: \(self.filePath.lastPathComponent)")
         
         // make sure we clean up
-        defer {            
-            ao_close(device)
+        defer {                                   
+            ao_close(device)            
             mpg123_close(self.mpg123Handle)
             mpg123_delete(self.mpg123Handle)
             self.mpg123Handle = nil
             self.m_isPlaying = false
             self.m_isPaused = false   
-            self.m_stopFlag = true         
+            self.m_stopFlag = true                 
         }
 
         // Buffer for audio output
@@ -217,7 +217,7 @@ internal class Mp3AudioPlayer {
         self.m_timeElapsed = 0
 
         // Decode and play the file        
-        while !self.m_stopFlag {
+        while !self.m_stopFlag && !g_quit {
             if (self.m_doSeekToPos) {
                 self.m_doSeekToPos = false
                 
@@ -253,6 +253,13 @@ internal class Mp3AudioPlayer {
                 timeToStartCrossfade = true
 
                 currentVolume = Float(Float(timeLeft)/Float(self.m_targetFadeDuration))                    
+            }            
+
+            // check buffer
+            guard !buffer.isEmpty else {
+                let msg = "Buffer is empty"
+                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: msg)
+                return
             }
 
             // play samples

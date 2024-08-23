@@ -243,7 +243,7 @@ internal class M4aAudioPlayer {
         PlayerLog.ApplicationLog?.logInformation(title: "[M4aAudioPlayer].playAsync()", text: "Started playing: \(self.filePath.lastPathComponent)")
 
         // Clean up using defer
-        defer {
+        defer {            
             ao_close(self.m_audioState.device)
             swr_free(&self.m_audioState.swrCtx)
             av_frame_free(&self.m_audioState.frame)
@@ -251,7 +251,7 @@ internal class M4aAudioPlayer {
             avformat_close_input(&self.m_audioState.formatCtx)
             self.m_isPlaying = false
             self.m_isPaused = false
-            self.m_stopFlag = true
+            self.m_stopFlag = true        
         }
 
         var timeToStartCrossfade: Bool = false
@@ -260,7 +260,7 @@ internal class M4aAudioPlayer {
         self.m_timeElapsed = 0
 
         // Main decoding and playback loop
-        while !self.m_stopFlag {    
+        while !self.m_stopFlag && !g_quit {    
            if (self.m_doSeekToPos) {
                 self.m_doSeekToPos = false
 
@@ -298,7 +298,7 @@ internal class M4aAudioPlayer {
                     return
                 }
                                     
-                while avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame) >= 0 {                        
+                while !g_quit && !m_stopFlag && avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame) >= 0 {                        
                     // Allocate buffer for resampled audio
                     var outputBuffer: UnsafeMutablePointer<UInt8>? = nil
                     let bufferSize = av_samples_alloc(&outputBuffer, nil, 2, self.m_audioState.frame!.pointee.nb_samples, AV_SAMPLE_FMT_S16, 0)
@@ -309,7 +309,7 @@ internal class M4aAudioPlayer {
                         PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
                         break
                     }
-
+                    
                     // Cast frame data pointers
                     // Manually create an array from the tuple
                     let inputData: [UnsafePointer<UInt8>?] = [
@@ -322,6 +322,18 @@ internal class M4aAudioPlayer {
                         UnsafePointer(self.m_audioState.frame!.pointee.data.6),
                         UnsafePointer(self.m_audioState.frame!.pointee.data.7)
                     ]
+
+                    for (index, pointer) in inputData.enumerated() {
+                        if pointer == nil {
+                            PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: "Found nil in inputData pointers at index \(index).")
+                        }
+                    }
+
+                    guard inputData.allSatisfy({ $0 != nil }) else {
+                        let msg = "Found nil in inputData pointers."
+                        PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
+                        return
+                    }
                     
                     // Use withUnsafeBufferPointer to pass the array as a pointer
                     inputData.withUnsafeBufferPointer { bufferPointer in
