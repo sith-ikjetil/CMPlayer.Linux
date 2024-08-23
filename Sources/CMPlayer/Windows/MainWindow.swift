@@ -388,16 +388,14 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     
                     if g_player.audioPlayerActive == 1 && g_player.audio1 != nil {
                         if (PlayerPreferences.crossfadeSongs && g_player.durationAudioPlayer1 <= PlayerPreferences.crossfadeTimeInSeconds * 1000)
-                            || g_player.durationAudioPlayer1 <= 1000 
-                            || ( g_player.durationAudioPlayer1 > 0 && !g_player.isPaused && !g_player.audio1!.isPlaying ) 
+                            || g_player.durationAudioPlayer1 <= 1000                             
                         {
                             g_player.skip(crossfade: PlayerPreferences.crossfadeSongs)
                         }
                     }
                     else if g_player.audioPlayerActive == 2 && g_player.audio2 != nil {
                         if (PlayerPreferences.crossfadeSongs && g_player.durationAudioPlayer2 <= PlayerPreferences.crossfadeTimeInSeconds * 1000)
-                            || g_player.durationAudioPlayer2 <= 1000 
-                            || ( g_player.durationAudioPlayer2 > 0 && !g_player.isPaused && !g_player.audio2!.isPlaying) 
+                            || g_player.durationAudioPlayer2 <= 1000                             
                         {
                             g_player.skip(crossfade: PlayerPreferences.crossfadeSongs)
                         }
@@ -567,6 +565,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandReplay(parts: [String]) -> Void {
+        g_lock.lock()
         if g_player.audioPlayerActive == 1 {
             if ( !g_player.audio1!.isPlaying ) {
                 g_player.resume()
@@ -579,6 +578,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             }
             g_player.audio2?.seekToPos(position: g_player.audio2!.duration)
         }
+        g_lock.unlock()
     }    
     ///
     /// Play next song
