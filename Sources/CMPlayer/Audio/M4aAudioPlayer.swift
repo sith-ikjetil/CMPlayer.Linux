@@ -13,13 +13,16 @@ import Foundation
 import Cffmpeg
 import Cao
 
+let g_fver: Int32 = getFFmpegMajorVersion()
+
 ///
 /// Audio state variables.
 ///
 internal struct M4aAudioState {
     var formatCtx: UnsafeMutablePointer<AVFormatContext>?
-    var codecCtx: UnsafeMutablePointer<AVCodecContext>?
-    var codec: UnsafeMutablePointer<AVCodec>?
+    var codecCtx: UnsafeMutablePointer<AVCodecContext>?    
+    //var codec: UnsafePointer<AVCodec>?      // ffmpeg version 6    
+    var codec: UnsafeMutablePointer<AVCodec>? // ffmpeg version 4
     var packet = AVPacket()
     var frame: UnsafeMutablePointer<AVFrame>?
     var swrCtx: OpaquePointer? //UnsafeMutablePointer<SwrContext>?
@@ -125,7 +128,7 @@ internal class M4aAudioPlayer {
             avformat_close_input(&m_audioState.formatCtx)
             throw CmpError(message: msg)
         }                
-
+        
         // Find the audio stream
         for i in 0..<Int32(self.m_audioState.formatCtx!.pointee.nb_streams) {
             if self.m_audioState.formatCtx!.pointee.streams![Int(i)]!.pointee.codecpar.pointee.codec_type == AVMEDIA_TYPE_AUDIO {
@@ -133,9 +136,9 @@ internal class M4aAudioPlayer {
                 break
             }
         }
-
-        if self.m_audioState.audioStreamIndex == -1 {
-            let msg = "[M4aAudioPlayer].play(). m_audioState.audioStreamIndex invalid with value: -1."
+        
+        if self.m_audioState.audioStreamIndex < 0 {
+            let msg = "[M4aAudioPlayer].play(). m_audioState.audioStreamIndex invalid with value: \(self.m_audioState.audioStreamIndex)."
             avformat_close_input(&m_audioState.formatCtx)
             throw CmpError(message: msg)
         }
@@ -151,25 +154,20 @@ internal class M4aAudioPlayer {
         }
         else {
             let msg = "[M4aAudioPlayer].play(). Cannot find duration."
-            throw CmpError(message: msg)
-        }      
-        
-        if self.m_audioState.audioStreamIndex == -1 {
-            let msg = "[M4aAudioPlayer].play(). Could not find an audio stream."
             avformat_close_input(&self.m_audioState.formatCtx)
             throw CmpError(message: msg)
-        }
+        }              
         
         // Get codec parameters
         let codecpar = self.m_audioState.formatCtx!.pointee.streams![Int(self.m_audioState.audioStreamIndex)]!.pointee.codecpar
         
-        // Find the decoder for the audio stream
+        // Find the decoder for the audio stream    
         self.m_audioState.codec = avcodec_find_decoder(codecpar!.pointee.codec_id)
         if self.m_audioState.codec == nil {
             let msg = "[M4aAudioPlayer].play(). avcodec_find_decoder failed with value: nil. Unsupported codec."
             avformat_close_input(&self.m_audioState.formatCtx)            
             throw CmpError(message: msg)
-        }
+        }    
         
         // Allocate codec context
         self.m_audioState.codecCtx = avcodec_alloc_context3(self.m_audioState.codec)
@@ -231,8 +229,8 @@ internal class M4aAudioPlayer {
             avformat_close_input(&self.m_audioState.formatCtx)
             throw CmpError(message: msg)
         }
-
-        self.audioQueue.async { [weak self] in
+        
+        self.audioQueue.async { [weak self] in            
             self?.playAsync()
         }
     }
@@ -312,7 +310,7 @@ internal class M4aAudioPlayer {
                     guard bufferSize >= 0 else {
                         let msg = "Error allocating buffer for resampled audio."
                         PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
-                        break
+                        return
                     }
                     
                     // Cast frame data pointers
@@ -326,19 +324,7 @@ internal class M4aAudioPlayer {
                         UnsafePointer(self.m_audioState.frame!.pointee.data.5),
                         UnsafePointer(self.m_audioState.frame!.pointee.data.6),
                         UnsafePointer(self.m_audioState.frame!.pointee.data.7)
-                    ]
-
-                    for (index, pointer) in inputData.enumerated() {
-                        if pointer == nil {
-                            PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: "Found nil in inputData pointers at index \(index).")
-                        }
-                    }
-
-                    guard inputData.allSatisfy({ $0 != nil }) else {
-                        let msg = "Found nil in inputData pointers."
-                        PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
-                        return
-                    }
+                    ]                    
                     
                     // Use withUnsafeBufferPointer to pass the array as a pointer
                     inputData.withUnsafeBufferPointer { bufferPointer in

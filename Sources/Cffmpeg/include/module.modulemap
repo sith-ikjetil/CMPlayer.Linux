@@ -4,5 +4,6 @@ module Cffmpeg {
     header "/usr/include/x86_64-linux-gnu/libavutil/avutil.h"
     header "/usr/include/x86_64-linux-gnu/libavutil/opt.h"
     header "/usr/include/x86_64-linux-gnu/libswresample/swresample.h"
+    header "bridging-header.h"
     export *
 }
