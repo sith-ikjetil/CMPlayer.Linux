@@ -496,7 +496,7 @@ internal class M4aAudioPlayer {
 
             // Print metadata
             var tag: UnsafeMutablePointer<AVDictionaryEntry>? = nil
-            while let nextTag = av_dict_get(formatContext?.pointee.metadata, nil, tag, AV_DICT_IGNORE_SUFFIX) {
+            while let nextTag = av_dict_get(formatContext?.pointee.metadata, "", tag, AV_DICT_IGNORE_SUFFIX) {
                 if let key = nextTag.pointee.key, let value = nextTag.pointee.value {
                     let checkKey = String(cString: key).lowercased()
                     switch checkKey {
@@ -525,12 +525,12 @@ internal class M4aAudioPlayer {
             avformat_close_input(&formatContext)
             
             // Log we found metadatda
-            PlayerLog.ApplicationLog?.logInformation(title: "[M4aAudioPlayer].gatherMetadata()", text: "Found metadata for: \(path.lastPathComponent)")
+            PlayerLog.ApplicationLog?.logInformation(title: "[M4aAudioPlayer].gatherMetadata()", text: "Found metadata for: \(path.path)")
 
             return metadata         
         }
 
-        let msg = "[M4aAudioPlayer].gatherMetadata(). Unknown file type from file: \(path.lastPathComponent)"
+        let msg = "[M4aAudioPlayer].gatherMetadata(). Unknown file type from file: \(path.path)"
         throw CmpError(message: msg)
     }
 }// AudioPlayer
