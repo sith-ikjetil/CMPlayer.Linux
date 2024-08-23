@@ -757,26 +757,30 @@ func extractMetadataYear(text: String) -> Int {
     return 0
 }
 
-func PrintSoundCheck() {
-    print("CMPlayer Sound Check")
-    print("====================")
+func PrintAndExecuteIntegrityCheck() {
+    print("CMPlayer Integrity Check")
+    print("========================")
+    PrintAndExecuteOutputDevices()
+    PrintAndExecuteLibraryFiles()
+}
 
+func PrintAndExecuteOutputDevices() {    
     // Get the list of available drivers
     var driverCount: Int32 = 0
     if let driverInfoList = ao_driver_info_list(&driverCount) {
         // Iterate through the available drivers and print them
         if driverCount > 0 {
-            print("Found audio output devices. Sound should be possible.")
+            print("(i): Found audio output devices. Sound should be possible.")
         }
         else {
-            print("Found no audio output devices. Sound should not be possible.")
+            print("(e): Found no audio output devices. Sound should not be possible.")
         }
         print("")
-        print("Drivers")
+        print("Drivers:")
         for i in 0..<Int(driverCount) {
             if let driverInfoPointer = driverInfoList[i] {
                 let driverInfo = driverInfoPointer.pointee
-                print(" \(String(cString: driverInfo.name))")            
+                print(" > \(String(cString: driverInfo.name))")            
                 //if driverInfo.type == AO_TYPE_LIVE {
                 //    print("  Description: \(String(cString: driverInfo.short_name))")
                 //    print("  Comment: \(String(cString: driverInfo.comment))\n")                    
@@ -785,8 +789,61 @@ func PrintSoundCheck() {
         }
     } 
     else {
-        print("An error occurred.")
-        print("Message: Failed to retrieve audio driver information.")
+        print("(e): An error occurred.")
+        print("(e): Failed to retrieve audio driver information.")
     }
     print("")
+}
+
+func PrintAndExecuteLibraryFiles() {    
+    let files: [String] = ["libao.so",
+                           "libavcodec.so",
+                           "libavformat.so",
+                           "libavutil.so",
+                           "libmpg123.so"]
+
+    let directories: [String] = ["/usr"]
+
+    print("Libraries:")
+    for i: Int in 0..<files.count {
+        let fileName = files[i]
+        var dir: String = ""
+        var bFound: Bool = false
+        for j: Int in 0..<directories.count {
+            let directory: String = directories[j]
+            var isDirectory: ObjCBool = false
+            let exists = FileManager.default.fileExists(atPath: directory, isDirectory: &isDirectory)
+            if exists && isDirectory.boolValue {
+                if let fileURL: URL = findFile(named: fileName, under: URL(fileURLWithPath: directory)) {
+                    dir = fileURL.deletingLastPathComponent().path
+                    bFound = true
+                    break
+                }            
+            }
+        }
+
+        if bFound {
+            print(" > \(fileName.convertStringToLengthPaddedString(18, .left," ")) found at: \(dir)")
+        }
+        else {
+            print(" > \(fileName.convertStringToLengthPaddedString(18, .left," ")) NOT found!")
+        }
+    }
+    print("")
+}
+
+func findFile(named fileName: String, under directory: URL) -> URL? {
+    let fileManager = FileManager.default
+    
+    // Create a recursive enumerator to go through all directories and files
+    let enumerator = fileManager.enumerator(at: directory, includingPropertiesForKeys: nil)
+    
+    // Iterate through the enumerator
+    while let fileURL = enumerator?.nextObject() as? URL {
+        if fileURL.lastPathComponent == fileName {
+            return fileURL
+        }
+    }
+    
+    return nil
 }

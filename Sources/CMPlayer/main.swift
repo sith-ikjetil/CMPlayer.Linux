@@ -48,27 +48,27 @@ internal var g_rows: Int = -1
 internal var g_cols: Int = -1
 internal var g_quit: Bool = false
 internal var g_doNotPaint: Bool = false
-internal var g_doSoundCheck: Bool = false
 //
 // Startup code
 //
 // Check for command line arguments.
 if CommandLine.argc >= 2 {
-    if CommandLine.arguments[1].lowercased() == "--sound-check" {
-        g_doSoundCheck = true
+    if CommandLine.arguments[1].lowercased() == "--integrity-check" {
+        // initialize libao
+        ao_initialize()        
+        PrintAndExecuteIntegrityCheck()
+        // shutdown ao
+        ao_shutdown() 
+        exit(ExitCodes.SUCCESS.rawValue)   
     }
     else {
         print("CMPlayer")
         print("=========================")
         print("Usage: cmplayer <options>")
         print("<option>")
-        print(" --help        = show this help screen")
-        print(" --sound-check = do a check for sound output")
-        print("")
-        print("Built and tested:")
-        print(" v1.5.5.0 = swift-5.10.1, libmpg123, ffmpeg, libao, libavcodec, libavutil")
-        print("            libavformat")
-        print("")
+        print(" --help            = show this help screen")
+        print(" --integrity-check = do an integrity check")
+        print("")        
         exit(ExitCodes.SUCCESS.rawValue)
     }    
 }
@@ -90,12 +90,6 @@ atexit( {
     mpg123_exit()
     ao_shutdown()
 })
-
-// if do sound check, print out and exit
-if g_doSoundCheck {
-    PrintSoundCheck()
-    exit(ExitCodes.SUCCESS.rawValue)
-}
 
 // we have normal startup
 // redirect stderr

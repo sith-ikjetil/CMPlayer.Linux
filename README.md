@@ -52,15 +52,16 @@ put them into your .bashrc and .bash_profile using the following:
 PATH=/opt/swift-5.10.1/usr/bin:$PATH
 (the path is ofcourse up to you where you put swift)
 
-## Header files for Cffmpeg
+## Preprocessor Flags
 There are the following preprocessor flags defined in Package.swift:
-### Cffmpeg
- - CMP_FFMPEG_V6 (for ffmpeg v4)
- - CMP_FFMPEG_V4 (for ffmpeg v5)
+ - CMP_FFMPEG_V6 (for ffmpeg v6)
+ - CMP_FFMPEG_V4 (for ffmpeg v4)
  - CMP_TARGET_UBUNTU (for Ubuntu)
  - CMP_TARGET_FEDORA (for Fedora)
 
-Uncomment any flag that is not your platform or target distro.
+Uncomment any flag that is not your version of ffmpeg or target distro.
+
+## Header files for Cffmpeg
 
 ### Ubuntu
 Are located at:
