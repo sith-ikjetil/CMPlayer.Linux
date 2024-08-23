@@ -1,0 +1,8 @@
+module Cffmpeg {
+    header "/usr/include/x86_64-linux-gnu/libavformat/avformat.h"
+    header "/usr/include/x86_64-linux-gnu/libavcodec/avcodec.h"
+    header "/usr/include/x86_64-linux-gnu/libavutil/avutil.h"
+    header "/usr/include/x86_64-linux-gnu/libavutil/opt.h"
+    header "/usr/include/x86_64-linux-gnu/libswresample/swresample.h"
+    export *
+}
