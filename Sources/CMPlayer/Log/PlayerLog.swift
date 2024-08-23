@@ -179,7 +179,7 @@ internal class PlayerLog {
         let xeRoot: XMLElement = XMLElement(name: "Log")
         
         // Set the attribute directly on the root element
-        xeRoot.addAttribute(XMLNode.attribute(withName: "id", stringValue: "CMPlayer.macOS.Log") as! XMLNode)
+        xeRoot.addAttribute(XMLNode.attribute(withName: "id", stringValue: "CMPlayer.Linux.Log") as! XMLNode)
         
         for entry in self.entries
         {
