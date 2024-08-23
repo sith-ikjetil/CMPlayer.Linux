@@ -35,6 +35,11 @@ execute the following commands:
  - sudo dnf install libao
  - sudo dnf install libao-devel
 
+## C_INCLUDE_PATH
+### Fedora
+Remember to set the C_INCLUDE_PATH for ffmpeg headers:
+export C_INCLUDE_PATH=/usr/include/ffmpeg:$C_INCLUDE_PATH
+
 ## LD_LIBRARY_PATH
 After installing Swift, remember to update LD_LIBRARY_PATH. Set 
 the following into your .bashrc and .bash_profile.

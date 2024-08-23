@@ -21,7 +21,7 @@ let g_fver: Int32 = getFFmpegMajorVersion()
 internal struct M4aAudioState {
     var formatCtx: UnsafeMutablePointer<AVFormatContext>?
     var codecCtx: UnsafeMutablePointer<AVCodecContext>?   
-#if CMP_FFMPEG_V6 
+#if CMP_FFMPEG_V6
     var codec: UnsafePointer<AVCodec>?          // ffmpeg version 6    
 #else
     var codec: UnsafeMutablePointer<AVCodec>?   // ffmpeg version 4
@@ -164,8 +164,12 @@ internal class M4aAudioPlayer {
         // Get codec parameters
         let codecpar = self.m_audioState.formatCtx!.pointee.streams![Int(self.m_audioState.audioStreamIndex)]!.pointee.codecpar
         
-        // Find the decoder for the audio stream    
+        // Find the decoder for the audio stream 
+#if CMP_FFMPEG_V6
         self.m_audioState.codec = avcodec_find_decoder(codecpar!.pointee.codec_id)
+#else 
+        self.m_audioState.codec = UnsafeMutablePointer(mutating: avcodec_find_decoder(codecpar!.pointee.codec_id))
+#endif
         if self.m_audioState.codec == nil {
             let msg = "[M4aAudioPlayer].play(). avcodec_find_decoder failed with value: nil. Unsupported codec."
             avformat_close_input(&self.m_audioState.formatCtx)            
