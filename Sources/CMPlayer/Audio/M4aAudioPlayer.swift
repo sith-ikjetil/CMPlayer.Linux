@@ -29,6 +29,11 @@ internal struct M4aAudioState {
 }
 
 //
+// av_ch_layout_stereo
+//
+let av_ch_layout_stereo: Int32 = 1|2
+
+//
 // Represents CMPlayer AudioPlayer.
 //
 internal class M4aAudioPlayer {
@@ -204,7 +209,7 @@ internal class M4aAudioPlayer {
         self.m_audioState.swrCtx = swr_alloc()
         let rawSwrCtxPtr: UnsafeMutableRawPointer? = UnsafeMutableRawPointer(self.m_audioState.swrCtx)
         av_opt_set_int(rawSwrCtxPtr, "in_channel_layout", Int64(self.m_audioState.codecCtx!.pointee.channel_layout), 0)
-        av_opt_set_int(rawSwrCtxPtr, "out_channel_layout", Int64(AV_CH_LAYOUT_STEREO), 0)
+        av_opt_set_int(rawSwrCtxPtr, "out_channel_layout", Int64(av_ch_layout_stereo), 0)
         av_opt_set_int(rawSwrCtxPtr, "in_sample_rate", Int64(self.m_audioState.codecCtx!.pointee.sample_rate), 0)
         av_opt_set_int(rawSwrCtxPtr, "out_sample_rate", 44100, 0)
         av_opt_set_sample_fmt(rawSwrCtxPtr, "in_sample_fmt", self.m_audioState.codecCtx!.pointee.sample_fmt, 0)
