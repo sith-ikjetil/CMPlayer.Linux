@@ -283,6 +283,13 @@ internal class M4aAudioPlayer {
             if retVal < 0 { // ERROR OR EOF < 0
                 return
             }
+
+            guard let _ = self.m_audioState.codecCtx, let _ = self.m_audioState.frame else {
+                let msg = "Codec context or frame is nil."
+                PlayerLog.ApplicationLog?.logError(title: "[M4aPlayer].playAsync()", text: msg)
+                return
+            }
+
             
             if self.m_audioState.packet.stream_index == self.m_audioState.audioStreamIndex {
                 retVal = avcodec_send_packet(self.m_audioState.codecCtx, &self.m_audioState.packet)
