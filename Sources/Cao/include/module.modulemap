@@ -1,4 +1,4 @@
-module Cffmpeg {    
+module Cao {    
     header "bridging-header.h"
     export *
 }

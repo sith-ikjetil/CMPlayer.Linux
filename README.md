@@ -45,8 +45,14 @@ PATH=/opt/swift-5.10.1/usr/bin:$PATH
 (the path is ofcourse up to you where you put swift)
 
 ## Header files for Cffmpeg
-So there are not preprocessor tags in swift which makes it difficult to 
-create projects across many api versions and platforms.
+There are the following preprocessor flags defined in Package.swift:
+### Cffmpeg
+ - CMP_FFMPEG_V6 (for ffmpeg v4)
+ - CMP_FFMPEG_V4 (for ffmpeg v5)
+ - CMP_TARGET_UBUNTU (for Ubuntu)
+ - CMP_TARGET_FEDORA (for Fedora)
+
+Uncomment any flag that is not your platform or target distro.
 
 ### Ubuntu
 Are located at:

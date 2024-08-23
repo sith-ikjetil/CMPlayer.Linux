@@ -20,9 +20,12 @@ let g_fver: Int32 = getFFmpegMajorVersion()
 ///
 internal struct M4aAudioState {
     var formatCtx: UnsafeMutablePointer<AVFormatContext>?
-    var codecCtx: UnsafeMutablePointer<AVCodecContext>?    
-    //var codec: UnsafePointer<AVCodec>?      // ffmpeg version 6    
-    var codec: UnsafeMutablePointer<AVCodec>? // ffmpeg version 4
+    var codecCtx: UnsafeMutablePointer<AVCodecContext>?   
+#if CMP_FFMPEG_V6 
+    var codec: UnsafePointer<AVCodec>?          // ffmpeg version 6    
+#else
+    var codec: UnsafeMutablePointer<AVCodec>?   // ffmpeg version 4
+#endif
     var packet = AVPacket()
     var frame: UnsafeMutablePointer<AVFrame>?
     var swrCtx: OpaquePointer? //UnsafeMutablePointer<SwrContext>?
@@ -206,7 +209,11 @@ internal class M4aAudioPlayer {
         // Set up resampling context
         self.m_audioState.swrCtx = swr_alloc()
         let rawSwrCtxPtr: UnsafeMutableRawPointer? = UnsafeMutableRawPointer(self.m_audioState.swrCtx)
+#if CMP_FFMPEG_V6
         av_opt_set_int(rawSwrCtxPtr, "in_channel_layout", Int64(self.m_audioState.codecCtx!.pointee.channel_layout), 0)
+#else
+        av_opt_set_int(rawSwrCtxPtr, "in_channel_layout", Int64(self.m_audioState.codecCtx!.pointee.channel_layout), 0)
+#endif
         av_opt_set_int(rawSwrCtxPtr, "out_channel_layout", Int64(av_ch_layout_stereo), 0)
         av_opt_set_int(rawSwrCtxPtr, "in_sample_rate", Int64(self.m_audioState.codecCtx!.pointee.sample_rate), 0)
         av_opt_set_int(rawSwrCtxPtr, "out_sample_rate", 44100, 0)

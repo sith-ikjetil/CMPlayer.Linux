@@ -20,12 +20,22 @@ import PackageDescription
                     "Cmpg123",
                     "Cao",
                     "Cffmpeg",
+                ],
+                cSettings: [
+                    .define("CMP_TARGET_UBUNTU"),
+                    //.define("CMP_TARGET_FEDORA"),
+                    .define("CMP_FFMPEG_V4"),
+                    //.define("CMP_FFMPEG_V6"),
                 ]
             ),
             .target(
                 name: "Cmpg123",
                 dependencies: [],
                 cSettings: [
+                    .define("CMP_TARGET_UBUNTU"),
+                    //.define("CMP_TARGET_FEDORA"),
+                    .define("CMP_FFMPEG_V4"),
+                    //.define("CMP_FFMPEG_V6"),
                     .headerSearchPath("include"),                    
                     .define("CMP_MPG123_LIBRARY", to: "1")
                 ],
@@ -37,6 +47,10 @@ import PackageDescription
                 name: "Cao",
                 dependencies: [],
                 cSettings: [
+                    .define("CMP_TARGET_UBUNTU"),
+                    //.define("CMP_TARGET_FEDORA"),
+                    .define("CMP_FFMPEG_V4"),
+                    //.define("CMP_FFMPEG_V6"),
                     .headerSearchPath("include"),                    
                     .define("CMP_AO_LIBRARY", to: "1")
                 ],
@@ -48,6 +62,10 @@ import PackageDescription
                 name: "Cffmpeg",
                 dependencies: [],
                 cSettings: [
+                    .define("CMP_TARGET_UBUNTU"),
+                    //.define("CMP_TARGET_FEDORA"),
+                    .define("CMP_FFMPEG_V4"),
+                    //.define("CMP_FFMPEG_V6"),
                     .headerSearchPath("include"),                    
                     .define("CMP_FFMPEG_LIBRARY", to: "1")
                 ],
