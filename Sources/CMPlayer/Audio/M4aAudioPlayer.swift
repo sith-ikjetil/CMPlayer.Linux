@@ -22,7 +22,8 @@ internal struct M4aAudioState {
     var codecCtx: UnsafeMutablePointer<AVCodecContext>?   
 #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
     var codec: UnsafePointer<AVCodec>?          // ffmpeg version 6    
-    var chLayout: AVChannelLayout = AVChannelLayout()
+    var chLayoutIn: AVChannelLayout = AVChannelLayout()
+    var chLayoutOut: AVChannelLayout = AVChannelLayout()
 #else
     var codec: UnsafeMutablePointer<AVCodec>?   // ffmpeg version 4
 #endif
@@ -221,24 +222,33 @@ internal class M4aAudioPlayer {
         self.m_audioState.swrCtx = swr_alloc()
         let rawSwrCtxPtr: UnsafeMutableRawPointer? = UnsafeMutableRawPointer(self.m_audioState.swrCtx)
 #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7        
-        var ret = av_channel_layout_copy(&self.m_audioState.chLayout, &self.m_audioState.codecCtx!.pointee.ch_layout)        
+        var ret = av_channel_layout_copy(&self.m_audioState.chLayoutIn, &self.m_audioState.codecCtx!.pointee.ch_layout)        
         if ret < 0 {
             let msg = "[M4aAudioPlayer].play(). av_channel_layout_copy failed with value: \(ret)"
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)  
             throw CmpError(message: msg)
         }
-        ret = av_opt_set_chlayout(rawSwrCtxPtr, "in_chlayout", &self.m_audioState.chLayout, 0)        
+        ret = av_opt_set_chlayout(rawSwrCtxPtr, "in_chlayout", &self.m_audioState.chLayoutIn, 0)        
         if ret < 0 {
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout failed with value: \(ret)"
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout IN failed with value: \(ret)"
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)  
             throw CmpError(message: msg)
         }
+        av_channel_layout_default(&self.m_audioState.chLayoutOut, 2);
+        ret = av_opt_set_chlayout(rawSwrCtxPtr, "out_chlayout", &self.m_audioState.chLayoutOut, 0)
+        if ret < 0 {
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout OUT failed with value: \(ret)"
+            avcodec_free_context(&self.m_audioState.codecCtx)
+            avformat_close_input(&self.m_audioState.formatCtx)  
+            throw CmpError(message: msg)
+        }
+        //av_opt_set_int(rawSwrCtxPtr, "out_channel_layout", Int64(av_ch_layout_stereo), 0)
 #else
         av_opt_set_int(rawSwrCtxPtr, "in_channel_layout", Int64(self.m_audioState.codecCtx!.pointee.channel_layout), 0)
-#endif
         av_opt_set_int(rawSwrCtxPtr, "out_channel_layout", Int64(av_ch_layout_stereo), 0)
+#endif        
         av_opt_set_int(rawSwrCtxPtr, "in_sample_rate", Int64(self.m_audioState.codecCtx!.pointee.sample_rate), 0)
         av_opt_set_int(rawSwrCtxPtr, "out_sample_rate", 44100, 0)
         av_opt_set_sample_fmt(rawSwrCtxPtr, "in_sample_fmt", self.m_audioState.codecCtx!.pointee.sample_fmt, 0)
