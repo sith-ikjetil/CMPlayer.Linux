@@ -108,7 +108,7 @@ guard stderr_old != -1 else {
 // normal startup and normal execution continue
 do {
     // set log system
-    PlayerLog.ApplicationLog = PlayerLog(autoSave: true, loadOldLog: false)
+    PlayerLog.ApplicationLog = PlayerLog(autoSave: true, loadOldLog: false, logSaveType: PlayerLogSaveAsType.plainText)
 
     // initialize CMPlayer.Linux
     try g_player.initialize()    

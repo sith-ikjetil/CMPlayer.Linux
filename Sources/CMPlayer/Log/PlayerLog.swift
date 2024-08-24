@@ -18,7 +18,8 @@ internal class PlayerLog {
     ///
     /// static constants/variables
     /// 
-    static let logFilename: String = "CMPlayer.Log.xml"
+    static let logFilenameXml: String = "CMPlayer.Log.xml"
+    static let logFilenamePlainText: String = "CMPlayer.Log.txt"
     static var ApplicationLog: PlayerLog? = nil 
     ///
     /// variables
@@ -28,12 +29,14 @@ internal class PlayerLog {
     /// private variables
     /// 
     private var autoSave: Bool = true    
+    private var saveType: PlayerLogSaveAsType = PlayerLogSaveAsType.plainText
     ///
     /// Overloaded initializer.
     ///
-    init(autoSave: Bool, loadOldLog: Bool ){
+    init(autoSave: Bool, loadOldLog: Bool, logSaveType: PlayerLogSaveAsType ){
         self.autoSave = autoSave
-                
+        self.saveType = logSaveType
+
         if loadOldLog {
             self.loadOldLog()
         }
@@ -42,7 +45,11 @@ internal class PlayerLog {
     /// Loads old log into memory
     ///
     func loadOldLog() {
-        let url: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilename, isDirectory: false)
+        guard self.saveType == .xml else {
+            return
+        }
+        
+        let url: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenameXml, isDirectory: false)
         
         do {
             if FileManager.default.fileExists(atPath: url.path) {
@@ -193,17 +200,53 @@ internal class PlayerLog {
     ///
     /// Saves the log
     ///
-    internal func saveLog()
+    internal func saveLogAsXml()
     {                
         let xd: XMLDocument = self.saveLogAsXMLDocument()
         let xml: String = xd.xmlString
-        let url: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilename, isDirectory: false)
+        let url: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenameXml, isDirectory: false)
         
         do {
             try xml.write(to: url, atomically: true,encoding: .utf8)            
         }
         catch {
             PlayerLog.ApplicationLog?.logError(title: "[PlayerLog].saveLog()", text: "\(error)")
+        }
+    }    
+    /// 
+    /// saveLog saves as any one of several types.
+    /// 
+    /// - Parameter type: format to save to
+    internal func saveLog() {
+        switch self.saveType {
+            case .xml:
+                self.saveLogAsXml() 
+            case .plainText:
+                self.saveLogAsPlainText()
+        }
+    }
+    ///
+    /// Saves the log
+    ///
+    internal func saveLogAsPlainText()
+    {    
+        var text: String = ""
+                    
+        for entry in self.entries
+        {
+            text += "[\(entry.type)] \(entry.timeStamp)"
+            text += "\n"
+            text += "\(entry.title)"
+            text += "\n"
+            text += "\(entry.text)"
+            text += "\n\n"
+        }
+
+        let path: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenamePlainText, isDirectory: false)
+        do {
+            try text.write(to: path, atomically: true, encoding: .utf8)
+        } catch {
+
         }
     }    
     ///
