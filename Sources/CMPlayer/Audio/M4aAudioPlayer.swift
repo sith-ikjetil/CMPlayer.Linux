@@ -24,7 +24,7 @@ internal struct M4aAudioState {
     var codec: UnsafePointer<AVCodec>?          // ffmpeg version 6    
     var chLayoutIn: AVChannelLayout = AVChannelLayout()
     var chLayoutOut: AVChannelLayout = AVChannelLayout()
-#else
+#elseif CMP_FFMPEG_V4
     var codec: UnsafeMutablePointer<AVCodec>?   // ffmpeg version 4
 #endif
     var packet = AVPacket()
@@ -175,7 +175,7 @@ internal class M4aAudioPlayer {
         // Find the decoder for the audio stream 
 #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
         self.m_audioState.codec = avcodec_find_decoder(codecpar!.pointee.codec_id)
-#else
+#elseif CMP_FFMPEG_V4
         self.m_audioState.codec = UnsafeMutablePointer(mutating: avcodec_find_decoder(codecpar!.pointee.codec_id))
 #endif
         if self.m_audioState.codec == nil {
@@ -243,9 +243,8 @@ internal class M4aAudioPlayer {
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)  
             throw CmpError(message: msg)
-        }
-        //av_opt_set_int(rawSwrCtxPtr, "out_channel_layout", Int64(av_ch_layout_stereo), 0)
-#else
+        }        
+#elseif CMP_FFMPEG_V4
         av_opt_set_int(rawSwrCtxPtr, "in_channel_layout", Int64(self.m_audioState.codecCtx!.pointee.channel_layout), 0)
         av_opt_set_int(rawSwrCtxPtr, "out_channel_layout", Int64(av_ch_layout_stereo), 0)
 #endif        
