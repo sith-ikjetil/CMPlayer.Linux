@@ -22,7 +22,7 @@ internal struct M4aAudioState {
     var codecCtx: UnsafeMutablePointer<AVCodecContext>?   
 #if CMP_FFMPEG_V6
     var codec: UnsafePointer<AVCodec>?          // ffmpeg version 6    
-    var chLayout: AVChannelLayout?
+    var chLayout: AVChannelLayout = AVChannelLayout()
 #else
     var codec: UnsafeMutablePointer<AVCodec>?   // ffmpeg version 4
 #endif
@@ -213,10 +213,21 @@ internal class M4aAudioPlayer {
         // Set up resampling context
         self.m_audioState.swrCtx = swr_alloc()
         let rawSwrCtxPtr: UnsafeMutableRawPointer? = UnsafeMutableRawPointer(self.m_audioState.swrCtx)
-#if CMP_FFMPEG_V6
-        self.m_audioState.chLayout = AVChannelLayout()
-        av_channel_layout_copy(&self.m_audioState.chLayout!, &self.m_audioState.codecCtx!.pointee.ch_layout)        
-        av_opt_set(rawSwrCtxPtr, "in_chlayout", &self.m_audioState.chLayout!, 0)        
+#if CMP_FFMPEG_V6        
+        var ret = av_channel_layout_copy(&self.m_audioState.chLayout, &self.m_audioState.codecCtx!.pointee.ch_layout)        
+        if ret < 0 {
+            let msg = "[M4aAudioPlayer].play(). av_channel_layout_copy failed with value: \(ret)"
+            avcodec_free_context(&self.m_audioState.codecCtx)
+            avformat_close_input(&self.m_audioState.formatCtx)  
+            throw CmpError(message: msg)
+        }
+        ret = av_opt_set_chlayout(rawSwrCtxPtr, "in_chlayout", &self.m_audioState.chLayout, 0)        
+        if ret < 0 {
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout failed with value: \(ret)"
+            avcodec_free_context(&self.m_audioState.codecCtx)
+            avformat_close_input(&self.m_audioState.formatCtx)  
+            throw CmpError(message: msg)
+        }
 #else
         av_opt_set_int(rawSwrCtxPtr, "in_channel_layout", Int64(self.m_audioState.codecCtx!.pointee.channel_layout), 0)
 #endif
