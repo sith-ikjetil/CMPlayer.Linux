@@ -539,7 +539,7 @@ internal class M4aAudioPlayer {
                             metadata.genre = String(cString: value)
                         case "track":
                             metadata.trackNo =  extractMetadataTrackNo(text: String(cString: value))
-                        case "year", "date":
+                        case "year", "date", "time":
                             if metadata.recordingYear == 0 {
                                 metadata.recordingYear = extractMetadataYear(text: String(cString: value))
                             }                
