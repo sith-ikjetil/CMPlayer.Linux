@@ -7,4 +7,7 @@
 #elif CMP_TARGET_FEDORA_V40
 #include </usr/include/ao/ao.h>
 #include </usr/include/ao/os_types.h>
+#elif CMP_TARGET_MANJARO_V24
+#include </usr/include/ao/ao.h>
+#include </usr/include/ao/os_types.h>
 #endif

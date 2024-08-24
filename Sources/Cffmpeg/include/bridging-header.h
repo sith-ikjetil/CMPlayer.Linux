@@ -16,6 +16,12 @@
 #include </usr/include/ffmpeg/libswresample/swresample.h>
 #include </usr/include/ffmpeg/libavutil/opt.h>
 #include </usr/include/ffmpeg/libavutil/dict.h>
+#elif CMP_TARGET_MANJARO_V24
+#include </usr/include/libavformat/avformat.h>
+#include </usr/include/libavcodec/avcodec.h>
+#include </usr/include/libswresample/swresample.h>
+#include </usr/include/libavutil/opt.h>
+#include </usr/include/libavutil/dict.h>
 #endif
 
 #if LIBAVCODEC_VERSION_MAJOR >= 59

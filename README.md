@@ -46,6 +46,12 @@ execute the following commands:
  - sudo dnf install libmpg123-devel
  - sudo dnf install libao
  - sudo dnf install libao-devel
+
+## Manjaro
+In order to get these libraries onto you Manjaro distro, you can  
+execute the following commands:
+ - sudo pacman -Syu libao
+ - sudo pacman -Syu mpg123
   
 ## C_INCLUDE_PATH
 ### Fedora
