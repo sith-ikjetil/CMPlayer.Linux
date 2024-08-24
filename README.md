@@ -79,31 +79,37 @@ PATH=/opt/swift-5.10.1/usr/bin:$PATH
 ## Preprocessor Flags
 There are the following preprocessor flags defined in Package.swift:
 ### cSettings and swiftSettings
- - CMP_FFMPEG_V6            (for ffmpeg v6)
- - CMP_FFMPEG_V4            (for ffmpeg v4)
- - CMP_TARGET_UBUNTU        (for Ubuntu)
- - CMP_TARGET_UBUNTU_V24_04 (for Ubuntu 24_04)
- - CMP_TARGET_FEDORA        (for Fedora)
+ - CMP_FFMPEG_V7            (ffmpeg v7)
+ - CMP_FFMPEG_V6            (ffmpeg v6)
+ - CMP_FFMPEG_V4            (ffmpeg v4)
+ - CMP_TARGET_UBUNTU_V22_04 (Ubuntu 22.04)
+ - CMP_TARGET_UBUNTU_V24_04 (Ubuntu 24.04)
+ - CMP_TARGET_FEDORA_V40    (Fedora 40)
+ - CMP_TARGET_MANJARO_V24   (Manjaro 24)
   
 Uncomment any flag that is not your version of ffmpeg or target distro.  
   
 ## Header Files
-  
-### Cffmpeg
+The following are the location of include header files to the  
+Swift C wrapper libraries used by CMPlayer.Linux.    
+### Cffmpeg (swift C wrapper library for ffmpeg)
 Are located at:
- - /usr/include/x86_64-linux-gnu/*library* (Ubuntu)
- - /usr/include/ffmpeg/*library* (Fedora)
+ - /usr/include/x86_64-linux-gnu/*library* (Ubuntu 22.04, 24.04)
+ - /usr/include/ffmpeg/*library* (Fedora 40)
+ - /usr/include/*library* (Manjaro 24)
   
-### Cao
+### Cao (swift C wrapper library for libao)
 Are located at:
- - /usr/include/ao/ (Ubuntu)
+ - /usr/include/ao/ (Ubuntu 22.04, 24.04)
  - /usr/include/ao/ (Fedora)
+ - /usr/include/ao/ (Manjaro)
   
-### Cmpg123
+### Cmpg123 (swift C wrapper library for libmpg123)
 Are located at:
- - /usr/include/ (Ubuntu)
+ - /usr/include/ (Ubuntu 22.04)
  - /usr/include/x86_64-linux-gnu/ (Ubuntu 24.04)
- - /usr/include/ (Fedora)
+ - /usr/include/ (Fedora 40)
+ - /usr/include/ (Manjaro 24)
   
 ## CMPlayer.Linux (in app) Help Text
 ```
