@@ -1,9 +1,8 @@
 //
 //  ConsoleKey.swift
-//  CMPlayer
 //
-//  Created by Kjetil Kr Solberg on 07/10/2019.
-//  Copyright © 2019 Kjetil Kr Solberg. All rights reserved.
+//  Created by Kjetil Kr Solberg on 24-09-2024.
+//  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
 //
 
 //

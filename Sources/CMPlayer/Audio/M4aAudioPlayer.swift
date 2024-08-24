@@ -1,9 +1,8 @@
 //
 //  AudioPlayer.swift
-//  ConsoleMusicPlayer-macOS
 //
-//  Created by Kjetil Kr Solberg on 21/09/2019.
-//  Copyright © 2019 Kjetil Kr Solberg. All rights reserved.
+//  Created by Kjetil Kr Solberg on 24-09-2024.
+//  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
 //
 
 //
@@ -23,6 +22,7 @@ internal struct M4aAudioState {
     var codecCtx: UnsafeMutablePointer<AVCodecContext>?   
 #if CMP_FFMPEG_V6
     var codec: UnsafePointer<AVCodec>?          // ffmpeg version 6    
+    var chLayout: AVChannelLayout?
 #else
     var codec: UnsafeMutablePointer<AVCodec>?   // ffmpeg version 4
 #endif
@@ -167,11 +167,11 @@ internal class M4aAudioPlayer {
         // Find the decoder for the audio stream 
 #if CMP_FFMPEG_V6
         self.m_audioState.codec = avcodec_find_decoder(codecpar!.pointee.codec_id)
-#else 
+#else
         self.m_audioState.codec = UnsafeMutablePointer(mutating: avcodec_find_decoder(codecpar!.pointee.codec_id))
 #endif
         if self.m_audioState.codec == nil {
-            let msg = "[M4aAudioPlayer].play(). avcodec_find_decoder failed with value: nil. Unsupported codec."
+            let msg = "[M4aAudioPlayer].play(). avcodec_find_decoder failed with value: nil. Unsupported codec: \(codecpar!.pointee.codec_id)."
             avformat_close_input(&self.m_audioState.formatCtx)            
             throw CmpError(message: msg)
         }    
@@ -214,7 +214,9 @@ internal class M4aAudioPlayer {
         self.m_audioState.swrCtx = swr_alloc()
         let rawSwrCtxPtr: UnsafeMutableRawPointer? = UnsafeMutableRawPointer(self.m_audioState.swrCtx)
 #if CMP_FFMPEG_V6
-        av_opt_set_int(rawSwrCtxPtr, "in_channel_layout", Int64(self.m_audioState.codecCtx!.pointee.channel_layout), 0)
+        self.m_audioState.chLayout = AVChannelLayout()
+        av_channel_layout_copy(&self.m_audioState.chLayout!, &self.m_audioState.codecCtx!.pointee.ch_layout)        
+        av_opt_set(rawSwrCtxPtr, "in_chlayout", &self.m_audioState.chLayout!, 0)        
 #else
         av_opt_set_int(rawSwrCtxPtr, "in_channel_layout", Int64(self.m_audioState.codecCtx!.pointee.channel_layout), 0)
 #endif
@@ -236,6 +238,9 @@ internal class M4aAudioPlayer {
         self.m_audioState.device = ao_open_live(ao_default_driver_id(), &self.m_audioState.aoFormat, nil)
         if self.m_audioState.device == nil {
             let msg = "[M4aAudioPlayer].play(). ao_open_live failed with value: nil. Error opening audio device."
+#if CMP_FFMPEG_V6
+            av_channel_layout_uninit(&self.m_audioState.chLayout!)
+#endif
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)
             throw CmpError(message: msg)
@@ -258,6 +263,9 @@ internal class M4aAudioPlayer {
 
         // Clean up using defer
         defer {            
+#if CMP_FFMPEG_V6
+            av_channel_layout_uninit(&self.m_audioState.chLayout!)
+#endif
             ao_close(self.m_audioState.device)
             swr_free(&self.m_audioState.swrCtx)
             av_frame_free(&self.m_audioState.frame)

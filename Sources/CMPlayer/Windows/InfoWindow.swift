@@ -1,9 +1,9 @@
 //
-//  HelpWindow.swift
-//  ConsoleMusicPlayer-macOS
+//  InfoWindow.swift
 //
-//  Created by Kjetil Kr Solberg on 20/09/2019.
-//  Copyright © 2019 Kjetil Kr Solberg. All rights reserved.
+//  Created by Kjetil Kr Solberg on 24-09-2024.
+//  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
+//yright © 2019 Kjetil Kr Solberg. All rights reserved.
 //
 
 //

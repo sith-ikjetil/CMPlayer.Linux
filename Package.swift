@@ -27,6 +27,13 @@ import PackageDescription
                     //.define("CMP_TARGET_FEDORA"),
                     .define("CMP_FFMPEG_V4"),
                     //.define("CMP_FFMPEG_V6"),
+                ],
+                swiftSettings: [
+                    .define("CMP_TARGET_UBUNTU"),
+                    //.define("CMP_TARGET_UBUNTU_V24_04"),
+                    //.define("CMP_TARGET_FEDORA"),
+                    .define("CMP_FFMPEG_V4"),
+                    //.define("CMP_FFMPEG_V6"),
                 ]
             ),
             .target(
