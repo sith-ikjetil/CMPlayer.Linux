@@ -1,19 +1,30 @@
-# CMPlayer
+# CMPlayer.Linux
 License: **GPL-3.0-or-later**  
-This is a console music player for Linux. 
-
+This is a console music player for Linux.  
+  
+## Application
+The application name is **cmplayer** and the following  
+arguments are supported:
+ - --Help (shows usage screen)
+ - --integrity-check (does a quick integrity check of cmplayer)
+  
+## Supported File Formats
+The following file formats are currently supported:
+ - .mp3
+ - .m4a
+  
 ## Libraries
 The player uses the following tools and libraries:
- - Swift
+ - Swift (version 5.10.1)
  - libmpg123 (libmpg123.so)
  - ffmpeg
  - libao (libao.so)
  - libavcodec (libavcodec.so)
  - libavformat (libavformat.so)
  - libavutil (libavutil.so)
-
+  
 ## Ubuntu
-In order to get these libraries onto your Ubuntu distro, you can 
+In order to get these libraries onto your Ubuntu distro, you can  
 execute the following commands:
  - sudo apt install ffmpeg
  - sudo apt install libavcodec-dev
@@ -23,9 +34,9 @@ execute the following commands:
  - sudo apt install libao-common 
  - sudo apt install libao-dev
  - On WSL: sudo apt install pulseaudio (Doesn't always work)
-
+   
 ## Fedora
-In order to get these libraries onto you Fedora distro, you can 
+In order to get these libraries onto you Fedora distro, you can   
 execute the following commands:
  - sudo dnf install ffmpeg
  - sudo dnf install --allowerasing libavcodec-free-devel
@@ -34,45 +45,57 @@ execute the following commands:
  - sudo dnf install libmpg123-devel
  - sudo dnf install libao
  - sudo dnf install libao-devel
-
+  
 ## C_INCLUDE_PATH
 ### Fedora
-Remember to set the C_INCLUDE_PATH for ffmpeg headers:
-export C_INCLUDE_PATH=/usr/include/ffmpeg:$C_INCLUDE_PATH
-
+Remember to set the C_INCLUDE_PATH for ffmpeg headers:  
+```bash
+export C_INCLUDE_PATH=/usr/include/ffmpeg:$C_INCLUDE_PATH  
+```
+  
 ## LD_LIBRARY_PATH
-After installing Swift, remember to update LD_LIBRARY_PATH. Set 
-the following into your .bashrc and .bash_profile.
-export LD_LIBRARY_PATH=/opt/swift-5.10.1/usr/lib/swift/linux:$LD_LIBRARY_PATH
-(the path is ofcourse up to you where you put swift)
-
+After installing Swift, remember to update LD_LIBRARY_PATH. Set  
+the following into your .bashrc and .bash_profile.  
+```bash
+export LD_LIBRARY_PATH=/opt/swift-5.10.1/usr/lib/swift/linux:$LD_LIBRARY_PATH\  
+```
+(the path is of course up to you where you put swift)  
+  
 ## PATH
-You must put swift binaries in you path. An example would be to 
-put them into your .bashrc and .bash_profile using the following:
-PATH=/opt/swift-5.10.1/usr/bin:$PATH
-(the path is ofcourse up to you where you put swift)
-
+You must put swift binaries in you path. An example would be to  
+put them into your .bashrc and .bash_profile using the following:  
+```bash
+PATH=/opt/swift-5.10.1/usr/bin:$PATH  
+```
+(the path is of course up to you where you put swift)  
+  
 ## Preprocessor Flags
 There are the following preprocessor flags defined in Package.swift:
  - CMP_FFMPEG_V6 (for ffmpeg v6)
  - CMP_FFMPEG_V4 (for ffmpeg v4)
  - CMP_TARGET_UBUNTU (for Ubuntu)
  - CMP_TARGET_FEDORA (for Fedora)
-
-Uncomment any flag that is not your version of ffmpeg or target distro.
-
-## Header files for Cffmpeg
-
-### Ubuntu
+  
+Uncomment any flag that is not your version of ffmpeg or target distro.  
+  
+## Header Files
+  
+### Cffmpeg
 Are located at:
- - /usr/include/x86_64-linux-gnu/<library>
-
-### Fedora
+ - /usr/include/x86_64-linux-gnu/<library> (Ubuntu)
+ - /usr/include/ffmpeg/<library> (Fedora)
+  
+### Cao
 Are located at:
- - /usr/include/ffmpeg/<library>
-
-
-## CMPlayer (in app) Help Text
+ - /usr/include/ao/ (Ubuntu)
+ - /usr/include/ao/ (Fedora)
+  
+### Cmpg123
+Are located at:
+ - /usr/include/ (Ubuntu)
+ - /usr/include/ (Fedora)
+  
+## CMPlayer.Linux (in app) Help Text
 ```
 <song no>
 :: adds song to playlist
