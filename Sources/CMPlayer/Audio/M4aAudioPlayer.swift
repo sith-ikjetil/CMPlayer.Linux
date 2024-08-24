@@ -54,8 +54,9 @@ internal class M4aAudioPlayer {
     private var m_length: off_t = 0
     private var m_rate: CLong = 0    
     private var m_stopFlag: Bool = false
-    private var m_isPlaying = false
-    private var m_isPaused = false
+    private var m_isPlaying: Bool = false
+    private var m_isPaused: Bool = false
+    private var m_hasPlayed: Bool = false
     private var m_timeElapsed: UInt64 = 0
     private var m_duration: UInt64 = 0
     private var m_channels: Int32 = 2
@@ -77,6 +78,11 @@ internal class M4aAudioPlayer {
         get {
             return self.m_isPaused
         }
+    }
+    var hasPlayed: Bool {
+        get {
+            return self.m_hasPlayed
+        }
     }    
     var timeElapsed: UInt64 {
         get {
@@ -87,7 +93,7 @@ internal class M4aAudioPlayer {
         get {
             return self.m_duration
         }
-    }
+    }    
     ///
     /// Only initializer
     ///
@@ -109,6 +115,7 @@ internal class M4aAudioPlayer {
             return;
         }
 
+        self.m_hasPlayed = false
         self.m_stopFlag = false
 
         // Open audio file
@@ -282,6 +289,8 @@ internal class M4aAudioPlayer {
             av_frame_free(&self.m_audioState.frame)
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)
+            self.m_timeElapsed = self.duration
+            self.m_hasPlayed = true
             self.m_isPlaying = false
             self.m_isPaused = false
             self.m_stopFlag = true        

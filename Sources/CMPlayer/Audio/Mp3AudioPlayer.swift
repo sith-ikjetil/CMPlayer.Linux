@@ -28,8 +28,9 @@ internal class Mp3AudioPlayer {
     private var m_rate: CLong = 0
     private let audioQueue = DispatchQueue(label: "dqueue.cmp.linux.mp3-audio-player", qos: .background)
     private var m_stopFlag: Bool = false
-    private var m_isPlaying = false
-    private var m_isPaused = false
+    private var m_isPlaying: Bool = false    
+    private var m_isPaused: Bool = false
+    private var m_hasPlayed: Bool = false
     private var m_timeElapsed: UInt64 = 0
     private var m_duration: UInt64 = 0
     private var m_channels: Int32 = 2
@@ -51,6 +52,11 @@ internal class Mp3AudioPlayer {
             return self.m_isPaused
         }
     }    
+    var hasPlayed: Bool {
+        get {
+            return self.m_hasPlayed
+        }
+    }
     var timeElapsed: UInt64 {
         get {
             return self.m_timeElapsed
@@ -83,6 +89,7 @@ internal class Mp3AudioPlayer {
         }
 
         // set flags
+        self.m_hasPlayed = false
         self.m_stopFlag = false
 
         // make sure mpg123Handle is not already set
@@ -200,7 +207,9 @@ internal class Mp3AudioPlayer {
             ao_close(device)            
             mpg123_close(self.mpg123Handle)
             mpg123_delete(self.mpg123Handle)
+            self.m_timeElapsed = self.duration
             self.mpg123Handle = nil
+            self.m_hasPlayed = true
             self.m_isPlaying = false
             self.m_isPaused = false   
             self.m_stopFlag = true                 

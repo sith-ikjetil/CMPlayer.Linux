@@ -48,6 +48,15 @@ internal class CmpAudioPlayer {
         }
         return false
     }    
+    var hasPlayed: Bool {
+        if self.mp3Player != nil {
+            return self.mp3Player!.hasPlayed
+        }
+        else if self.m4aPlayer != nil {
+            return self.m4aPlayer!.hasPlayed
+        }
+        return false
+    }    
     var timeElapsed: UInt64 {
         get {
             if mp3Player != nil {

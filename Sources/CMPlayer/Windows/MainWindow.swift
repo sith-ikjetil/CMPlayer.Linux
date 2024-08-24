@@ -388,6 +388,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     if g_player.audioPlayerActive == 1 && g_player.audio1 != nil {
                         if (PlayerPreferences.crossfadeSongs && g_player.durationAudioPlayer1 <= PlayerPreferences.crossfadeTimeInSeconds * 1000)
                             || g_player.durationAudioPlayer1 <= 1000                             
+                            || g_player.audio1?.hasPlayed == true
                         {
                             g_player.skip(crossfade: PlayerPreferences.crossfadeSongs)
                         }
@@ -395,6 +396,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     else if g_player.audioPlayerActive == 2 && g_player.audio2 != nil {
                         if (PlayerPreferences.crossfadeSongs && g_player.durationAudioPlayer2 <= PlayerPreferences.crossfadeTimeInSeconds * 1000)
                             || g_player.durationAudioPlayer2 <= 1000                             
+                            || g_player.audio2?.hasPlayed == true
                         {
                             g_player.skip(crossfade: PlayerPreferences.crossfadeSongs)
                         }
