@@ -103,7 +103,7 @@ internal class Player {
                     try self.audio1?.play()
                 }                
             }
-            else if player == 2 {
+            else if player == 2 {                
                 if self.audio2 == nil {
                     self.audio2 = CmpAudioPlayer(path:g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer2 = g_playlist[playlistIndex].duration
@@ -118,6 +118,10 @@ internal class Player {
             }
         }
         catch let error as CmpError {
+            // allow for concurrent threads to exit
+            g_quit = true
+            Thread.sleep(forTimeInterval: TimeInterval(g_asyncCompletionDelay)) 
+
             let msg = "CMPlayer ABEND.\n[Player].play(player,playlistIndex).\nError playing player \(player) on index \(playlistIndex).\nMessage: \(error.message)"            
             
             Console.clearScreen()
@@ -130,6 +134,10 @@ internal class Player {
             exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
         }
         catch {
+            // allow for concurrent threads to exit
+            g_quit = true
+            Thread.sleep(forTimeInterval: TimeInterval(g_asyncCompletionDelay)) 
+
             let msg = "CMPlayer ABEND.\n[Player].play(player,playlistIndex).\nUnknown error playing player \(player) on index \(playlistIndex).\nMessage: \(error)"            
             
             Console.clearScreen()

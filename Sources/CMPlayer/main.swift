@@ -27,6 +27,7 @@ internal let g_versionString: String = "1.5.5.0"
 internal let g_lock = NSLock()     // global lock 
 internal let g_crossfadeMinTime: Int = 1   // seconds
 internal let g_crossfadeMaxTime: Int = 20  // seconds
+internal let g_asyncCompletionDelay: Float = 0.2
 //
 // Global variables/properties
 //
@@ -83,9 +84,7 @@ guard mpg123_init() == 0 else {
 ao_initialize()
 
 // ensure we exit/close libmpg123/libao
-atexit( {
-    // let all players stop playing and clean up
-    Thread.sleep(forTimeInterval: TimeInterval(200) / 1000)
+atexit( {    
     // close libraries
     mpg123_exit()
     ao_shutdown()
@@ -95,7 +94,7 @@ atexit( {
 // redirect stderr
 // we do this to remove process_comment messages
 let stderr_old = redirect_stderr()
-guard stderr_old != -1 else {
+guard stderr_old != -1 else {    
     print("Failed to redirect stderr to /dev/null")
     exit(ExitCodes.ERROR_REDIRECT.rawValue)
 }
@@ -108,9 +107,15 @@ do {
 
     // initialize CMPlayer.Linux
     try g_player.initialize()    
-
+    
     // run the program and save exit code
     try g_player.run()
+
+    // ensure g_quit is true to let all async code to exit
+    g_quit = true
+    
+    // let all players stop playing and clean up
+    Thread.sleep(forTimeInterval: TimeInterval(g_asyncCompletionDelay))
 
     // restore stderr
     restore_stderr(stderr_old)    
@@ -128,6 +133,10 @@ do {
     // exit with exit code
     exit(ExitCodes.SUCCESS.rawValue)
 } catch let error as CmpError {
+    // allow for concurrent threads to exit
+    g_quit = true
+    Thread.sleep(forTimeInterval: TimeInterval(g_asyncCompletionDelay))
+
     let msg = "CMPlayer ABEND.\nException caught.\nMessage: \(error.message)"    
 
     Console.clearScreen()
@@ -139,6 +148,10 @@ do {
     PlayerLog.ApplicationLog?.logError(title: "CMPlayer", text: msg)
     exit(ExitCodes.ERROR_UNKNOWN.rawValue)
 } catch {        
+    // allow for concurrent threads to exit
+    g_quit = true
+    Thread.sleep(forTimeInterval: TimeInterval(g_asyncCompletionDelay))
+
     let msg = "CMPlayer ABEND.\nUnknown exception caught.\nMessage: \(error)"
 
     Console.clearScreen()
