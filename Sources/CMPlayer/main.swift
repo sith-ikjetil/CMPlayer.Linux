@@ -62,12 +62,18 @@ if CommandLine.argc >= 2 {
         ao_shutdown() 
         exit(ExitCodes.SUCCESS.rawValue)   
     }
+    else if CommandLine.arguments[1].lowercased() == "--version" {
+        print("CMPlayer v\(g_versionString)")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
     else {
         print("CMPlayer")
         print("=========================")
         print("Usage: cmplayer <options>")
         print("<option>")
         print(" --help            = show this help screen")
+        print(" --version         = show version numbers")
         print(" --integrity-check = do an integrity check")
         print("")        
         exit(ExitCodes.SUCCESS.rawValue)
