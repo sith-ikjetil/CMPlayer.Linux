@@ -23,6 +23,7 @@ import PackageDescription
                 ],
                 cSettings: [
                     .define("CMP_TARGET_UBUNTU"),
+                    //.define("CMP_TARGET_UBUNTU_V24_04"),
                     //.define("CMP_TARGET_FEDORA"),
                     .define("CMP_FFMPEG_V4"),
                     //.define("CMP_FFMPEG_V6"),
@@ -31,13 +32,8 @@ import PackageDescription
             .target(
                 name: "Cmpg123",
                 dependencies: [],
-                cSettings: [
-                    .define("CMP_TARGET_UBUNTU"),
-                    //.define("CMP_TARGET_FEDORA"),
-                    .define("CMP_FFMPEG_V4"),
-                    //.define("CMP_FFMPEG_V6"),
-                    .headerSearchPath("include"),                    
-                    .define("CMP_MPG123_LIBRARY", to: "1")
+                cSettings: [                    
+                    .headerSearchPath("include"),
                 ],
                 linkerSettings: [
                     .linkedLibrary("mpg123"),                    
@@ -47,12 +43,7 @@ import PackageDescription
                 name: "Cao",
                 dependencies: [],
                 cSettings: [
-                    .define("CMP_TARGET_UBUNTU"),
-                    //.define("CMP_TARGET_FEDORA"),
-                    .define("CMP_FFMPEG_V4"),
-                    //.define("CMP_FFMPEG_V6"),
                     .headerSearchPath("include"),                    
-                    .define("CMP_AO_LIBRARY", to: "1")
                 ],
                 linkerSettings: [
                     .linkedLibrary("ao"),                    
@@ -62,12 +53,7 @@ import PackageDescription
                 name: "Cffmpeg",
                 dependencies: [],
                 cSettings: [
-                    .define("CMP_TARGET_UBUNTU"),
-                    //.define("CMP_TARGET_FEDORA"),
-                    .define("CMP_FFMPEG_V4"),
-                    //.define("CMP_FFMPEG_V6"),
                     .headerSearchPath("include"),                    
-                    .define("CMP_FFMPEG_LIBRARY", to: "1")
                 ],
                 linkerSettings: [
                     .linkedLibrary("avcodec"),
