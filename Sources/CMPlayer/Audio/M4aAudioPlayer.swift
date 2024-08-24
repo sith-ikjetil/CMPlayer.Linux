@@ -267,7 +267,8 @@ internal class M4aAudioPlayer {
         if self.m_audioState.device == nil {
             let msg = "[M4aAudioPlayer].play(). ao_open_live failed with value: nil. Error opening audio device."
 #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
-            av_channel_layout_uninit(&self.m_audioState.chLayout)
+            av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
+            av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
 #endif
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)
@@ -292,7 +293,8 @@ internal class M4aAudioPlayer {
         // Clean up using defer
         defer {            
 #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
-            av_channel_layout_uninit(&self.m_audioState.chLayout)
+            av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
+            av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
 #endif
             ao_close(self.m_audioState.device)
             swr_free(&self.m_audioState.swrCtx)
