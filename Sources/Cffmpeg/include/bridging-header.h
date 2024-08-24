@@ -1,4 +1,4 @@
-#ifdef CMP_TARGET_UBUNTU
+#ifdef CMP_TARGET_UBUNTU_V22_04
 #include </usr/include/x86_64-linux-gnu/libavformat/avformat.h>
 #include </usr/include/x86_64-linux-gnu/libavcodec/avcodec.h>
 #include </usr/include/x86_64-linux-gnu/libswresample/swresample.h>
@@ -10,7 +10,7 @@
 #include </usr/include/x86_64-linux-gnu/libswresample/swresample.h>
 #include </usr/include/x86_64-linux-gnu/libavutil/opt.h>
 #include </usr/include/x86_64-linux-gnu/libavutil/dict.h>
-#elif CMP_TARGET_FEDORA
+#elif CMP_TARGET_FEDORA_V40
 #include </usr/include/ffmpeg/libavformat/avformat.h>
 #include </usr/include/ffmpeg/libavcodec/avcodec.h>
 #include </usr/include/ffmpeg/libswresample/swresample.h>

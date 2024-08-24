@@ -22,18 +22,20 @@ import PackageDescription
                     "Cffmpeg",
                 ],
                 cSettings: [
-                    .define("CMP_TARGET_UBUNTU"),
+                    .define("CMP_TARGET_UBUNTU_V22_04"),
                     //.define("CMP_TARGET_UBUNTU_V24_04"),
-                    //.define("CMP_TARGET_FEDORA"),
+                    //.define("CMP_TARGET_FEDORA_V40"),
                     .define("CMP_FFMPEG_V4"),
                     //.define("CMP_FFMPEG_V6"),
+                    //.define("CMP_FFMPEG_V7"),
                 ],
                 swiftSettings: [
-                    .define("CMP_TARGET_UBUNTU"),
+                    .define("CMP_TARGET_UBUNTU_V22_04"),
                     //.define("CMP_TARGET_UBUNTU_V24_04"),
-                    //.define("CMP_TARGET_FEDORA"),
+                    //.define("CMP_TARGET_FEDORA_V40"),
                     .define("CMP_FFMPEG_V4"),
                     //.define("CMP_FFMPEG_V6"),
+                    //.define("CMP_FFMPEG_V7"),
                 ]
             ),
             .target(
