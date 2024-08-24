@@ -18,8 +18,7 @@ import Cmpg123
 internal class SongEntry {
     //
     // variables
-    //
-    let unknownMetadataStringValue: String = "--unknown--"
+    //    
     var songNo: Int = 0
     var artist: String = ""
     var fullArtist: String = ""
@@ -221,7 +220,7 @@ internal class SongEntry {
     func trimAndSetStringDefaultValue(str: String) -> String {
         var s = str.trimmingCharacters(in: .whitespacesAndNewlines)
         if s.count == 0 {
-            s = self.unknownMetadataStringValue
+            s = g_metadataNotFoundName
         }
         return s
     }

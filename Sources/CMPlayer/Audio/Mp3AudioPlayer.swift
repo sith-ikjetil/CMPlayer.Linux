@@ -428,39 +428,64 @@ internal class Mp3AudioPlayer {
                 // Call the mpg123_id3 function to fill in the pointers
                 let err = mpg123_id3(handle, id3v1Pointer, id3v2Pointer)
                 if err == 0 {
+                    var bFoundTitle: Bool = false
+                    var bFoundArtist: Bool = false
+                    var bFoundAlbumName: Bool = false
+                    var bFoundYear: Bool = false
+                    var bFoundGenre: Bool = false
                     if let id3v2 = id3v2Pointer?.pointee?.pointee {
                         // Access ID3v2 metadata fields safely
                         if id3v2.title?.pointee.p != nil {
                             let title = String(cString: id3v2.title.pointee.p)
-                            metadata.title = title
-                        }
+                            if title.count > 0 {
+                                metadata.title = title
+                                bFoundTitle = true
+                            }
+                        }                        
                         
                         if id3v2.artist?.pointee.p != nil {
                             let artist = String(cString: id3v2.artist.pointee.p)
-                            metadata.artist = artist
+                            if artist.count > 0 {
+                                metadata.artist = artist
+                                bFoundArtist = true
+                            }
                         }
-                        
+                                                
                         if id3v2.album?.pointee.p != nil {
                             let album = String(cString: id3v2.album.pointee.p)
-                            metadata.albumName = album
-                        }
+                            if album.count > 0 {
+                                metadata.albumName = album
+                                bFoundAlbumName = true
+                            }
+                        }                        
 
                         if id3v2.year?.pointee.p != nil {
                             let year = String(cString: id3v2.year.pointee.p)
-                            metadata.recordingYear = Int(year) ?? 0
-                        }
+                            if year.count > 0 {
+                                metadata.recordingYear = Int(year) ?? 0
+                                if metadata.recordingYear != 0 {
+                                    bFoundYear = true
+                                }
+                            }
+                        }                        
 
                         if id3v2.genre?.pointee.p != nil {
                             let genre = String(cString: id3v2.genre.pointee.p)
-                            metadata.genre = genre
-                            if genre.count > 2 && genre.first == Character("(") && genre.last == Character(")")  {
-                                let snum = genre.trimmingCharacters(in: CharacterSet(charactersIn: "()"))
-                                let num = UInt8(snum)
-                                if num != nil {
-                                    metadata.genre = convertId3V1GenreIndexToName(index: num!)  
-                                }                                
+                            if genre.count > 0 {
+                                metadata.genre = genre
+                                if genre.first == Character("(") && genre.last == Character(")")  {
+                                    let snum = genre.trimmingCharacters(in: CharacterSet(charactersIn: "()"))
+                                    let num = UInt8(snum)
+                                    if num != nil {
+                                        metadata.genre = convertId3V1GenreIndexToName(index: num!)  
+                                    }                                
+                                }
+                                else if let num = UInt8(genre) {
+                                    metadata.genre = convertId3V1GenreIndexToName(index: num)  
+                                }
+                                bFoundGenre = true
                             }
-                        }                                                
+                        }                                                                   
 
                         // Loop through the text fields to find the track number
                         for i in 0..<id3v2.texts {                            
@@ -470,42 +495,57 @@ internal class Mp3AudioPlayer {
                             if id == "TRCK" {
                                 metadata.trackNo = Int(text) ?? -1
                             }                                                                               
-                            if id == "TYER" || id == "TDAT" || id == "TORY" {                                                                
+                            if id == "TYER" || id == "TORY" {
                                 if metadata.recordingYear == 0 {
-                                    metadata.recordingYear = extractMetadataYear(text: text)                                    
+                                    metadata.recordingYear = extractMetadataYear(text: text)
+                                    bFoundYear = true
                                 }
                             }
                         }                                                
                     } 
-                    else if let id3v1 = id3v1Pointer?.pointee?.pointee {
+
+                    if let id3v1 = id3v1Pointer?.pointee?.pointee {
                         // ID3v1 fallback                        
-                        let title = String(cString: withUnsafePointer(to: id3v1.title) {
-                            UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
-                        })
-                        let artist = String(cString: withUnsafePointer(to: id3v1.artist) {
-                            UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
-                        })
-                        let album = String(cString: withUnsafePointer(to: id3v1.album) {
-                            UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
-                        })
-                        let year = String(cString: withUnsafePointer(to: id3v1.year) {
-                            UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
-                        })
-                        //let comment = String(cString: withUnsafePointer(to: id3v1.comment) {
-                        //    UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
-                        //})
-                        let genre = id3v1.genre
-                        
-                        metadata.title = title
-                        metadata.artist = artist
-                        metadata.albumName = album
-                        metadata.recordingYear = Int(year) ?? -1
-                        metadata.genre = convertId3V1GenreIndexToName(index: genre)                        
+                        if !bFoundTitle {
+                            let title = String(cString: withUnsafePointer(to: id3v1.title) {
+                                UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
+                            })
+                            metadata.title = title                            
+                        }
+                        if !bFoundArtist {
+                            let artist = String(cString: withUnsafePointer(to: id3v1.artist) {
+                                UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
+                            })
+                            metadata.artist = artist
+                        }
+                        if !bFoundAlbumName {
+                            let album = String(cString: withUnsafePointer(to: id3v1.album) {
+                                UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
+                            })
+                            metadata.albumName = album
+                        }
+                        if !bFoundYear {
+                            let year = String(cString: withUnsafePointer(to: id3v1.year)  {
+                                UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
+                            })                            
+                            metadata.recordingYear = extractMetadataYear(text: year)
+                        }                        
+                        if !bFoundGenre {
+                            metadata.genre = convertId3V1GenreIndexToName(index: id3v1.genre)
+                        }
                     } 
                     else {
                         let msg = "[Mp3AudioPlayer].gatherMetadata(path:). Metadata not found. File: \(path.lastPathComponent)"
                         throw CmpError(message: msg)
                     }
+
+                    //
+                    // ensure valid values
+                    //
+                    if metadata.trackNo < 0 {
+                        metadata.trackNo = 0
+                    }
+
                     //
                     // return metadata
                     //

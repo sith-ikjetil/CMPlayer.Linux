@@ -27,6 +27,7 @@ internal let g_lock = NSLock()     // global lock
 internal let g_crossfadeMinTime: Int = 1   // seconds
 internal let g_crossfadeMaxTime: Int = 20  // seconds
 internal let g_asyncCompletionDelay: Float = 0.2
+internal let g_metadataNotFoundName: String = "--unknown--"
 //
 // Global variables/properties
 //
