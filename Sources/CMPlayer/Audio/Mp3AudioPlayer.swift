@@ -274,7 +274,7 @@ internal class Mp3AudioPlayer {
                 ao_play(device, pointer, UInt32(done))
             }            
 
-            while (self.m_isPaused && !self.m_stopFlag) {
+            while (self.m_isPaused && !self.m_stopFlag && !g_quit) {
                 usleep(100_000)
             }
         }

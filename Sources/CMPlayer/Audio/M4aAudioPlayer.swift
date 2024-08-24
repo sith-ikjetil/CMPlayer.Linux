@@ -390,27 +390,17 @@ internal class M4aAudioPlayer {
                     }
                                                 
                     // Free the output buffer
-                    av_freep(&outputBuffer)
+                    av_freep(&outputBuffer)                    
 
-                    guard self.m_stopFlag == false else {
-                        return
-                    }
-
-                    while self.m_isPaused {
+                    while (self.m_isPaused && !self.m_stopFlag && !g_quit) {
                         usleep(100_000)
-                        if self.m_stopFlag {
-                            return
-                        }
-                    }                                                                       
+                    }                                      
                 }// while    
                 av_packet_unref(&self.m_audioState.packet)                
             }// if av_read_frame
             
-            while self.m_isPaused {
+            while (self.m_isPaused && !self.m_stopFlag && !g_quit) {
                 usleep(100_000)
-                if self.m_stopFlag {
-                    return
-                }
             }
         }// while !self.m_stopFlag
     }// private func playAsync()
