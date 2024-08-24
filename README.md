@@ -3,9 +3,10 @@ License: **GPL-3.0-or-later**
 This is a console music player for Linux.  
   
 ## Application
-The application name is **cmplayer** and the following  
+The applications name is **cmplayer** and the following  
 arguments are supported:
- - --Help (shows usage screen)
+ - --help (shows usage screen)
+ - --version (shows version number)
  - --integrity-check (does a quick integrity check of cmplayer)
   
 ## Supported File Formats
@@ -15,7 +16,7 @@ The following file formats are currently supported:
   
 ## Libraries
 The player uses the following tools and libraries:
- - Swift (version 5.10.1)
+ - Swift (version 5.10.1+)
  - libmpg123 (libmpg123.so)
  - ffmpeg
  - libao (libao.so)
@@ -33,7 +34,7 @@ execute the following commands:
  - sudo apt install libmpg123-dev
  - sudo apt install libao-common 
  - sudo apt install libao-dev
- - On WSL: sudo apt install pulseaudio (Doesn't always work)
+ - On WSL: sudo apt install pulseaudio (can be helpful, but doesn't always work)
    
 ## Fedora
 In order to get these libraries onto you Fedora distro, you can   
@@ -71,10 +72,12 @@ PATH=/opt/swift-5.10.1/usr/bin:$PATH
   
 ## Preprocessor Flags
 There are the following preprocessor flags defined in Package.swift:
- - CMP_FFMPEG_V6 (for ffmpeg v6)
- - CMP_FFMPEG_V4 (for ffmpeg v4)
- - CMP_TARGET_UBUNTU (for Ubuntu)
- - CMP_TARGET_FEDORA (for Fedora)
+### cSettings and swiftSettings
+ - CMP_FFMPEG_V6            (for ffmpeg v6)
+ - CMP_FFMPEG_V4            (for ffmpeg v4)
+ - CMP_TARGET_UBUNTU        (for Ubuntu)
+ - CMP_TARGET_UBUNTU_V24_04 (for Ubuntu 24_04)
+ - CMP_TARGET_FEDORA        (for Fedora)
   
 Uncomment any flag that is not your version of ffmpeg or target distro.  
   
@@ -82,8 +85,8 @@ Uncomment any flag that is not your version of ffmpeg or target distro.
   
 ### Cffmpeg
 Are located at:
- - /usr/include/x86_64-linux-gnu/<library> (Ubuntu)
- - /usr/include/ffmpeg/<library> (Fedora)
+ - /usr/include/x86_64-linux-gnu/*library* (Ubuntu)
+ - /usr/include/ffmpeg/*library* (Fedora)
   
 ### Cao
 Are located at:
@@ -93,6 +96,7 @@ Are located at:
 ### Cmpg123
 Are located at:
  - /usr/include/ (Ubuntu)
+ - /usr/include/x86_64-linux-gnu/ (Ubuntu 24.04)
  - /usr/include/ (Fedora)
   
 ## CMPlayer.Linux (in app) Help Text
