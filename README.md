@@ -57,7 +57,7 @@ export C_INCLUDE_PATH=/usr/include/ffmpeg:$C_INCLUDE_PATH
 After installing Swift, remember to update LD_LIBRARY_PATH. Set  
 the following into your .bashrc and .bash_profile.  
 ```bash
-export LD_LIBRARY_PATH=/opt/swift-5.10.1/usr/lib/swift/linux:$LD_LIBRARY_PATH\  
+export LD_LIBRARY_PATH=/opt/swift-5.10.1/usr/lib/swift/linux:$LD_LIBRARY_PATH  
 ```
 (the path is of course up to you where you put swift)  
   
