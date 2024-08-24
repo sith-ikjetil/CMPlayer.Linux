@@ -364,7 +364,7 @@ internal class M4aAudioPlayer {
                         UnsafePointer(self.m_audioState.frame!.pointee.data.6),
                         UnsafePointer(self.m_audioState.frame!.pointee.data.7)
                     ]                    
-                    
+
                     // Use withUnsafeBufferPointer to pass the array as a pointer
                     inputData.withUnsafeBufferPointer { bufferPointer in
                         let samples = swr_convert(self.m_audioState.swrCtx, &outputBuffer, self.m_audioState.frame!.pointee.nb_samples, UnsafeMutablePointer(mutating: bufferPointer.baseAddress), self.m_audioState.frame!.pointee.nb_samples)                            
