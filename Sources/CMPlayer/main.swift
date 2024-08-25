@@ -81,7 +81,7 @@ if CommandLine.argc >= 2 {
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
-    else if CommandLine.arguments[1].lowercased() == "--set-output-ao" {
+    else if CommandLine.arguments[1].lowercased() == "--set-output-api-ao" {
         print("CMPlayer Set Output")
         print("=========================")
         PlayerPreferences.ensureLoadPreferences()
@@ -91,7 +91,7 @@ if CommandLine.argc >= 2 {
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
-    else if CommandLine.arguments[1].lowercased() == "--set-output-alsa" {
+    else if CommandLine.arguments[1].lowercased() == "--set-output-api-alsa" {
         print("CMPlayer Set Output")
         print("=========================")
         PlayerPreferences.ensureLoadPreferences()
@@ -101,17 +101,31 @@ if CommandLine.argc >= 2 {
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
+    else if CommandLine.arguments[1].lowercased() == "--get-output-api" {
+        PlayerPreferences.ensureLoadPreferences()
+        print("CMPlayer Get Output")
+        print("=========================")
+        if PlayerPreferences.outputSoundLibrary == OutputSoundLibrary.ao {
+            print("(i): Output api is: ao")
+        }
+        else if PlayerPreferences.outputSoundLibrary == OutputSoundLibrary.alsa {
+            print("(i): Output api is: alsa")
+        }                   
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
     else {
         print("CMPlayer Help")
         print("=========================")
         print("Usage: cmplayer <options>")
         print("<options>")
-        print(" --help            = show this help screen")
-        print(" --version         = show version numbers")
-        print(" --integrity-check = do an integrity check")
-        print(" --purge           = remove all stored data")
-        print(" --set-output-ao   = sets audio playback to use libao (ao)")
-        print(" --set-output-alsa = sets audio playback to use libasound (alsa)")
+        print(" --help                = show this help screen")
+        print(" --version             = show version numbers")
+        print(" --integrity-check     = do an integrity check")
+        print(" --purge               = remove all stored data")
+        print(" --set-output-api-ao   = sets audio output api to libao (ao)")
+        print(" --set-output-api-alsa = sets audio output api to libasound (alsa)")
+        print(" --get-output-api      = gets audio output api")
         print("")        
         exit(ExitCodes.SUCCESS.rawValue)
     }    

@@ -10,8 +10,9 @@ The applications name is **cmplayer** and the following arguments are supported:
  - --version (shows version number)
  - --integrity-check (does a quick integrity check of cmplayer)
  - --purge (remove all stored data)
- - --set-output-ao (sets audio playback to use libao (ao))
- - --set-output-alsa (sets audio playback to use libasound (alsa))
+ - --set-output-api-ao (sets audio output api to libao (ao))
+ - --set-output-api-alsa (sets audio output api to libasound (alsa))
+ - --get-output-api (gets audio output api)
   
 ## Supported File Formats
 The following file formats are currently supported:
