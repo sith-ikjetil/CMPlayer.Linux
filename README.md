@@ -9,6 +9,9 @@ The applications name is **cmplayer** and the following arguments are supported:
  - --help (shows usage screen)
  - --version (shows version number)
  - --integrity-check (does a quick integrity check of cmplayer)
+ - --purge (remove all stored data)
+ - --set-output-ao (sets audio playback to use libao (ao))
+ - --set-output-alsa (sets audio playback to use libasound (alsa))
   
 ## Supported File Formats
 The following file formats are currently supported:
@@ -96,11 +99,17 @@ Are located at:
  - /usr/include/ffmpeg/*library* (Fedora 40)
  - /usr/include/*library* (Manjaro 24)
   
-### Cao (swift C wrapper library for libao)
+### Cao (swift C wrapper library for libao (ao))
 Are located at:
  - /usr/include/ao/ (Ubuntu 22.04, 24.04)
  - /usr/include/ao/ (Fedora)
  - /usr/include/ao/ (Manjaro)
+  
+### Casound (swift C wrapper library for libasound (alsa))
+Are located at:
+ - /usr/include/alsa/ (Ubuntu 22.04, 24.04)
+ - /usr/include/alsa/ (Fedora)
+ - /usr/include/alsa/ (Manjaro)
   
 ### Cmpg123 (swift C wrapper library for libmpg123)
 Are located at:
