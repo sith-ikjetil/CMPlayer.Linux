@@ -69,6 +69,8 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
             }
         }
         
+        self.preferencesText.append(" Audio Output")
+        self.preferencesText.append(" :: \(PlayerPreferences.outputSoundLibrary.rawValue)")
         self.preferencesText.append(" Music Formats")
         self.preferencesText.append(" :: \(PlayerPreferences.musicFormats)")
         self.preferencesText.append(" Enable Autoplay On Startup")
@@ -80,7 +82,7 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
         self.preferencesText.append(" View Type")
         self.preferencesText.append(" :: \(PlayerPreferences.viewType.rawValue)")
         self.preferencesText.append(" Theme")
-        self.preferencesText.append(" :: \(PlayerPreferences.colorTheme.rawValue)")
+        self.preferencesText.append(" :: \(PlayerPreferences.colorTheme.rawValue)")        
     }    
     ///
     /// Renders screen output. Does clear screen first.

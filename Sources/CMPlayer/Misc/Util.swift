@@ -834,27 +834,33 @@ func extractMetadataYear(text: String) -> Int {
     
     return 0
 }
-
+///
+/// Does an integrity check.
+/// 
 func PrintAndExecuteIntegrityCheck() {
     print("CMPlayer Integrity Check")
     print("========================")
     PrintAndExecuteOutputDevices()
     PrintAndExecuteLibraryFiles()
 }
-
-func PrintAndExecuteOutputDevices() {    
-    // Get the list of available drivers
-    var driverCount: Int32 = 0
-    if let driverInfoList = ao_driver_info_list(&driverCount) {
-        // Iterate through the available drivers and print them
-        if driverCount > 0 {
-            print("(i): Found audio output devices. Sound should be possible.")
-        }
-        else {
-            print("(e): Found no audio output devices. Sound should not be possible.")
-        }
-        print("")
-        print("Drivers:")
+///
+/// Prints information about output devices.
+/// 
+func PrintAndExecuteOutputDevices() {        
+    print("ao:")
+    printAoInfo()    
+    print("")
+    print("alsa:")
+    printALSAInfo()
+    print("")
+}
+///
+/// prints ao information
+/// 
+func printAoInfo() {
+    var driverCount: Int32 = 0    
+    if let driverInfoList = ao_driver_info_list(&driverCount) {                
+        // Iterate through the available drivers and print them        
         for i in 0..<Int(driverCount) {
             if let driverInfoPointer = driverInfoList[i] {
                 let driverInfo = driverInfoPointer.pointee
@@ -864,15 +870,57 @@ func PrintAndExecuteOutputDevices() {
                 //    print("  Comment: \(String(cString: driverInfo.comment))\n")                    
                 //}
             }             
-        }
+        }    
     } 
     else {
         print("(e): An error occurred.")
         print("(e): Failed to retrieve audio driver information.")
     }
-    print("")
 }
+///
+/// prints also infomation
+/// 
+func printALSAInfo() {
+    var err: Int32 = 0
+    var card: Int32 = -1    
+    var ctlHandle: OpaquePointer?
 
+    // Get the first card
+    err = snd_card_next(&card)
+    guard err >= 0, card >= 0 else {
+        print("(e): No sound cards found: '\(String(cString: snd_strerror(err)))'")
+        return
+    }    
+
+    while card >= 0 {
+        // Open the control interface for the card
+        let cardName = "hw:\(card)"
+        if snd_ctl_open(&ctlHandle, cardName, 0) < 0 {
+            print("(e): Error opening control interface: '\(String(cString: snd_strerror(err)))'")
+            break
+        }
+
+        let cardInfo: OpaquePointer? = nil
+        if snd_ctl_card_info(ctlHandle, cardInfo) < 0 {
+            print("(e): Error getting card information: (\(card)): '\(String(cString: snd_strerror(err)))'")
+            snd_ctl_close(ctlHandle)
+            break
+        }
+        
+        print(" > Card \(card): \(String(cString: snd_ctl_card_info_get_id(cardInfo))) [\(String(cString: snd_ctl_card_info_get_name(cardInfo)))], driver \(String(cString: snd_ctl_card_info_get_driver(cardInfo)))")        
+
+        snd_ctl_close(ctlHandle)
+
+        // Move to the next card
+        if snd_card_next(&card) < 0 {
+            break
+        }
+    }
+}
+///
+/// Attempts to find .so library files under /usr.
+/// Prints out result.
+/// 
 func PrintAndExecuteLibraryFiles() {    
     let files: [String] = ["libao.so",
                            "libasound.so",
@@ -910,7 +958,9 @@ func PrintAndExecuteLibraryFiles() {
     }
     print("")
 }
-
+/// 
+/// finds a file. URL if found, nil otherwise.
+/// 
 func findFile(named fileName: String, under directory: URL) -> URL? {
     let fileManager = FileManager.default
     
