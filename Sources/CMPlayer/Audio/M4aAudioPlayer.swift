@@ -284,7 +284,7 @@ internal class M4aAudioPlayer {
             }
         }
         else if PlayerPreferences.outputSoundLibrary == .alsa {
-            let err = snd_pcm_open(&self.m_audioState.alsaState.pcmHandle, self.m_audioState.alsaState.pcmDeviceName, SND_PCM_STREAM_PLAYBACK, 0)
+            var err = snd_pcm_open(&self.m_audioState.alsaState.pcmHandle, self.m_audioState.alsaState.pcmDeviceName, SND_PCM_STREAM_PLAYBACK, 0)
             guard err >= 0 else {
                 let msg = "[M4aAudioPlayer].play(). alsa. snd_pcm_open failed with value: \(err)"
     #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
@@ -293,6 +293,21 @@ internal class M4aAudioPlayer {
     #endif
                 avcodec_free_context(&self.m_audioState.codecCtx)
                 avformat_close_input(&self.m_audioState.formatCtx)
+                self.m_isPlaying = false
+                
+                throw CmpError(message: msg)
+            }
+            err = snd_pcm_set_params(self.m_audioState.alsaState.pcmHandle, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, self.m_audioState.alsaState.channels, self.m_audioState.alsaState.sampleRate, 1, 500000)
+            guard err >= 0 else {
+                let msg = "[M4aAudioPlayer].play(). alsa. snd_pcm_set_params failed with value: \(err)"
+                 #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+                av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
+                av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
+    #endif
+                avcodec_free_context(&self.m_audioState.codecCtx)
+                avformat_close_input(&self.m_audioState.formatCtx)
+                self.m_isPlaying = false                
+                
                 throw CmpError(message: msg)
             }
         }
