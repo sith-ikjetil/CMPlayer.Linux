@@ -91,6 +91,7 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         var index_search: Int = self.searchIndex    
         let max = self.modeText.count + self.searchResult.count
         if PlayerPreferences.viewType == ViewType.Default {
+            let layout: MainWindowLayout = MainWindowLayout.get()
             while index_search < max {
                 if index_screen_lines >= (g_rows-3) {
                     break
@@ -113,19 +114,20 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 else {
                     let se = self.searchResult[index_search-self.modeText.count]
                 
-                    Console.printXY(1, index_screen_lines, "\(se.songNo) ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+                    Console.printXY(layout.songNoX, index_screen_lines, "\(se.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
                 
-                    Console.printXY(10, index_screen_lines, "\(se.artist)", g_fieldWidthArtist, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.artistX, index_screen_lines, "\(se.artist)", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
 
-                    Console.printXY(43, index_screen_lines, "\(se.title)", g_fieldWidthTitle, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.titleX, index_screen_lines, "\(se.title)", layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                 
-                    Console.printXY(76, index_screen_lines, itsRenderMsToFullString(se.duration, false), g_fieldWidthDuration, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.durationX, index_screen_lines, itsRenderMsToFullString(se.duration, false), layout.durationCols, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                 }
                 index_screen_lines += 1
                 index_search += 1
             }
         }
-        else if PlayerPreferences.viewType == ViewType.Details {           
+        else if PlayerPreferences.viewType == ViewType.Details { 
+            let layout: MainWindowLayout = MainWindowLayout.get()          
             while index_search < max {
                 if index_screen_lines >= (g_rows-3) {
                     break
@@ -151,20 +153,20 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 else {
                     let song = self.searchResult[index_search-self.modeText.count]
                     
-                    Console.printXY(1, index_screen_lines, String(song.songNo)+" ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
-                    Console.printXY(1, index_screen_lines+1, " ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.songNoX, index_screen_lines, "\(song.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
+                    Console.printXY(layout.songNoX, index_screen_lines+1, " ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                     
-                    Console.printXY(10, index_screen_lines, song.artist, g_fieldWidthArtist, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-                    Console.printXY(10, index_screen_lines+1, song.albumName, g_fieldWidthArtist, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.artistX, index_screen_lines, song.artist, layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.artistX, index_screen_lines+1, song.albumName, layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                     
-                    Console.printXY(43, index_screen_lines, song.title, g_fieldWidthTitle, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-                    Console.printXY(43, index_screen_lines+1, song.genre, g_fieldWidthTitle, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.titleX, index_screen_lines, song.title, layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.titleX, index_screen_lines+1, song.genre, layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                     
                     let timeString: String = itsRenderMsToFullString(song.duration, false)
                     let endTimePart: String = String(timeString[timeString.index(timeString.endIndex, offsetBy: -5)..<timeString.endIndex])
-                    Console.printXY(76, index_screen_lines, endTimePart, g_fieldWidthDuration, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.durationX, index_screen_lines, endTimePart, layout.durationCols, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                     
-                    Console.printXY(76, index_screen_lines+1, " ", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.durationX, index_screen_lines+1, " ", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                     
                     index_screen_lines += 2
                     index_search += 1

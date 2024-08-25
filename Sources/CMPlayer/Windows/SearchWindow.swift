@@ -334,7 +334,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
                 
                 let se = self.searchResult[index_search]
                 
-                Console.printXY(1, index_screen_lines, "\(se.songNo) ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+                Console.printXY(layout.songNoX, index_screen_lines, "\(se.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
                 
                 Console.printXY(layout.artistX, index_screen_lines, se.getArtist(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
 

@@ -142,9 +142,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         if PlayerPreferences.viewType == ViewType.Default {  
             let layout: MainWindowLayout = MainWindowLayout.get()    
 
-            Console.printXY(1,3,"Song No.", layout.songNoCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)                    
+            Console.printXY(layout.songNoX,3,"Song No.", layout.songNoCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)                    
 
-            Console.printXY(layout.songNoX,3,"Artist", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.artistX,3,"Artist", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
             Console.printXY(layout.titleX,3,"Title", layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
@@ -189,7 +189,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         if PlayerPreferences.viewType == ViewType.Default {
             let layout: MainWindowLayout = MainWindowLayout.get() 
 
-            Console.printXY(1, y, String(song.songNo)+" ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
+            Console.printXY(layout.songNoX, y, "\(song.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
             
             Console.printXY(layout.artistX, y, song.getArtist(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)            
             Console.printXY(layout.titleX, y, song.getTitle(), layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
@@ -201,8 +201,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         else if PlayerPreferences.viewType == ViewType.Details {
             let layout: MainWindowLayout = MainWindowLayout.get() 
 
-            Console.printXY(1, y, "\(song.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
-            Console.printXY(1, y+1, " ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(layout.songNoX, y, "\(song.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
+            Console.printXY(layout.songNoX, y+1, " ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             
             Console.printXY(layout.artistX, y, song.getArtist(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             Console.printXY(layout.artistX, y+1, song.getAlbumName(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
