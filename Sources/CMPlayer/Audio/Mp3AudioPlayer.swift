@@ -418,12 +418,9 @@ internal class Mp3AudioPlayer {
                 throw CmpError(message: msg)
             }
 
-            defer {                
-                mpg123_close(handle);
-            }
-            
             let err = mpg123_open(handle, path.path)
             guard err == 0 else {
+                mpg123_close(handle);
                 let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_open failed for file: \(path.lastPathComponent)"
                 throw CmpError(message: msg)
             }      
@@ -460,6 +457,8 @@ internal class Mp3AudioPlayer {
 
             // Ensure positive duration
             guard duration > 0 else {
+                mpg123_close(handle)
+                mpg123_delete(handle)
                 let msg = "[Mp3AudioPlayer].gatherMetadata(path:). Duration was 0. File: \(path.lastPathComponent)"
                 throw CmpError(message: msg)
             }

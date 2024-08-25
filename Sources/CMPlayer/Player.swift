@@ -49,7 +49,15 @@ internal class Player {
     ///
     func initialize() throws -> Void {        
         PlayerDirectories.ensureDirectoriesExistence()
-        PlayerPreferences.ensureLoadPreferences()        
+        PlayerPreferences.ensureLoadPreferences()
+
+        let pathLogFile: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenamePlainText, isDirectory: false)                
+        do {
+            try FileManager.default.removeItem(at: pathLogFile)
+        }
+        catch {
+
+        }        
         
         PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Started.")
         
@@ -68,9 +76,9 @@ internal class Player {
         }
         
         let wnd = InitializeWindow()
-        wnd.showWindow()
+        wnd.showWindow()        
         
-        g_library.library = g_songs
+        g_library.library = g_songs        
         g_library.save()
         
         if PlayerPreferences.autoplayOnStartup && g_playlist.count > 0 {
