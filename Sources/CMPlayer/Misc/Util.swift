@@ -872,8 +872,7 @@ func printAoInfo() {
             }             
         }    
     } 
-    else {
-        print("(e): An error occurred.")
+    else {        
         print("(e): Failed to retrieve audio driver information.")
     }
 }
@@ -911,7 +910,7 @@ func printALSAInfo() {
         let cardInfoTyped: OpaquePointer? = OpaquePointer(cardInfoRaw)
 
         if snd_ctl_card_info(ctlHandle, cardInfoTyped) < 0 {
-            print("(e): Error getting card information: (\(card)): '\(String(cString: snd_strerror(err)))'")
+            print("(e): Error getting card information: '\(String(cString: snd_strerror(err)))'")
             snd_ctl_close(ctlHandle)
             break
         }
