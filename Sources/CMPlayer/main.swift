@@ -67,14 +67,27 @@ if CommandLine.argc >= 2 {
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
+    else if CommandLine.arguments[1].lowercased() == "--purge" {
+        print("CMPlayer Purge")
+        print("=========================")
+        if PlayerDirectories.purge() {
+            print("(i): Purge success")
+        }
+        else {
+            print("(e): Purge error")
+        }
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
     else {
-        print("CMPlayer")
+        print("CMPlayer Help")
         print("=========================")
         print("Usage: cmplayer <options>")
-        print("<option>")
+        print("<options>")
         print(" --help            = show this help screen")
         print(" --version         = show version numbers")
         print(" --integrity-check = do an integrity check")
+        print(" --purge           = remove all stored data")
         print("")        
         exit(ExitCodes.SUCCESS.rawValue)
     }    

@@ -38,4 +38,16 @@ internal class PlayerDirectories {
             }
         }                
     }// enusreDirectoriesExistence
+    internal static func purge() -> Bool {
+        let cmpDir: URL = PlayerDirectories.consoleMusicPlayerDirectory
+        if FileManager.default.fileExists(atPath: cmpDir.path) {
+            do {
+                try FileManager.default.removeItem(at: cmpDir)                
+            }
+            catch {
+                return false
+            }
+        }                
+        return true
+    }
 }// PlayerDirectories
