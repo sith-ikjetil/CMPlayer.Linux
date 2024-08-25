@@ -29,11 +29,11 @@ internal class PlayerLog {
     /// private variables
     /// 
     private var autoSave: Bool = true    
-    private var saveType: PlayerLogSaveAsType = PlayerLogSaveAsType.plainText
+    private var saveType: PlayerLogSaveType = PlayerLogSaveType.plainText
     ///
     /// Overloaded initializer.
     ///
-    init(autoSave: Bool, loadOldLog: Bool, logSaveType: PlayerLogSaveAsType ){
+    init(autoSave: Bool, loadOldLog: Bool, logSaveType: PlayerLogSaveType ){
         self.autoSave = autoSave
         self.saveType = logSaveType
 
@@ -192,6 +192,7 @@ internal class PlayerLog {
                 return
             }
         }
+        
         let logEntry = PlayerLogEntry(type: PlayerLogEntryType.Other, title: title, text: text, timeStamp: Date())
         self.entries.append(logEntry)
         if self.autoSave {

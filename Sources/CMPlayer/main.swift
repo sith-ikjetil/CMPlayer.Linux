@@ -53,83 +53,8 @@ internal var g_doNotPaint: Bool = false
 //
 // Startup code
 //
-// Check for command line arguments.
-if CommandLine.argc >= 2 {
-    if CommandLine.arguments[1].lowercased() == "--integrity-check" {
-        PlayerPreferences.ensureLoadPreferences()        
-        // initialize libao
-        ao_initialize()        
-        PrintAndExecuteIntegrityCheck()
-        // shutdown ao
-        ao_shutdown() 
-        exit(ExitCodes.SUCCESS.rawValue)   
-    }
-    else if CommandLine.arguments[1].lowercased() == "--version" {
-        print("CMPlayer v\(g_versionString)")
-        print("")
-        exit(ExitCodes.SUCCESS.rawValue)
-    }
-    else if CommandLine.arguments[1].lowercased() == "--purge" {
-        print("CMPlayer Purge")
-        print("=========================")
-        if PlayerDirectories.purge() {
-            print("(i): Purge success")
-        }
-        else {
-            print("(e): Purge error")
-        }
-        print("")
-        exit(ExitCodes.SUCCESS.rawValue)
-    }
-    else if CommandLine.arguments[1].lowercased() == "--set-output-api-ao" {
-        print("CMPlayer Set Output")
-        print("=========================")
-        PlayerPreferences.ensureLoadPreferences()
-        PlayerPreferences.outputSoundLibrary = OutputSoundLibrary.ao
-        PlayerPreferences.savePreferences()
-        print("(i): Output sound set to ao")
-        print("")
-        exit(ExitCodes.SUCCESS.rawValue)
-    }
-    else if CommandLine.arguments[1].lowercased() == "--set-output-api-alsa" {
-        print("CMPlayer Set Output")
-        print("=========================")
-        PlayerPreferences.ensureLoadPreferences()
-        PlayerPreferences.outputSoundLibrary = OutputSoundLibrary.alsa
-        PlayerPreferences.savePreferences()
-        print("(i): Output sound set to alsa")
-        print("")
-        exit(ExitCodes.SUCCESS.rawValue)
-    }
-    else if CommandLine.arguments[1].lowercased() == "--get-output-api" {
-        PlayerPreferences.ensureLoadPreferences()
-        print("CMPlayer Get Output")
-        print("=========================")
-        if PlayerPreferences.outputSoundLibrary == OutputSoundLibrary.ao {
-            print("(i): Output api is: ao")
-        }
-        else if PlayerPreferences.outputSoundLibrary == OutputSoundLibrary.alsa {
-            print("(i): Output api is: alsa")
-        }                   
-        print("")
-        exit(ExitCodes.SUCCESS.rawValue)
-    }
-    else {
-        print("CMPlayer Help")
-        print("=========================")
-        print("Usage: cmplayer <options>")
-        print("<options>")
-        print(" --help                = show this help screen")
-        print(" --version             = show version numbers")
-        print(" --integrity-check     = do an integrity check")
-        print(" --purge               = remove all stored data")
-        print(" --set-output-api-ao   = sets audio output api to libao (ao)")
-        print(" --set-output-api-alsa = sets audio output api to libasound (alsa)")
-        print(" --get-output-api      = gets audio output api")
-        print("")        
-        exit(ExitCodes.SUCCESS.rawValue)
-    }    
-}
+// Handle command line arguments
+CommandLineHandler.processCommandLine()
 
 // initialize libmpg123
 guard mpg123_init() == 0 else {
@@ -159,9 +84,6 @@ guard stderr_old != -1 else {
 // stderr redirect successfull
 // normal startup and normal execution continue
 do {
-    // set log system
-    PlayerLog.ApplicationLog = PlayerLog(autoSave: true, loadOldLog: false, logSaveType: PlayerLogSaveAsType.plainText)
-
     // initialize CMPlayer.Linux
     try g_player.initialize()    
     
@@ -179,7 +101,8 @@ do {
 
     // clear screen
     Console.clearScreen()
-    Console.gotoXY(1, 1)    
+    Console.gotoXY(1, 1)  
+    Console.resetConsoleColors()  
     system("clear") 
     
     print("CMPlayer exited normally.")
@@ -198,6 +121,7 @@ do {
 
     Console.clearScreen()
     Console.gotoXY(1, 1)
+    Console.resetConsoleColors()
     system("clear")    
     
     print(msg)
@@ -213,6 +137,7 @@ do {
 
     Console.clearScreen()
     Console.gotoXY(1, 1)
+    Console.resetConsoleColors()
     system("clear")    
     print(msg) 
 

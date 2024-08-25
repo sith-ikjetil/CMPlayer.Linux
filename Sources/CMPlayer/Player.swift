@@ -49,7 +49,8 @@ internal class Player {
     ///
     func initialize() throws -> Void {        
         PlayerDirectories.ensureDirectoriesExistence()
-        PlayerPreferences.ensureLoadPreferences()
+        PlayerPreferences.ensureLoadPreferences()        
+        PlayerLog.ApplicationLog = PlayerLog(autoSave: true, loadOldLog: false, logSaveType: PlayerLogSaveType.plainText)
 
         let pathLogFile: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenamePlainText, isDirectory: false)                
         do {
@@ -138,6 +139,7 @@ internal class Player {
             
             Console.clearScreen()
             Console.gotoXY(1, 1)
+            Console.resetConsoleColors()
             system("clear")            
             
             print(msg) 
@@ -153,7 +155,8 @@ internal class Player {
             let msg = "CMPlayer ABEND.\n[Player].play(player,playlistIndex).\nUnknown error playing player \(player) on index \(playlistIndex).\nMessage: \(error)"            
             
             Console.clearScreen()
-            Console.gotoXY(1, 1)            
+            Console.gotoXY(1, 1) 
+            Console.resetConsoleColors()           
             system("clear")            
 
             print(msg) 

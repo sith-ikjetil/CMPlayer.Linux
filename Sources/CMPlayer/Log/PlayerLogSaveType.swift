@@ -13,7 +13,7 @@ import Foundation
 //
 // Types of save
 //
-internal enum PlayerLogSaveAsType {
+internal enum PlayerLogSaveType {
     case xml
     case plainText
 }

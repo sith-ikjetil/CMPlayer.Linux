@@ -130,6 +130,7 @@ internal class Console {
             
             Console.clearScreen()
             Console.gotoXY(1, 1)
+            Console.resetConsoleColors()
             system("clear")
             
             print(msg)
@@ -153,6 +154,7 @@ internal class Console {
             
             Console.clearScreen()
             Console.gotoXY(1, 1)
+            Console.resetConsoleColors()
             system("clear")
             
             print(msg)
@@ -217,6 +219,13 @@ internal class Console {
         print("\u{001B}[\(y);\(x)H\(Console.applyTextColor(colorBg: bgColor, modifierBg: modifierBg, colorText: colorText, modifierText: modifierText, text: nmsg))", terminator: "")
     }    
     ///
+    /// Resets console colors
+    /// 
+    static func resetConsoleColors()
+    {
+        print("\u{001B}[0m")
+    }
+    ///
     /// Initializes console.
     ///
     static func initialize() -> Void {
@@ -248,6 +257,7 @@ internal class Console {
 
             Console.clearScreen()
             Console.gotoXY(1, 1)
+            Console.resetConsoleColors()
             system("clear")
             
             print(msg)
