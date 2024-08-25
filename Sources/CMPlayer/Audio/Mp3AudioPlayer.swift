@@ -418,27 +418,32 @@ internal class Mp3AudioPlayer {
                 throw CmpError(message: msg)
             }
 
+            defer {
+                // deleted the handle
+                mpg123_delete(handle)                
+            }
+
             let err = mpg123_open(handle, path.path)
-            guard err == 0 else {
-                mpg123_close(handle);
+            guard err == 0 else {                
                 let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_open failed for file: \(path.lastPathComponent)"
                 throw CmpError(message: msg)
             }      
 
+            defer {
+                // closed the source after open
+                mpg123_close(handle)
+            }
+
             //
             // find duration
             //              
-            if mpg123_scan(handle) != 0 {                
-                mpg123_close(handle)
-                mpg123_delete(handle)
+            if mpg123_scan(handle) != 0 {                                                
                 let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_scan failed. File: \(path.lastPathComponent)"
                 throw CmpError(message: msg)                
             }
 
             let length  = mpg123_length(handle)
-            if length  <= 0 {
-                mpg123_close(handle)
-                mpg123_delete(handle)
+            if length  <= 0 {                
                 let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_length failed with length: \(length). File: \(path.lastPathComponent)"                
                 throw CmpError(message: msg)
             }
@@ -456,9 +461,7 @@ internal class Mp3AudioPlayer {
             metadata.duration = UInt64(duration * 1000)            
 
             // Ensure positive duration
-            guard duration > 0 else {
-                mpg123_close(handle)
-                mpg123_delete(handle)
+            guard duration > 0 else {            
                 let msg = "[Mp3AudioPlayer].gatherMetadata(path:). Duration was 0. File: \(path.lastPathComponent)"
                 throw CmpError(message: msg)
             }
