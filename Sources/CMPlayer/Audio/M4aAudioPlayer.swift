@@ -294,13 +294,13 @@ internal class M4aAudioPlayer {
                 avcodec_free_context(&self.m_audioState.codecCtx)
                 avformat_close_input(&self.m_audioState.formatCtx)
                 self.m_isPlaying = false
-                
+
                 throw CmpError(message: msg)
             }
             err = snd_pcm_set_params(self.m_audioState.alsaState.pcmHandle, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, self.m_audioState.alsaState.channels, self.m_audioState.alsaState.sampleRate, 1, 500000)
             guard err >= 0 else {
                 let msg = "[M4aAudioPlayer].play(). alsa. snd_pcm_set_params failed with value: \(err)"
-                 #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+    #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
                 av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
     #endif
@@ -454,7 +454,7 @@ internal class M4aAudioPlayer {
                             ao_play(self.m_audioState.device, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), UInt32(UInt32(samples) * UInt32(2) * UInt32(MemoryLayout<Int16>.size)))                            
                         }
                         else {
-                            let size = Int(samples) * Int(self.m_audioState.alsaState.channels) * 2 // 2 bytes per sample
+                            let size = Int(samples)
                             snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), snd_pcm_uframes_t(size))
                         }
                     }
