@@ -439,8 +439,8 @@ internal class M4aAudioPlayer {
                             ao_play(self.m_audioState.device, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), UInt32(UInt32(samples) * UInt32(2) * UInt32(MemoryLayout<Int16>.size)))                            
                         }
                         else {
-                            let frames = Int(bufferSize) / 2 / Int(self.m_audioState.alsaState.channels)
-                            snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), snd_pcm_uframes_t(frames))
+                            let size = Int(samples) * Int(self.m_audioState.alsaState.channels) * 2 // 2 bytes per sample
+                            snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), snd_pcm_uframes_t(size))
                         }
                     }
                                                 
