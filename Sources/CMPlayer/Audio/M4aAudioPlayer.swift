@@ -122,7 +122,7 @@ internal class M4aAudioPlayer {
         // Open audio file
         var err = avformat_open_input(&self.m_audioState.formatCtx, self.filePath.path, nil, nil)
         if err != 0 {
-            let msg = "[M4aAudioPlayer].play(). avformat_open_input failed with value \(err). Could not open file \(self.filePath.path)"            
+            let msg = "[M4aAudioPlayer].play(). avformat_open_input failed with value \(err) = '\(errorToString(error: err))'. Could not open file \(self.filePath.path)."
             throw CmpError(message: msg)
         }
         
@@ -135,7 +135,7 @@ internal class M4aAudioPlayer {
         // Retrieve stream information
         err = avformat_find_stream_info(self.m_audioState.formatCtx, nil)
         if err < 0 {            
-            let msg = "[M4aAudioPlayer].play(). avformat_find_stream_info failed with value: \(err). Could not find stream information."
+            let msg = "[M4aAudioPlayer].play(). avformat_find_stream_info failed with value: \(err) = '\(errorToString(error: err))'. Could not find stream information."
             avformat_close_input(&m_audioState.formatCtx)
             throw CmpError(message: msg)
         }                
@@ -194,7 +194,7 @@ internal class M4aAudioPlayer {
         
         err = avcodec_parameters_to_context(self.m_audioState.codecCtx, codecpar)
         if err < 0 {
-            let msg = "[M4aAudioPlayer].play(). avcodec_parameters_to_context failed with value: \(err). Could not copy codec context."
+            let msg = "[M4aAudioPlayer].play(). avcodec_parameters_to_context failed with value: \(err) = '\(errorToString(error: err))'. Could not copy codec context."
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)            
             throw CmpError(message: msg)
@@ -203,7 +203,7 @@ internal class M4aAudioPlayer {
         // Open codec
         err = avcodec_open2(self.m_audioState.codecCtx, self.m_audioState.codec, nil)
         if err < 0 {
-            let msg = "[M4aAudioPlayer].play(). avcodec_open2 failed with value: \(err). Could not open codec."
+            let msg = "[M4aAudioPlayer].play(). avcodec_open2 failed with value: \(err) = '\(errorToString(error: err))'. Could not open codec."
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)
             throw CmpError(message: msg)
@@ -224,14 +224,14 @@ internal class M4aAudioPlayer {
 #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7        
         var ret = av_channel_layout_copy(&self.m_audioState.chLayoutIn, &self.m_audioState.codecCtx!.pointee.ch_layout)        
         if ret < 0 {
-            let msg = "[M4aAudioPlayer].play(). av_channel_layout_copy failed with value: \(ret)"
+            let msg = "[M4aAudioPlayer].play(). av_channel_layout_copy failed with value: \(ret) = '\(errorToString(error: err))'."
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)  
             throw CmpError(message: msg)
         }
         ret = av_opt_set_chlayout(rawSwrCtxPtr, "in_chlayout", &self.m_audioState.chLayoutIn, 0)        
         if ret < 0 {
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout IN failed with value: \(ret)"
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout IN failed with value: \(ret) = '\(errorToString(error: err))'."
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)  
             throw CmpError(message: msg)
@@ -239,7 +239,7 @@ internal class M4aAudioPlayer {
         av_channel_layout_default(&self.m_audioState.chLayoutOut, 2);
         ret = av_opt_set_chlayout(rawSwrCtxPtr, "out_chlayout", &self.m_audioState.chLayoutOut, 0)
         if ret < 0 {
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout OUT failed with value: \(ret)"
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout OUT failed with value: \(ret) = '\(errorToString(error: err))'."
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)  
             throw CmpError(message: msg)
@@ -346,7 +346,7 @@ internal class M4aAudioPlayer {
             if self.m_audioState.packet.stream_index == self.m_audioState.audioStreamIndex {
                 retVal = avcodec_send_packet(self.m_audioState.codecCtx, &self.m_audioState.packet)
                 if retVal < 0 {
-                    let msg = "[M4aAudioPlayer].playAsync(). avcodec_send_packet failed with value: \(retVal). Error sending packet to decoder."
+                    let msg = "[M4aAudioPlayer].playAsync(). avcodec_send_packet failed with value: \(retVal) = '\(errorToString(error: retVal))'."
                     PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
                     return
                 }
@@ -382,7 +382,7 @@ internal class M4aAudioPlayer {
                         
                         // Ensure resampling was successful
                         guard samples >= 0 else {
-                            let msg = "swr_convert filed with value: \(samples). Error resampling audio."
+                            let msg = "swr_convert filed with value: \(samples) = '\(errorToString(error: samples))'."
                             PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
                             return
                         }
@@ -494,6 +494,11 @@ internal class M4aAudioPlayer {
     /// 
     static func gatherMetadata(path: URL) throws -> CmpMetadata {
         let metadata = CmpMetadata()      
+        let errorToString: (Int32) -> String = { error in
+            var errBuf = [CChar](repeating: 0, count: 128)
+            av_strerror(error, &errBuf, errBuf.count)
+            return String(cString: errBuf)
+        }
 
         if path.path.lowercased().hasSuffix(".m4a") {
             let filename = path.path
@@ -502,7 +507,7 @@ internal class M4aAudioPlayer {
             // Open the file
             var err = avformat_open_input(&formatContext, filename, nil, nil)
             if err != 0 {
-                let msg = "[M4aAudioPlayer].gatherMetadata(). avformat_open_input failed with value: \(err). Could not open file."
+                let msg = "[M4aAudioPlayer].gatherMetadata(). avformat_open_input failed with value: \(err) = '\(errorToString(err))'."
                 throw CmpError(message: msg)
             }
 
@@ -510,7 +515,7 @@ internal class M4aAudioPlayer {
             err = avformat_find_stream_info(formatContext, nil)
             if err < 0 {
                 avformat_close_input(&formatContext)
-                let msg = "[M4aAudioPlayer].gatherMetadata(). avformat_find_stream_info failed with value: \(err). Could not find stream information."
+                let msg = "[M4aAudioPlayer].gatherMetadata(). avformat_find_stream_info failed with value: \(err) = '\(errorToString(err))'."
                 throw CmpError(message: msg)
             }
 
@@ -572,5 +577,15 @@ internal class M4aAudioPlayer {
 
         let msg = "[M4aAudioPlayer].gatherMetadata(). Unknown file type from file: \(path.path)"
         throw CmpError(message: msg)
+    }
+    ///
+    /// errorToString
+    /// 
+    /// converts an av error code to string.
+    ///
+    func errorToString(error: Int32) -> String {
+        var errBuf = [CChar](repeating: 0, count: 128)
+        av_strerror(error, &errBuf, errBuf.count)
+        return "\(String(cString: errBuf))"
     }
 }// AudioPlayer
