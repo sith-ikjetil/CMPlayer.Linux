@@ -10,6 +10,58 @@
 //
 import Foundation
 
+//
+// Represent MainWindow fields pos and sizes.
+//
+internal class MainWindowLayout {
+    // cols
+    let songNoCols: Int = g_fieldWidthSongNo
+    var artistCols: Int = 0
+    var titleCols: Int = 0
+    let durationCols: Int = g_fieldWidthDuration    
+    // x
+    let songNoX: Int = 1    
+    var artistX: Int = 0
+    var titleX: Int = 0
+    var durationX: Int = 0
+
+    func getTotalCols() -> Int {
+        return self.songNoCols + self.durationCols + self.artistCols + self.titleCols
+    }
+
+    static func get() -> MainWindowLayout {
+            //
+            // calculate cols
+            //
+            let layout: MainWindowLayout = MainWindowLayout()
+            let ncalc: Int = Int(floor(Double(g_cols - layout.songNoCols - layout.durationCols) / 2.0))
+            layout.artistCols = ncalc
+            layout.titleCols =  ncalc
+
+            var total: Int = layout.getTotalCols()
+            if total < g_cols {
+                while total < g_cols {
+                    layout.titleCols += 1
+                    total = layout.getTotalCols()
+                }
+            }
+            else if total > g_cols {
+                while total > g_cols {
+                    layout.titleCols -= 1
+                    total = layout.getTotalCols()
+                }
+            }
+
+            //
+            // calculate x
+            //
+            layout.artistX = layout.songNoCols + 1
+            layout.titleX = layout.artistX + layout.artistCols 
+            layout.durationX = layout.titleX + layout.titleCols 
+            return layout
+    }
+}
+
 ///
 /// Represents CMPlayer MainWindow.
 ///
@@ -87,38 +139,34 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         Console.printXY(1,2," ", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
     
-        if PlayerPreferences.viewType == ViewType.Default {            
-            Console.printXY(1,3,"Song No.", g_fieldWidthSongNo+1, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        
-            let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
-            let artistCols: Int = Int(floor(ncalc))
-            let titleCols: Int =  Int(ceil(ncalc))
+        if PlayerPreferences.viewType == ViewType.Default {  
+            let layout: MainWindowLayout = MainWindowLayout.get()    
 
-            Console.printXY(10,3,"Artist", artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(1,3,"Song No.", layout.songNoCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)                    
+
+            Console.printXY(layout.songNoX,3,"Artist", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
-            Console.printXY(10+artistCols,3,"Title", titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.titleX,3,"Title", layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
-            Console.printXY(10+artistCols+titleCols-2,3,"Time", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.durationX,3,"Time", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
             //let sep = String("\u{2550}")
             Console.printXY(1,4,"=", g_cols, .left, "=", bgColor, ConsoleColorModifier.none, ConsoleColor.green, ConsoleColorModifier.bold)
         }
         else if PlayerPreferences.viewType == ViewType.Details {
-            Console.printXY(1,3,"Song No.", g_fieldWidthSongNo+1, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(1,4," ", g_fieldWidthSongNo+1, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-            
-            let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
-            let artistCols: Int = Int(floor(ncalc))
-            let titleCols: Int =  Int(ceil(ncalc))
+            let layout: MainWindowLayout = MainWindowLayout.get()    
 
-            Console.printXY(10,3,"Artist", artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(10,4,"Album Name", artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(1,3,"Song No.", layout.songNoCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(1,4," ", layout.songNoCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)                        
+
+            Console.printXY(layout.artistX,3,"Artist", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.artistX,4,"Album Name", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
-            Console.printXY(10+artistCols,3,"Title", titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(10+artistCols,4,"Genre", titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.titleX,3,"Title", layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.titleX,4,"Genre", layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
-            Console.printXY(10+artistCols+titleCols-2,3,"Time", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(10+artistCols+titleCols-2,4," ", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.durationX,3,"Time", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.durationX,4," ", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         
             //let sep = String("\u{2550}")
             Console.printXY(1,5,"=", g_cols, .left, "=", bgColor, ConsoleColorModifier.none, ConsoleColor.green, ConsoleColorModifier.bold)
@@ -139,38 +187,34 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         let songNoColor = ConsoleColor.cyan
         
         if PlayerPreferences.viewType == ViewType.Default {
+            let layout: MainWindowLayout = MainWindowLayout.get() 
+
             Console.printXY(1, y, String(song.songNo)+" ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
             
-            let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
-            let artistCols: Int = Int(floor(ncalc))
-            let titleCols: Int =  Int(ceil(ncalc))
-
-            Console.printXY(10, y, song.getArtist(), artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)            
-            Console.printXY(10+artistCols, y, song.getTitle(), titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(layout.artistX, y, song.getArtist(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)            
+            Console.printXY(layout.titleX, y, song.getTitle(), layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             
             let timeString: String = itsRenderMsToFullString(time, false)
             let endTimePart: String = String(timeString[timeString.index(timeString.endIndex, offsetBy: -5)..<timeString.endIndex])
-            Console.printXY(10+artistCols+titleCols-2, y, endTimePart, g_fieldWidthDuration, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(layout.durationX, y, endTimePart, layout.durationCols, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
         else if PlayerPreferences.viewType == ViewType.Details {
-            Console.printXY(1, y, "\(song.songNo) ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
-            Console.printXY(1, y+1, " ", g_fieldWidthSongNo+1, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-            
-            let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
-            let artistCols: Int = Int(floor(ncalc))
-            let titleCols: Int =  Int(ceil(ncalc))
+            let layout: MainWindowLayout = MainWindowLayout.get() 
 
-            Console.printXY(10, y, song.getArtist(), artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-            Console.printXY(10, y+1, song.getAlbumName(), artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(1, y, "\(song.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
+            Console.printXY(1, y+1, " ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             
-            Console.printXY(10+artistCols, y, song.getTitle(), titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-            Console.printXY(10+artistCols, y+1, song.getGenre(), titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(layout.artistX, y, song.getArtist(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(layout.artistX, y+1, song.getAlbumName(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            
+            Console.printXY(layout.titleX, y, song.getTitle(), layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(layout.titleX, y+1, song.getGenre(), layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             
             let timeString: String = itsRenderMsToFullString(time, false)
             let endTimePart: String = String(timeString[timeString.index(timeString.endIndex, offsetBy: -5)..<timeString.endIndex])
-            Console.printXY(10+artistCols+titleCols-2, y, endTimePart, g_fieldWidthDuration, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(layout.durationX, y, endTimePart, layout.durationCols, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             
-            Console.printXY(10+artistCols+titleCols-2, y+1, " ", g_fieldWidthDuration, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(layout.durationX, y+1, " ", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
     }
     /// 

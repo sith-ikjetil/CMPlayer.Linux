@@ -17,7 +17,7 @@ import Glibc
 //
 // Global constants.
 //
-internal let g_fieldWidthSongNo: Int = 8   // fixed
+internal let g_fieldWidthSongNo: Int = 9   // fixed
 internal let g_fieldWidthArtist: Int = 33  // min
 internal let g_fieldWidthTitle: Int = 33   // min
 internal let g_fieldWidthDuration: Int = 5 // fixed

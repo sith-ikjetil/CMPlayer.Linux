@@ -242,10 +242,8 @@ internal class SongEntry {
     func getArtist() -> String {
         var s = self.trimAndSetStringDefaultValue(str: self.fullArtist)
 
-        let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
-        let artistCols: Int = Int(floor(ncalc))
-        //let titleCols: Int =  Int(ceil(ncalc))
-        let maxStringLength = artistCols - 1
+        let layout: MainWindowLayout = MainWindowLayout.get()        
+        let maxStringLength = layout.artistCols - 1
 
         if s.count > maxStringLength {
             s = String(s[s.startIndex..<s.index(s.startIndex, offsetBy: maxStringLength)])
@@ -259,10 +257,8 @@ internal class SongEntry {
     func getAlbumName() -> String {
         var s = self.trimAndSetStringDefaultValue(str: self.fullAlbumName)
 
-        let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
-        let artistCols: Int = Int(floor(ncalc))
-        //let titleCols: Int =  Int(ceil(ncalc))
-        let maxStringLength = artistCols - 1
+        let layout: MainWindowLayout = MainWindowLayout.get()        
+        let maxStringLength = layout.artistCols - 1
 
         if s.count > maxStringLength {
             s = String(s[s.startIndex..<s.index(s.startIndex, offsetBy: maxStringLength)])
@@ -276,10 +272,8 @@ internal class SongEntry {
     func getTitle() -> String {
         var s = self.trimAndSetStringDefaultValue(str: self.fullTitle)
 
-        let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
-        //let artistCols: Int = Int(floor(ncalc))
-        let titleCols: Int =  Int(ceil(ncalc))
-        let maxStringLength = titleCols - 3
+        let layout: MainWindowLayout = MainWindowLayout.get()                        
+        let maxStringLength = layout.titleCols - 1
         
         if s.count > maxStringLength {
             s = String(s[s.startIndex..<s.index(s.startIndex, offsetBy: maxStringLength)])
@@ -293,10 +287,8 @@ internal class SongEntry {
     func getGenre() -> String {
         var s = self.trimAndSetStringDefaultValue(str: self.fullGenre)
 
-        let ncalc: Double = Double(g_cols - g_fieldWidthSongNo+1 - g_fieldWidthDuration) / 2.0
-        //let artistCols: Int = Int(floor(ncalc))
-        let titleCols: Int =  Int(ceil(ncalc))
-        let maxStringLength = titleCols - 3
+        let layout: MainWindowLayout = MainWindowLayout.get()                        
+        let maxStringLength = layout.titleCols - 1
 
         if s.count > maxStringLength {
             s = String(s[s.startIndex..<s.index(s.startIndex, offsetBy: maxStringLength)])
