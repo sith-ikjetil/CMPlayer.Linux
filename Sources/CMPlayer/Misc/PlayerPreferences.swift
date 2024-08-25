@@ -66,9 +66,9 @@ internal class PlayerPreferences {
     static var logError: Bool = true
     static var logDebug: Bool = true
     static var logOther: Bool = true
-    static var logMaxSize: Int = 500
+    static var logMaxSize: Int = 50
     static var logMaxSizeReached: LogMaxSizeReached = LogMaxSizeReached.EmptyLog
-    static let logMaxSizes: [Int] = [100, 500, 1000, 2000, 3000, 4000, 5000]
+    //static let logMaxSizes: [Int] = [100, 500, 1000, 2000, 3000, 4000, 5000]
     static var logApplicationStartLoadType: LogApplicationStartLoadType = LogApplicationStartLoadType.DoNotLoadOldLog    
     ///
     /// Default initializer.
