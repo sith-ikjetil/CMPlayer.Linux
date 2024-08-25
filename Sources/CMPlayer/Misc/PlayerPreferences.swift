@@ -45,6 +45,14 @@ internal enum ColorTheme: String {
     case Black = "black"
 }
 
+//
+// Sound output library to use
+//
+internal enum OutputSoundLibrary: String {
+    case ao = "ao"
+    case alsa = "alsa"
+}
+
 ///
 /// Represents CMPlayer PlayerPreferences.
 ///
@@ -61,6 +69,7 @@ internal class PlayerPreferences {
     static var crossfadeTimeInSeconds: Int = 4
     static var viewType: ViewType = ViewType.Details
     static var colorTheme: ColorTheme = ColorTheme.Default
+    static var outputSoundLibrary: OutputSoundLibrary = OutputSoundLibrary.ao
     static var logInformation: Bool = true
     static var logWarning: Bool = true
     static var logError: Bool = true
@@ -108,6 +117,9 @@ internal class PlayerPreferences {
                 }
                 if let aColorTheme = xeGeneral.attribute(forName: "colorTheme") {
                     PlayerPreferences.colorTheme = ColorTheme(rawValue: aColorTheme.stringValue ?? "blue") ?? ColorTheme.Blue
+                }
+                if let aOutputSoundLibrary = xeGeneral.attribute(forName: "outputSoundLibrary") {
+                    PlayerPreferences.outputSoundLibrary = OutputSoundLibrary(rawValue: aOutputSoundLibrary.stringValue ?? "ao") ?? OutputSoundLibrary.ao
                 }
                 
                 
@@ -225,6 +237,11 @@ internal class PlayerPreferences {
         xnColorTheme.name = "colorTheme"
         xnColorTheme.setStringValue(self.colorTheme.rawValue, resolvingEntities: false)
         xeGeneral.addAttribute(xnColorTheme)
+
+        let xnOutputSoundLibrary: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnOutputSoundLibrary.name = "outputSoundLibrary"
+        xnOutputSoundLibrary.setStringValue(self.outputSoundLibrary.rawValue, resolvingEntities: false)
+        xeGeneral.addAttribute(xnOutputSoundLibrary)
         
         //
         // log

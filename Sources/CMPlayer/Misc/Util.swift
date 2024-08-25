@@ -862,6 +862,7 @@ func PrintAndExecuteOutputDevices() {
 
 func PrintAndExecuteLibraryFiles() {    
     let files: [String] = ["libao.so",
+                           "libasound.so",
                            "libavcodec.so",
                            "libavformat.so",
                            "libavutil.so",

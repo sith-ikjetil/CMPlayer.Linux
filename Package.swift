@@ -8,6 +8,7 @@ import PackageDescription
             .library(name: "Cmpg123", type: .dynamic, targets: ["Cmpg123"]),
             .library(name: "Cao", type: .dynamic, targets: ["Cao"]),
             .library(name: "Cffmpeg", type: .dynamic, targets: ["Cffmpeg"]),
+            .library(name: "Casound", type: .dynamic, targets: ["Casound"]),
         ],    
         dependencies: [
             .package(url: "https://github.com/ponyboy47/Termios.git", from: "0.1.1"),
@@ -20,6 +21,7 @@ import PackageDescription
                     "Cmpg123",
                     "Cao",
                     "Cffmpeg",
+                    "Casound",
                 ],
                 cSettings: [
                     .define("CMP_TARGET_UBUNTU_V22_04"),
@@ -71,6 +73,16 @@ import PackageDescription
                     .linkedLibrary("avformat"),
                     .linkedLibrary("avutil"),
                     .linkedLibrary("swresample"),
+                ]
+            ),
+            .target(
+                name: "Casound",
+                dependencies: [],
+                cSettings: [
+                    .headerSearchPath("include"),                    
+                ],
+                linkerSettings: [
+                    .linkedLibrary("asound"),                    
                 ]
             ),
         ]        

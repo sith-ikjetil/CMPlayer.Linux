@@ -11,6 +11,7 @@
 import Foundation
 import Cmpg123
 import Cao
+import Casound
 import Termios
 import Glibc
 
@@ -79,6 +80,26 @@ if CommandLine.argc >= 2 {
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
+    else if CommandLine.arguments[1].lowercased() == "--set-output-ao" {
+        print("CMPlayer Set Output")
+        print("=========================")
+        PlayerPreferences.ensureLoadPreferences()
+        PlayerPreferences.outputSoundLibrary = OutputSoundLibrary.ao
+        PlayerPreferences.savePreferences()
+        print("(i): Output sound set to ao")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    else if CommandLine.arguments[1].lowercased() == "--set-output-alsa" {
+        print("CMPlayer Set Output")
+        print("=========================")
+        PlayerPreferences.ensureLoadPreferences()
+        PlayerPreferences.outputSoundLibrary = OutputSoundLibrary.alsa
+        PlayerPreferences.savePreferences()
+        print("(i): Output sound set to alsa")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
     else {
         print("CMPlayer Help")
         print("=========================")
@@ -88,6 +109,8 @@ if CommandLine.argc >= 2 {
         print(" --version         = show version numbers")
         print(" --integrity-check = do an integrity check")
         print(" --purge           = remove all stored data")
+        print(" --set-output-ao   = sets audio playback to use libao (ao)")
+        print(" --set-output-alsa = sets audio playback to use libasound (alsa)")
         print("")        
         exit(ExitCodes.SUCCESS.rawValue)
     }    
