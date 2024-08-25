@@ -10,6 +10,19 @@
 //
 import Foundation
 import Cao
+import Casound
+
+///
+/// Alsa output state struct.
+///
+internal struct AlsaState {
+    let pcmDeviceName = "default"
+    var pcmHandle: OpaquePointer? = nil
+    var channels: UInt32 = 2
+    var sampleRate: UInt32 = 44100
+    var bufferSize: snd_pcm_uframes_t = 1024
+}
+
 ///
 /// CmpMetadata
 /// Container for metadata.

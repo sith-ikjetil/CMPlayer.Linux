@@ -11,6 +11,16 @@
 import Foundation
 import Cmpg123
 import Cao
+import Casound
+
+///
+/// Audio state variables.
+///
+internal struct Mp3AudioState {    
+    var aoDevice: OpaquePointer? = nil
+    var aoFormat = ao_sample_format()
+    var alsaState: AlsaState = AlsaState()
+}
 
 //
 // Represents CMPlayer AudioPlayer.
@@ -39,6 +49,7 @@ internal class Mp3AudioPlayer {
     private var m_enableCrossfade: Bool = false
     private var m_seekPos: UInt64 = 0
     private var m_doSeekToPos: Bool = false
+    private var m_audioState: Mp3AudioState = Mp3AudioState()
     ///
     /// get properties
     ///
@@ -168,34 +179,63 @@ internal class Mp3AudioPlayer {
         // get default libao playback driver
         let defaultDriver = ao_default_driver_id()
 
-        // Set the output format
-        var format = ao_sample_format()
-        format.bits = 16
-        format.channels = channels
-        format.rate = Int32(rate)
-        format.byte_format = AO_FMT_NATIVE
-        format.matrix = nil
+        // Set up libao format        
+        self.m_audioState.aoFormat.bits = 16
+        self.m_audioState.aoFormat.channels = channels
+        self.m_audioState.aoFormat.rate = Int32(rate)
+        self.m_audioState.aoFormat.byte_format = AO_FMT_NATIVE
+        self.m_audioState.aoFormat.matrix = nil
+        // Set up libasound format        
+        self.m_audioState.alsaState.channels = 2
+        self.m_audioState.alsaState.sampleRate = 44100 
+        self.m_audioState.alsaState.bufferSize = 1024 
 
         // open for playing
-        guard let device = ao_open_live(defaultDriver, &format, nil) else {
-            let msg = "[Mp3AudioPlayer].play(). ao_open_live failed. Couldn't open audio device"            
+        if PlayerPreferences.outputSoundLibrary == .ao {
+            self.m_audioState.aoDevice = ao_open_live(defaultDriver, &self.m_audioState.aoFormat, nil)
+            if self.m_audioState.aoDevice == nil {
+                let msg = "[Mp3AudioPlayer].play(). ao_open_live failed. Couldn't open audio device"            
 
-            mpg123_close(self.mpg123Handle)
-            mpg123_delete(self.mpg123Handle)
-            self.mpg123Handle = nil
-              
-            throw CmpError(message:msg)
+                mpg123_close(self.mpg123Handle)
+                mpg123_delete(self.mpg123Handle)
+                self.mpg123Handle = nil
+                self.m_isPlaying = false                
+
+                throw CmpError(message:msg)
+            }
+        }
+        else {
+            var err = snd_pcm_open(&self.m_audioState.alsaState.pcmHandle, self.m_audioState.alsaState.pcmDeviceName, SND_PCM_STREAM_PLAYBACK, 0)
+            guard err >= 0 else {
+                let msg = "[Mp3AudioPlayer].play(). alsa. snd_pcm_open failed with value: \(err). Failed to open ALSA PCM device."
+                mpg123_close(self.mpg123Handle)
+                mpg123_delete(self.mpg123Handle)
+                self.mpg123Handle = nil
+                self.m_isPlaying = false                
+                
+                throw CmpError(message: msg)
+            }  
+            err = snd_pcm_set_params(self.m_audioState.alsaState.pcmHandle, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, self.m_audioState.alsaState.channels, self.m_audioState.alsaState.sampleRate, 1, 500000)
+            guard err >= 0 else {
+                let msg = "[Mp3AudioPlayer].play(). alsa. snd_pcm_set_params failed with value: \(err)"
+                mpg123_close(self.mpg123Handle)
+                mpg123_delete(self.mpg123Handle)
+                self.mpg123Handle = nil
+                self.m_isPlaying = false                
+                
+                throw CmpError(message: msg)
+            }
         }
 
         self.audioQueue.async { [weak self] in
-            self?.playAsync(device: device)
+            self?.playAsync()
         }
     }
     ///
     /// Performs the actual playback from play().
     /// Runs in the background.        
     /// - Parameter device: mpg123 handle
-    private func playAsync(device: OpaquePointer?) {
+    private func playAsync() {
         // set flags
         self.m_isPlaying = true
 
@@ -203,8 +243,14 @@ internal class Mp3AudioPlayer {
         PlayerLog.ApplicationLog?.logInformation(title: "[Mp3AudioPlayer].playAsync()", text: "Started playing file: \(self.filePath.lastPathComponent)")
         
         // make sure we clean up
-        defer {                                   
-            ao_close(device)            
+        defer {                  
+            if PlayerPreferences.outputSoundLibrary == .ao {                 
+                ao_close(self.m_audioState.aoDevice)            
+            }
+            else if PlayerPreferences.outputSoundLibrary == .alsa {
+                snd_pcm_drain(self.m_audioState.alsaState.pcmHandle)
+                snd_pcm_close(self.m_audioState.alsaState.pcmHandle)
+            }
             mpg123_close(self.mpg123Handle)
             mpg123_delete(self.mpg123Handle)
             self.m_timeElapsed = self.duration
@@ -280,7 +326,13 @@ internal class Mp3AudioPlayer {
                 }
 
                 // play audio samples
-                ao_play(device, pointer, UInt32(done))
+                if PlayerPreferences.outputSoundLibrary == .ao {
+                    ao_play(self.m_audioState.aoDevice, pointer, UInt32(done))
+                }
+                else if PlayerPreferences.outputSoundLibrary == .alsa {
+                    let frames = Int(done) / 2 / Int(self.m_audioState.alsaState.channels)
+                    snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, pointer, snd_pcm_uframes_t(frames))
+                }
             }            
 
             while (self.m_isPaused && !self.m_stopFlag && !g_quit) {

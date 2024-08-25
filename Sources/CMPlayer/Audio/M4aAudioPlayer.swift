@@ -11,6 +11,7 @@
 import Foundation
 import Cffmpeg
 import Cao
+import Casound
 
 let g_fver: Int32 = getFFmpegMajorVersion()
 
@@ -33,7 +34,10 @@ internal struct M4aAudioState {
     var audioStreamIndex: Int32 = -1
     var device: OpaquePointer?//UnsafeMutablePointer<ao_device>?
     var aoFormat = ao_sample_format()
+    var alsaState: AlsaState = AlsaState()
 }
+
+
 
 //
 // av_ch_layout_stereo
@@ -260,20 +264,39 @@ internal class M4aAudioPlayer {
         self.m_audioState.aoFormat.rate = 44100
         self.m_audioState.aoFormat.byte_format = AO_FMT_NATIVE
         self.m_audioState.aoFormat.matrix = nil
+        // Set up libasound format        
+        self.m_audioState.alsaState.channels = 2
+        self.m_audioState.alsaState.sampleRate = 44100 
+        self.m_audioState.alsaState.bufferSize = 1024 
         
         // Open libao device
-        self.m_audioState.device = ao_open_live(ao_default_driver_id(), &self.m_audioState.aoFormat, nil)
-        if self.m_audioState.device == nil {
-            let msg = "[M4aAudioPlayer].play(). ao_open_live failed with value: nil. Error opening audio device."
-#if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
-            av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
-            av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
-#endif
-            avcodec_free_context(&self.m_audioState.codecCtx)
-            avformat_close_input(&self.m_audioState.formatCtx)
-            throw CmpError(message: msg)
+        if PlayerPreferences.outputSoundLibrary == .ao {
+            self.m_audioState.device = ao_open_live(ao_default_driver_id(), &self.m_audioState.aoFormat, nil)
+            if self.m_audioState.device == nil {
+                let msg = "[M4aAudioPlayer].play(). ao_open_live failed with value: nil. Error opening audio device."
+    #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+                av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
+                av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
+    #endif
+                avcodec_free_context(&self.m_audioState.codecCtx)
+                avformat_close_input(&self.m_audioState.formatCtx)
+                throw CmpError(message: msg)
+            }
         }
-        
+        else if PlayerPreferences.outputSoundLibrary == .alsa {
+            let err = snd_pcm_open(&self.m_audioState.alsaState.pcmHandle, self.m_audioState.alsaState.pcmDeviceName, SND_PCM_STREAM_PLAYBACK, 0)
+            guard err >= 0 else {
+                let msg = "[M4aAudioPlayer].play(). alsa. snd_pcm_open failed with value: \(err)"
+    #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+                av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
+                av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
+    #endif
+                avcodec_free_context(&self.m_audioState.codecCtx)
+                avformat_close_input(&self.m_audioState.formatCtx)
+                throw CmpError(message: msg)
+            }
+        }
+
         self.audioQueue.async { [weak self] in            
             self?.playAsync()
         }
@@ -295,7 +318,13 @@ internal class M4aAudioPlayer {
             av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
             av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
 #endif
-            ao_close(self.m_audioState.device)
+            if PlayerPreferences.outputSoundLibrary == .ao {
+                ao_close(self.m_audioState.device)
+            }
+            else if PlayerPreferences.outputSoundLibrary == .alsa {
+                snd_pcm_drain(self.m_audioState.alsaState.pcmHandle)
+                snd_pcm_close(self.m_audioState.alsaState.pcmHandle)
+            }
             swr_free(&self.m_audioState.swrCtx)
             av_frame_free(&self.m_audioState.frame)
             avcodec_free_context(&self.m_audioState.codecCtx)
@@ -406,7 +435,13 @@ internal class M4aAudioPlayer {
                         }
 
                         // Write audio data to device
-                        ao_play(self.m_audioState.device, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), UInt32(UInt32(samples) * UInt32(2) * UInt32(MemoryLayout<Int16>.size)))                            
+                        if PlayerPreferences.outputSoundLibrary == .ao {
+                            ao_play(self.m_audioState.device, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), UInt32(UInt32(samples) * UInt32(2) * UInt32(MemoryLayout<Int16>.size)))                            
+                        }
+                        else {
+                            let frames = Int(bufferSize) / 2 / Int(self.m_audioState.alsaState.channels)
+                            snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), snd_pcm_uframes_t(frames))
+                        }
                     }
                                                 
                     // Free the output buffer
