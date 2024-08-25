@@ -85,7 +85,7 @@ internal class Player {
             return
         }
         
-        PlayerLog.ApplicationLog?.logInformation(title: "[Player].play", text: "Playing index \(playlistIndex), file \(g_playlist[playlistIndex].fileURL?.path ?? "--unknown")")
+        PlayerLog.ApplicationLog?.logInformation(title: "[Player].play(player,playlistIndex)", text: "Playing player: \(player), index \(playlistIndex), file \(g_playlist[playlistIndex].fileURL?.path ?? "--unknown--")")
         
         self.audioPlayerActive = player
         do {
@@ -125,7 +125,7 @@ internal class Player {
             
             Console.clearScreen()
             Console.gotoXY(1, 1)
-            system("clear")
+            system("clear")            
             
             print(msg) 
 
@@ -141,7 +141,7 @@ internal class Player {
             
             Console.clearScreen()
             Console.gotoXY(1, 1)            
-            system("clear")
+            system("clear")            
 
             print(msg) 
 

@@ -570,7 +570,8 @@ internal class M4aAudioPlayer {
             avformat_close_input(&formatContext)
             
             // Log we found metadatda
-            PlayerLog.ApplicationLog?.logInformation(title: "[M4aAudioPlayer].gatherMetadata()", text: "Found metadata for: \(path.path)")
+            // this is a preformance issue
+            //PlayerLog.ApplicationLog?.logInformation(title: "[M4aAudioPlayer].gatherMetadata()", text: "Found metadata for: \(path.path)")
 
             return metadata         
         }

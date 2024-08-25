@@ -244,7 +244,7 @@ internal class Console {
         sigintSrcSIGINT.setEventHandler {
             g_doNotPaint = true // windows that repaint async does not paint over the printed message before exit
 
-            let msg: String = "CMPlayer exited due to Ctrl+C"            
+            let msg: String = "CMPlayer exited due to Ctrl+C."            
 
             Console.clearScreen()
             Console.gotoXY(1, 1)

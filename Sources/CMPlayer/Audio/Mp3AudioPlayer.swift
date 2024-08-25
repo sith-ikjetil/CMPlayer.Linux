@@ -533,10 +533,6 @@ internal class Mp3AudioPlayer {
                         if !bFoundGenre {
                             metadata.genre = convertId3V1GenreIndexToName(index: id3v1.genre)
                         }
-                    } 
-                    else {
-                        let msg = "[Mp3AudioPlayer].gatherMetadata(path:). Metadata not found. File: \(path.lastPathComponent)"
-                        throw CmpError(message: msg)
                     }
 
                     //
@@ -545,6 +541,10 @@ internal class Mp3AudioPlayer {
                     if metadata.trackNo < 0 {
                         metadata.trackNo = 0
                     }
+
+                    // Log we found metadatda
+                    // this is a preformance issue
+                    //PlayerLog.ApplicationLog?.logInformation(title: "[Mp3AudioPlayer].gatherMetadata()", text: "Found metadata for: \(path.path)")
 
                     //
                     // return metadata
