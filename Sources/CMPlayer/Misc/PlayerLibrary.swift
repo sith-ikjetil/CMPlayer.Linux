@@ -21,7 +21,8 @@ internal class PlayerLibrary {
     //
     private let filename: String = "CMPLayer.Library.xml"
     private var nextSongNo: Int = 1
-    private var dictionary: [String: Int] = [:]    
+    private var dictionary: [String: Int] = [:]
+    var invalidEntriesCount: Int = 0
     //
     // variables
     //
@@ -64,9 +65,9 @@ internal class PlayerLibrary {
     ///
     /// Loads the CMPlayer.Library.xml song library for faster song initialization load time.
     ///
-    func load() {
+    func load() throws {
         let fileUrl: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent("CMPlayer.Library.xml", isDirectory: false)
-        if FileManager.default.fileExists(atPath: fileUrl.path) {
+        if FileManager.default.fileExists(atPath: fileUrl.path) {            
             do {
                 self.dictionary.removeAll()
                 self.library.removeAll()
@@ -129,17 +130,19 @@ internal class PlayerLibrary {
                             }
                         }
                         catch let error as CmpError {
+                            self.invalidEntriesCount += 1
                             let msg = "Error adding song to library. Message: \(error.message)"
                             PlayerLog.ApplicationLog?.logWarning(title: "[PlayerLibrary].load()", text: msg)
                         }
                         catch {
-                            
+                            self.invalidEntriesCount += 1
                         }
                     }
                 }
             }
             catch {
-                
+                let msg = "[PlayerLibrary].load(). Error: \(error)."
+                throw CmpError(message: msg)
             }
         }
     }    

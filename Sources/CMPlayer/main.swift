@@ -56,6 +56,7 @@ internal var g_doNotPaint: Bool = false
 // Check for command line arguments.
 if CommandLine.argc >= 2 {
     if CommandLine.arguments[1].lowercased() == "--integrity-check" {
+        PlayerPreferences.ensureLoadPreferences()        
         // initialize libao
         ao_initialize()        
         PrintAndExecuteIntegrityCheck()

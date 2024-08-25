@@ -60,7 +60,12 @@ internal class Player {
             wnd.showWindow()
         }
         
-        g_library.load()
+        do {
+            try g_library.load()
+        }
+        catch {
+            
+        }
         
         let wnd = InitializeWindow()
         wnd.showWindow()

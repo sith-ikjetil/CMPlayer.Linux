@@ -842,17 +842,18 @@ func PrintAndExecuteIntegrityCheck() {
     print("========================")
     PrintAndExecuteOutputDevices()
     PrintAndExecuteLibraryFiles()
+    PrintAndExecutePlayerLibrary()
 }
 ///
 /// Prints information about output devices.
 /// 
 func PrintAndExecuteOutputDevices() {        
-    print("ao:")
+    print("Audio Output(ao):")
     printAoInfo()    
     print("")
-    print("alsa:")
+    print("ALSA:")
     printALSAInfo()
-    print("")
+    print("")    
 }
 ///
 /// prints ao information
@@ -926,6 +927,26 @@ func printALSAInfo() {
     }
 }
 ///
+/// Prints some statistics about player library.
+/// 
+func PrintAndExecutePlayerLibrary() {
+    print("Player Library:")    
+    do {
+        let lib: PlayerLibrary = PlayerLibrary()
+        try lib.load()
+        print(" > Number of valid entries     \(lib.library.count)")    
+        print(" > Number of invalid entries   \(lib.invalidEntriesCount)")    
+    }
+    catch let error as CmpError {
+        print(" > (e): Could not load library. Message: '\(error.message)'")
+    }
+    catch {
+        print(" > (e): Unknown error. Could not load library. Message: '\(error)'")
+    }
+
+    print("")
+}
+///
 /// Attempts to find .so library files under /usr.
 /// Prints out result.
 /// 
@@ -939,7 +960,7 @@ func PrintAndExecuteLibraryFiles() {
 
     let directories: [String] = ["/usr"]
 
-    print("Libraries:")
+    print("Libraries (.so):")
     for i: Int in 0..<files.count {
         let fileName = files[i]
         var dir: String = ""
@@ -984,3 +1005,4 @@ func findFile(named fileName: String, under directory: URL) -> URL? {
     
     return nil
 }
+
