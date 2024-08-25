@@ -2,9 +2,10 @@
 License: **GPL-3.0-or-later**  
 This is a console music player for Linux.  
   
+<img src="https://kjetil.azurewebsites.net/images/CMPlayerUbuntuWSL.png" alt="CMPlayer.Linux" style="width:70%;">
+
 ## Application
-The applications name is **cmplayer** and the following  
-arguments are supported:
+The applications name is **cmplayer** and the following arguments are supported:  
  - --help (shows usage screen)
  - --version (shows version number)
  - --integrity-check (does a quick integrity check of cmplayer)
@@ -15,7 +16,7 @@ The following file formats are currently supported:
  - .m4a
   
 ## Libraries
-The player uses the following tools and libraries:
+The player uses the following tools and libraries:  
  - Swift (version 5.10.1+)
  - libmpg123 (libmpg123.so)
  - ffmpeg
@@ -25,8 +26,7 @@ The player uses the following tools and libraries:
  - libavutil (libavutil.so)
   
 ## Ubuntu
-In order to get these libraries onto your Ubuntu distro, you can  
-execute the following commands:
+In order to get these libraries onto your Ubuntu distro, you can execute the following commands:  
  - sudo apt install ffmpeg
  - sudo apt install libavcodec-dev
  - sudo apt install libavformat-dev
@@ -37,8 +37,7 @@ execute the following commands:
  - On WSL: sudo apt install pulseaudio (can be helpful, but doesn't always work)
    
 ## Fedora
-In order to get these libraries onto you Fedora distro, you can   
-execute the following commands:
+In order to get these libraries onto you Fedora distro, you can execute the following commands:  
  - sudo dnf install ffmpeg
  - sudo dnf install --allowerasing libavcodec-free-devel
  - sudo dnf install --allowerasing libavformat-free-devel
@@ -48,8 +47,7 @@ execute the following commands:
  - sudo dnf install libao-devel
 
 ## Manjaro
-In order to get these libraries onto you Manjaro distro, you can  
-execute the following commands:
+In order to get these libraries onto you Manjaro distro, you can execute the following commands:  
  - sudo pacman -Syu libao
  - sudo pacman -Syu mpg123
   
@@ -61,16 +59,16 @@ export C_INCLUDE_PATH=/usr/include/ffmpeg:$C_INCLUDE_PATH
 ```
   
 ## LD_LIBRARY_PATH
-After installing Swift, remember to update LD_LIBRARY_PATH. Set  
-the following into your .bashrc and .bash_profile.  
+After installing Swift, remember to update LD_LIBRARY_PATH. Set the following  
+into your .bashrc and .bash_profile.  
 ```bash
 export LD_LIBRARY_PATH=/opt/swift-5.10.1/usr/lib/swift/linux:$LD_LIBRARY_PATH  
 ```
 (the path is of course up to you where you put swift)  
   
 ## PATH
-You must put swift binaries in you path. An example would be to  
-put them into your .bashrc and .bash_profile using the following:  
+You must put swift binaries in you path. An example would be to put them into your .bashrc  
+and .bash_profile using the following:  
 ```bash
 PATH=/opt/swift-5.10.1/usr/bin:$PATH  
 ```
