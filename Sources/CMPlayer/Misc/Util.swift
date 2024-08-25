@@ -900,14 +900,23 @@ func printALSAInfo() {
             break
         }
 
-        let cardInfo: OpaquePointer? = nil
-        if snd_ctl_card_info(ctlHandle, cardInfo) < 0 {
+        // Manually allocate memory for card info
+        let cardInfoSize = snd_ctl_card_info_sizeof()
+        let cardInfoRaw = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(cardInfoSize))
+        defer {
+            cardInfoRaw.deallocate()
+        }
+
+        // Cast the raw memory to an OpaquePointer
+        let cardInfoTyped: OpaquePointer? = OpaquePointer(cardInfoRaw)
+
+        if snd_ctl_card_info(ctlHandle, cardInfoTyped) < 0 {
             print("(e): Error getting card information: (\(card)): '\(String(cString: snd_strerror(err)))'")
             snd_ctl_close(ctlHandle)
             break
         }
         
-        print(" > Card \(card): \(String(cString: snd_ctl_card_info_get_id(cardInfo))) [\(String(cString: snd_ctl_card_info_get_name(cardInfo)))], driver \(String(cString: snd_ctl_card_info_get_driver(cardInfo)))")        
+        print(" > Card \(card): \(String(cString: snd_ctl_card_info_get_id(cardInfoTyped))) [\(String(cString: snd_ctl_card_info_get_name(cardInfoTyped)))], driver \(String(cString: snd_ctl_card_info_get_driver(cardInfoTyped)))")        
 
         snd_ctl_close(ctlHandle)
 
