@@ -193,7 +193,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
         let pstLib: String = "\(self.libraryLoadedCompleted)%"
         Console.printXY(1, 7, "Updating Song Library: " + pstLib, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        Console.printXY(1,23,"PLEASE BE PATIENT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows-1,"PLEASE BE PATIENT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         Console.gotoXY(g_cols,1)
         print("")

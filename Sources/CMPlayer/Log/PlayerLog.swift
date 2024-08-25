@@ -80,9 +80,16 @@ internal class PlayerLog {
                 return
             }
         }
-        self.entries.append(PlayerLogEntry(type: PlayerLogEntryType.Error, title: title, text: text, timeStamp: Date()))
+
+        let logEntry = PlayerLogEntry(type: PlayerLogEntryType.Error, title: title, text: text, timeStamp: Date())
+        self.entries.append(logEntry)
         if self.autoSave {
-            self.saveLog()
+            if saveType == .xml {
+                self.saveLog()
+            }
+            else if saveType == .plainText {
+                self.appendToPlainTextLog(logEntry: logEntry)
+            }
         }    
     }    
     ///
@@ -101,9 +108,16 @@ internal class PlayerLog {
                 return
             }
         }
-        self.entries.append(PlayerLogEntry(type: PlayerLogEntryType.Warning, title: title, text: text, timeStamp: Date()))
+
+        let logEntry = PlayerLogEntry(type: PlayerLogEntryType.Warning, title: title, text: text, timeStamp: Date())
+        self.entries.append(logEntry)
         if self.autoSave {
-            self.saveLog()
+            if saveType == .xml {
+                self.saveLog()
+            }
+            else if saveType == .plainText {
+                self.appendToPlainTextLog(logEntry: logEntry)
+            }
         }    
     }    
     ///
@@ -120,14 +134,19 @@ internal class PlayerLog {
             }
             else {
                 return
-            }
-        }        
-        self.entries.append(PlayerLogEntry(type: PlayerLogEntryType.Information, title: title, text: text, timeStamp: Date()))        
-        
+            }            
+        }    
+
+        let logEntry =  PlayerLogEntry(type: PlayerLogEntryType.Information, title: title, text: text, timeStamp: Date())   
+        self.entries.append(logEntry)
         if self.autoSave {
-            self.saveLog()
-        }
-        //os_log("(i): %{public}s","\(title): \(text)")
+            if saveType == .xml {
+                self.saveLog()
+            }
+            else if saveType == .plainText {
+                self.appendToPlainTextLog(logEntry: logEntry)
+            }
+        }    
     }    
     ///
     /// Logs a debug entry
@@ -145,10 +164,17 @@ internal class PlayerLog {
                 return
             }
         }
-        self.entries.append(PlayerLogEntry(type: PlayerLogEntryType.Debug, title: title, text: text, timeStamp: Date()))
+        
+        let logEntry = PlayerLogEntry(type: PlayerLogEntryType.Debug, title: title, text: text, timeStamp: Date())
+        self.entries.append(logEntry)
         if self.autoSave {
-            self.saveLog()
-        }        
+            if saveType == .xml {
+                self.saveLog()
+            }
+            else if saveType == .plainText {
+                self.appendToPlainTextLog(logEntry: logEntry)
+            }
+        }    
     }    
     ///
     /// Logs an other entry.
@@ -166,10 +192,16 @@ internal class PlayerLog {
                 return
             }
         }
-        self.entries.append(PlayerLogEntry(type: PlayerLogEntryType.Other, title: title, text: text, timeStamp: Date()))
+        let logEntry = PlayerLogEntry(type: PlayerLogEntryType.Other, title: title, text: text, timeStamp: Date())
+        self.entries.append(logEntry)
         if self.autoSave {
-            self.saveLog()
-        }     
+            if saveType == .xml {
+                self.saveLog()
+            }
+            else if saveType == .plainText {
+                self.appendToPlainTextLog(logEntry: logEntry)
+            }
+        }
     }    
     ///
     /// Clears the log.
@@ -180,7 +212,7 @@ internal class PlayerLog {
     ///
     /// Saves the log as an XML document
     ///
-    func saveLogAsXMLDocument() -> XMLDocument {        
+    func toXMLDocument() -> XMLDocument {        
         // Create the root element "Log"
         let xeRoot: XMLElement = XMLElement(name: "Log")
         
@@ -196,23 +228,29 @@ internal class PlayerLog {
         let xmlDoc = XMLDocument(rootElement: xeRoot)
         
         return xmlDoc
-    }    
+    }       
     ///
     /// Saves the log
     ///
     internal func saveLogAsXml()
     {                
-        let xd: XMLDocument = self.saveLogAsXMLDocument()
-        let xml: String = xd.xmlString
-        let url: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenameXml, isDirectory: false)
+        let path: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenameXml, isDirectory: false) 
+        saveLogAsXml(path: path)        
+    }  
+    ///
+    ///
+    ///
+    internal func saveLogAsXml(path: URL) {
+        let xd: XMLDocument = self.toXMLDocument()
+        let xml: String = xd.xmlString        
         
         do {
-            try xml.write(to: url, atomically: true,encoding: .utf8)            
+            try xml.write(to: path, atomically: true,encoding: .utf8)            
         }
         catch {
             PlayerLog.ApplicationLog?.logError(title: "[PlayerLog].saveLog()", text: "\(error)")
         }
-    }    
+    }
     /// 
     /// saveLog saves as any one of several types.
     /// 
@@ -222,27 +260,24 @@ internal class PlayerLog {
             case .xml:
                 self.saveLogAsXml() 
             case .plainText:
-                self.saveLogAsPlainText()
+                self.saveLogAsPlainText()                
         }
     }
     ///
     /// Saves the log
     ///
     internal func saveLogAsPlainText()
-    {    
-        var text: String = ""
-                    
-        for entry in self.entries
-        {
-            text += "[\(entry.type)] \(entry.timeStamp)"
-            text += "\n"
-            text += "\(entry.title)"
-            text += "\n"
-            text += "\(entry.text)"
-            text += "\n\n"
-        }
-
+    {
         let path: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenamePlainText, isDirectory: false)
+        self.saveLogAsPlainText(path: path)
+    }
+    /// 
+    /// Saves the log to the given path.
+    ///     
+    internal func saveLogAsPlainText(path: URL)
+    {    
+        let text = self.toPlainText()
+
         do {
             try text.write(to: path, atomically: true, encoding: .utf8)
         } catch {
@@ -254,25 +289,70 @@ internal class PlayerLog {
     ///
     /// parameter url: file to save.
     ///
-    func saveLogAs(url: URL) {
-        let xd: XMLDocument = self.saveLogAsXMLDocument()
-        let xml: String = xd.xmlString
-        
-        do {
-            try xml.write(to: url, atomically: true,encoding: .utf8)
-        }
-        catch {
-            PlayerLog.ApplicationLog?.logError(title: "[PlayerLog].saveLogAs(url)", text: "\(error)")
-        }
+    func saveLogAs(path: URL) {
+        switch self.saveType {
+            case .xml:
+                saveLogAsXml(path: path)            
+            case .plainText:
+                saveLogAsPlainText(path: path)            
+        }        
     }    
     ///
-    /// Saves log to a string.
+    /// Converts log to xml string.
     ///
     /// returnes: a string containing the xml log.
     ///
-    func saveLogToString() -> String {
-        let xd: XMLDocument = self.saveLogAsXMLDocument()
+    func toXmlString() -> String {
+        let xd: XMLDocument = self.toXMLDocument()
         return xd.xmlString
-    }// saveLogToString
+    }// saveLogToString    
+    /// 
+    /// Converts log to plain text string.
+    /// 
+    /// - Returns: log as plain text.
+    func toPlainText() -> String {
+        var text: String = ""
+
+        for entry in self.entries {
+            text += entry.toPlainText()
+        }
+
+        return text
+    }
+    ///
+    /// Appends text to plain text log
+    ///
+    private func appendToPlainTextLog(logEntry: PlayerLogEntry) {
+        let text: String = logEntry.toPlainText()
+        let filePath: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenamePlainText, isDirectory: false)
+
+        do {
+            // Check if file exists
+            if !FileManager.default.fileExists(atPath: filePath.path) {
+                // If file does not exist, create it with initial content
+                try text.write(to: filePath, atomically: true, encoding: .utf8)
+            } 
+            else {
+                // If file exists, append the new content
+                let fileHandle = try FileHandle(forWritingTo: filePath)
+
+                defer {
+                    // Close the file
+                    fileHandle.closeFile()
+                }
+
+                // Move to the end of the file
+                fileHandle.seekToEndOfFile()
+                
+                // Convert the string to Data and append it
+                if let data = text.data(using: .utf8) {
+                    fileHandle.write(data)
+                }                
+            }            
+        } 
+        catch {
+        
+        }
+    }
 }// PlayerLog
 

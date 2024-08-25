@@ -873,7 +873,7 @@ func printAoInfo() {
         }    
     } 
     else {        
-        print("(e): Failed to retrieve audio driver information.")
+        print(" > (e): Failed to retrieve audio driver information.")
     }
 }
 ///
@@ -887,7 +887,7 @@ func printALSAInfo() {
     // Get the first card
     err = snd_card_next(&card)
     guard err >= 0, card >= 0 else {
-        print("(e): No sound cards found: '\(String(cString: snd_strerror(err)))'")
+        print(" > (e): No sound cards found: '\(String(cString: snd_strerror(err)))'")
         return
     }    
 
@@ -895,7 +895,7 @@ func printALSAInfo() {
         // Open the control interface for the card
         let cardName = "hw:\(card)"
         if snd_ctl_open(&ctlHandle, cardName, 0) < 0 {
-            print("(e): Error opening control interface: '\(String(cString: snd_strerror(err)))'")
+            print(" > (e): Error opening control interface: '\(String(cString: snd_strerror(err)))'")
             break
         }
 
@@ -910,7 +910,7 @@ func printALSAInfo() {
         let cardInfoTyped: OpaquePointer? = OpaquePointer(cardInfoRaw)
 
         if snd_ctl_card_info(ctlHandle, cardInfoTyped) < 0 {
-            print("(e): Error getting card information: '\(String(cString: snd_strerror(err)))'")
+            print(" > (e): Error getting card information: '\(String(cString: snd_strerror(err)))'")
             snd_ctl_close(ctlHandle)
             break
         }
