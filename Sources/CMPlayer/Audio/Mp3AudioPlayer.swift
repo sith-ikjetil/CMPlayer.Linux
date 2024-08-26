@@ -544,17 +544,7 @@ internal class Mp3AudioPlayer {
                         if id3v2.genre?.pointee.p != nil {
                             let genre = String(cString: id3v2.genre.pointee.p)
                             if genre.count > 0 {
-                                metadata.genre = genre
-                                if genre.first == Character("(") && genre.last == Character(")")  {
-                                    let snum = genre.trimmingCharacters(in: CharacterSet(charactersIn: "()"))
-                                    let num = UInt8(snum)
-                                    if num != nil {
-                                        metadata.genre = convertId3V1GenreIndexToName(index: num!)  
-                                    }                                
-                                }
-                                else if let num = UInt8(genre) {
-                                    metadata.genre = convertId3V1GenreIndexToName(index: num)  
-                                }
+                                metadata.genre = extractMetadataGenre(text: genre)                                
                                 bFoundGenre = true
                             }
                         }                                                                   

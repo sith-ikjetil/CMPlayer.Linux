@@ -602,7 +602,7 @@ internal class M4aAudioPlayer {
                         case "album":
                             metadata.albumName = String(cString: value)
                         case "genre":
-                            metadata.genre = String(cString: value)
+                            metadata.genre = extractMetadataGenre(text: String(cString: value))
                         case "track":
                             metadata.trackNo =  extractMetadataTrackNo(text: String(cString: value))
                         case "year", "date", "time":

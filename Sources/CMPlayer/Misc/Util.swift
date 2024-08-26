@@ -844,6 +844,37 @@ func extractMetadataYear(text: String) -> Int {
     
     return 0
 }
+/// 
+/// 
+/// - Parameter text: 
+/// - Returns: 
+func extractMetadataGenre(text: String) -> String {
+    //
+    // 1. Search for a number, assume genre index and get name from index.
+    //
+    let pattern1 = "\\b(\\d{1,3})\\b"
+    let regex1 = try? NSRegularExpression(pattern: pattern1)
+    if let match = regex1?.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text)) {
+        if let range = Range(match.range(at: 1), in: text) {
+            if let genreId = UInt8(String(text[range])) {
+                return convertId3V1GenreIndexToName(index: genreId)
+            }
+        }
+    }
+
+    //
+    // 2. Search for a name, assume name is genre.
+    //
+    let pattern2 = "\\b([\\w-/ ]+)\\b"
+    let regex2 = try? NSRegularExpression(pattern: pattern2)
+    if let match = regex2?.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text)) {
+        if let range = Range(match.range(at: 1), in: text) {
+            return String(text[range])
+        }
+    }
+
+    return g_metadataNotFoundName
+}
 ///
 /// Does an integrity check.
 /// 
