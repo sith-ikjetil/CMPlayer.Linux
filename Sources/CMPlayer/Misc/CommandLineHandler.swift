@@ -52,8 +52,27 @@ internal class CommandLineHandler {
     /// execute --version
     /// 
     private static func execute__version()
-    {
-        print("CMPlayer v\(g_versionString)")
+    {        
+        let readLinuxReleaseInfo: () -> String? = {
+            if let text = try? String(contentsOfFile: "/etc/os-release") {
+                let pattern = "PRETTY_NAME=\"(.*)\""
+                let regex = try? NSRegularExpression(pattern: pattern)
+    
+                // Search for the first match
+                if let match = regex?.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text)) {
+                    // Extract the matched range for the first number
+                    if let range = Range(match.range(at: 1), in: text) {
+                        return String(text[range])
+                    }
+                }                
+            }
+            return nil
+        }
+
+        print("CMPlayer version \(g_versionString)")
+        if let distro = readLinuxReleaseInfo() {
+            print("Distribution: \(distro)")
+        }
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
