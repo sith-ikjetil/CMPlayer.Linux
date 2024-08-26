@@ -56,7 +56,7 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
     /// Renders screen output. Does clear screen first.
     ///
     func renderWindow() -> Void {
-        if g_rows < 24 || g_cols < 80 {
+        guard isWindowSizeValid() else {
             return
         }
         

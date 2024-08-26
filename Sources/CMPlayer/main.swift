@@ -29,6 +29,8 @@ internal let g_crossfadeMinTime: Int = 1   // seconds
 internal let g_crossfadeMaxTime: Int = 20  // seconds
 internal let g_asyncCompletionDelay: Float = 0.2
 internal let g_metadataNotFoundName: String = "--unknown--"
+internal let g_minCols: Int = 80
+internal let g_minRows: Int = 24
 //
 // Global variables/properties
 //

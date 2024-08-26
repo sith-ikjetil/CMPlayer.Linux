@@ -46,7 +46,7 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
     /// parameter path: Path to render on screen.
     ///
     func renderWindow() -> Void {
-        if g_rows < 24 || g_cols < 80 {
+        guard isWindowSizeValid() else {
             return
         }
         

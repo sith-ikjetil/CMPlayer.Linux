@@ -88,6 +88,16 @@ internal protocol TerminalSizeHasChangedProtocol {
 internal protocol PlayerWindowProtocol {
     func showWindow() -> Void
 }
+/// 
+/// Returnes true if window size is valid, false otherwise.
+/// - Returns: 
+internal func isWindowSizeValid() -> Bool {
+    if g_rows < g_minRows || g_cols < g_minCols {
+        return false
+    }
+
+    return true
+}
 ///
 /// Check to see if command is one of the supported given commands.
 ///

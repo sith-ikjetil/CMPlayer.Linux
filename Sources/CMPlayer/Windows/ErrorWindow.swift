@@ -51,7 +51,7 @@ internal class ErrorWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
     /// parameter message: The message to show in error.
     ///
     func renderWindow() -> Void {   
-        if g_rows < 24 || g_cols < 80 {
+        guard isWindowSizeValid() else {
             return
         }
 
