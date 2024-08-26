@@ -113,13 +113,14 @@ internal class Mp3AudioPlayer {
         var err: Int32 = 0
         self.mpg123Handle = mpg123_new(nil, &err)
         guard err == 0 else { // MPG123_OK
-            let msg = "[Mp3AudioPlayer].play(). mpg123_new failed. Failed to create mpg123 handle"            
+            let msg = "[Mp3AudioPlayer].play(). mpg123_new failed with value: \(err) = '\(renderMpg123Error(error: err))'. Failed to create mpg123 handle"
             throw CmpError(message: msg)
         }
 
         // Open the file
-        if mpg123_open(self.mpg123Handle, self.filePath.path) != 0 { // MPG123_OK
-            let msg = "[Mp3AudioPlayer].play(). mpg123_open failed. Failed to open MP3 file: \(self.filePath.lastPathComponent)"
+        err = mpg123_open(self.mpg123Handle, self.filePath.path)
+        if err != 0 { // MPG123_OK
+            let msg = "[Mp3AudioPlayer].play(). mpg123_open failed with value: \(err) = '\(renderMpg123Error(error: err))'. Failed to open MP3 file: \(self.filePath.lastPathComponent)"
 
             mpg123_delete(self.mpg123Handle)
             self.mpg123Handle = nil
@@ -130,17 +131,19 @@ internal class Mp3AudioPlayer {
         //
         // find duration
         //                      
-        if mpg123_scan(self.mpg123Handle) != 0 {                
+        err = mpg123_scan(self.mpg123Handle)
+        if err != 0 {                
+            let msg = "[Mp3AudioPlayer].play(). mpg123_scan failed with value: \(err) = '\(renderMpg123Error(error: err))'. File: \(self.filePath.path.lastPathComponent)"
             mpg123_close(self.mpg123Handle)
-            mpg123_delete(self.mpg123Handle)
-            let msg = "[Mp3AudioPlayer].play(). mpg123_scan failed. File: \(self.filePath.path.lastPathComponent)"
+            mpg123_delete(self.mpg123Handle)            
             throw CmpError(message: msg)                
         }
 
         self.m_length = mpg123_length(self.mpg123Handle)
         if self.m_length <= 0 {
-            let msg = "[Mp3AudioPlayer].play(). mpg123_length with invalid value: \(self.m_length)"
-                        
+            let msg = "[Mp3AudioPlayer].play(). mpg123_length failed with value: \(self.m_length)"
+            mpg123_close(self.mpg123Handle)
+            mpg123_delete(self.mpg123Handle)
             throw CmpError(message: msg)
         }
 
@@ -149,8 +152,9 @@ internal class Mp3AudioPlayer {
         var channels: Int32 = 0
         var encoding: Int32 = 0
 
-        if mpg123_getformat(mpg123Handle, &rate, &channels, &encoding) != 0 { // MPG123_OK
-            let msg = "[Mp3AudioPlayer].play(). mpg123_getformat failed. Failed to get MP3 format."            
+        err = mpg123_getformat(mpg123Handle, &rate, &channels, &encoding)
+        if err != 0 { // MPG123_OK
+            let msg = "[Mp3AudioPlayer].play(). mpg123_getformat failed with value: \(err) = '\(renderMpg123Error(error: err))'. Failed to get MP3 format."
 
             mpg123_close(self.mpg123Handle)
             mpg123_delete(self.mpg123Handle)
@@ -207,7 +211,7 @@ internal class Mp3AudioPlayer {
         else {
             var err = snd_pcm_open(&self.m_audioState.alsaState.pcmHandle, self.m_audioState.alsaState.pcmDeviceName, SND_PCM_STREAM_PLAYBACK, 0)
             guard err >= 0 else {
-                let msg = "[Mp3AudioPlayer].play(). alsa. snd_pcm_open failed with value: \(err). Failed to open ALSA PCM device."
+                let msg = "[Mp3AudioPlayer].play(). alsa. snd_pcm_open failed with value: \(err) = '\(renderAlsaError(error: err))'. Failed to open ALSA PCM device."
                 mpg123_close(self.mpg123Handle)
                 mpg123_delete(self.mpg123Handle)
                 self.mpg123Handle = nil
@@ -217,7 +221,7 @@ internal class Mp3AudioPlayer {
             }  
             err = snd_pcm_set_params(self.m_audioState.alsaState.pcmHandle, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, self.m_audioState.alsaState.channels, self.m_audioState.alsaState.sampleRate, 1, 500000)
             guard err >= 0 else {
-                let msg = "[Mp3AudioPlayer].play(). alsa. snd_pcm_set_params failed with value: \(err)"
+                let msg = "[Mp3AudioPlayer].play(). alsa. snd_pcm_set_params failed with value: \(err) = '\(renderAlsaError(error: err))'"
                 mpg123_close(self.mpg123Handle)
                 mpg123_delete(self.mpg123Handle)
                 self.mpg123Handle = nil
@@ -289,7 +293,7 @@ internal class Mp3AudioPlayer {
                 return
             }
             if (err != 0) { // MPG123_OK
-                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: "mpg123_read return failure code: \(err). File: \(self.filePath.lastPathComponent)")                                
+                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: "mpg123_read failed with value: \(err) = '\(renderMpg123Error(error: err))'. File: \(self.filePath.lastPathComponent)")
                 return
             }
             if done <= 0 {                 
@@ -412,6 +416,14 @@ internal class Mp3AudioPlayer {
         if path.path.lowercased().hasSuffix(".mp3") {
             let metadata = CmpMetadata()
 
+            let renderMpg123Error: (Int32) -> String = { error in
+                if let errorMessage = mpg123_plain_strerror(error) {        
+                    return "\(String(cString: errorMessage))"
+                }
+                return ""
+            }                
+
+
             //print("URL: \(self.fileURL!.path)")
             guard let handle = mpg123_new(nil, nil) else {
                 let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_new failed. File: \(path.lastPathComponent)"
@@ -423,9 +435,9 @@ internal class Mp3AudioPlayer {
                 mpg123_delete(handle)                
             }
 
-            let err = mpg123_open(handle, path.path)
+            var err = mpg123_open(handle, path.path)
             guard err == 0 else {                
-                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_open failed for file: \(path.lastPathComponent)"
+                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_open failed with value: \(err) = '\(renderMpg123Error(err))'. File: \(path.lastPathComponent)"
                 throw CmpError(message: msg)
             }      
 
@@ -436,9 +448,10 @@ internal class Mp3AudioPlayer {
 
             //
             // find duration
-            //              
-            if mpg123_scan(handle) != 0 {                                                
-                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_scan failed. File: \(path.lastPathComponent)"
+            //       
+            err = mpg123_scan(handle)
+            if  err != 0 {                                                
+                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_scan failed with value: \(err) = '\(renderMpg123Error(err))'. File: \(path.lastPathComponent)"
                 throw CmpError(message: msg)                
             }
 
@@ -452,8 +465,12 @@ internal class Mp3AudioPlayer {
             var rate: CLong = 0
             var channels: Int32 = 0
             var encoding: Int32 = 0
-            mpg123_getformat(handle, &rate, &channels, &encoding)            
-            
+            err = mpg123_getformat(handle, &rate, &channels, &encoding)            
+            if err != 0 {
+                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_getformat failed with value: \(err) = '\(renderMpg123Error(err))'. File: \(path.lastPathComponent)"
+                throw CmpError(message: msg)
+            }
+
             // Calculate duration
             // Scan the file to build an accurate index of frames
             
@@ -616,5 +633,24 @@ internal class Mp3AudioPlayer {
         
         let msg = "[Mp3AudioPlayer].gatherMetadata(path:). Unknown file type. File: \(path.lastPathComponent)"
         throw CmpError(message: msg)
+    }
+    /// 
+    /// - Parameter error: 
+    /// - Returns: 
+    func renderMpg123Error(error: Int32) -> String {
+        if let errorMessage = mpg123_plain_strerror(error) {        
+            return "\(String(cString: errorMessage))"
+        }        
+        return ""
+    }
+    /// 
+    /// Renders ALSA error.
+    /// - Parameter error: 
+    /// - Returns: 
+    func renderAlsaError(error: Int32) -> String {
+        if let errorMessage = snd_strerror(error) {        
+            return "\(String(cString: errorMessage))"
+        }
+        return ""
     }
 }// AudioPlayer
