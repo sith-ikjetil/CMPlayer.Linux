@@ -224,6 +224,7 @@ internal class Mp3AudioPlayer {
                 let msg = "[Mp3AudioPlayer].play(). alsa. snd_pcm_set_params failed with value: \(err) = '\(renderAlsaError(error: err))'"
                 mpg123_close(self.mpg123Handle)
                 mpg123_delete(self.mpg123Handle)
+                snd_pcm_close(self.m_audioState.alsaState.pcmHandle)
                 self.mpg123Handle = nil
                 self.m_isPlaying = false                
                 
