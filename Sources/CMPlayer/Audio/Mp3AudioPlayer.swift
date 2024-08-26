@@ -516,7 +516,7 @@ internal class Mp3AudioPlayer {
                         }                        
                         
                         if id3v2.artist?.pointee.p != nil {
-                            let artist = String(cString: id3v2.artist.pointee.p)
+                            let artist = String(cString: id3v2.artist.pointee.p)                            
                             if artist.count > 0 {
                                 metadata.artist = artist
                                 bFoundArtist = true
@@ -570,29 +570,31 @@ internal class Mp3AudioPlayer {
 
                     if let id3v1 = id3v1Pointer?.pointee?.pointee {
                         // ID3v1 fallback                        
-                        if !bFoundTitle {
-                            let title = String(cString: withUnsafePointer(to: id3v1.title) {
-                                UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
-                            })
-                            metadata.title = title                            
-                        }
                         if !bFoundArtist {
-                            let artist = String(cString: withUnsafePointer(to: id3v1.artist) {
-                                UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
-                            })
-                            metadata.artist = artist
+                            let artist = withUnsafePointer(to: id3v1.artist) { ptr in
+                                return String(cString: UnsafeRawPointer(ptr).assumingMemoryBound(to: CChar.self), encoding: .isoLatin1)         
+                            }
+                            metadata.artist = artist ?? g_metadataNotFoundName
+                        }                         
+                        if !bFoundTitle {
+                            let title = withUnsafePointer(to: id3v1.title) { ptr in
+                                return String(cString: UnsafeRawPointer(ptr).assumingMemoryBound(to: CChar.self), encoding: .isoLatin1)         
+                            }
+                            metadata.title = title ?? g_metadataNotFoundName                            
                         }
                         if !bFoundAlbumName {
-                            let album = String(cString: withUnsafePointer(to: id3v1.album) {
-                                UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
-                            })
-                            metadata.albumName = album
+                            let album = withUnsafePointer(to: id3v1.album) { ptr in
+                                return String(cString: UnsafeRawPointer(ptr).assumingMemoryBound(to: CChar.self), encoding: .isoLatin1)         
+                            }
+                            metadata.albumName = album ?? g_metadataNotFoundName                            
                         }
                         if !bFoundYear {
-                            let year = String(cString: withUnsafePointer(to: id3v1.year)  {
-                                UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)
-                            })                            
-                            metadata.recordingYear = extractMetadataYear(text: year)
+                            let year = withUnsafePointer(to: id3v1.year) { ptr in
+                                return String(cString: UnsafeRawPointer(ptr).assumingMemoryBound(to: CChar.self), encoding: .isoLatin1)         
+                            }                                                
+                            if year != nil {    
+                                metadata.recordingYear = extractMetadataYear(text: year!)
+                            }
                         }                        
                         if !bFoundGenre {
                             metadata.genre = convertId3V1GenreIndexToName(index: id3v1.genre)
@@ -609,7 +611,7 @@ internal class Mp3AudioPlayer {
                     // Log we found metadatda
                     // this is a preformance issue
                     //PlayerLog.ApplicationLog?.logInformation(title: "[Mp3AudioPlayer].gatherMetadata()", text: "Found metadata for: \(path.path)")
-
+                    
                     //
                     // return metadata
                     //
