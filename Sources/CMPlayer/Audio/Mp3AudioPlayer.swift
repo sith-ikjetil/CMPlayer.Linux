@@ -555,12 +555,14 @@ internal class Mp3AudioPlayer {
                             let text = String(cString: textItem.text.p)
                             let id = "\(Character(UnicodeScalar(UInt32(textItem.id.0))!))\(Character(UnicodeScalar(UInt32(textItem.id.1))!))\(Character(UnicodeScalar(UInt32(textItem.id.2))!))\(Character(UnicodeScalar(UInt32(textItem.id.3))!))"
                             if id == "TRCK" {
-                                metadata.trackNo = Int(text) ?? -1
-                            }                                                                               
-                            if id == "TYER" || id == "TORY" {
-                                if metadata.recordingYear == 0 {
+                                metadata.trackNo = Int(text) ?? 0
+                            }  
+                            if !bFoundYear {                                                                             
+                                if id == "TYER" || id == "TORY" {                                    
                                     metadata.recordingYear = extractMetadataYear(text: text)
-                                    bFoundYear = true
+                                    if metadata.recordingYear != 0 {                                   
+                                        bFoundYear = true               
+                                    }                     
                                 }
                             }
                         }                                                

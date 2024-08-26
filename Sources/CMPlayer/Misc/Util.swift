@@ -829,7 +829,7 @@ func extractMetadataTrackNo(text: String) -> Int {
 /// 
 func extractMetadataYear(text: String) -> Int {
     // Define a regular expression pattern for a number or a number1/number2 format
-    let pattern = "\\b(\\d{4}).*\\b"
+    let pattern = "\\b.*(\\d{4}).*\\b"
     
     // Create a regular expression object
     let regex = try? NSRegularExpression(pattern: pattern)
