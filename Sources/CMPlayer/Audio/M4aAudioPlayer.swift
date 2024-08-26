@@ -228,14 +228,14 @@ internal class M4aAudioPlayer {
 #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7        
         var ret = av_channel_layout_copy(&self.m_audioState.chLayoutIn, &self.m_audioState.codecCtx!.pointee.ch_layout)        
         if ret < 0 {
-            let msg = "[M4aAudioPlayer].play(). av_channel_layout_copy failed with value: \(ret) = '\(errorToString(error: err))'."
+            let msg = "[M4aAudioPlayer].play(). av_channel_layout_copy failed with value: \(ret) = '\(renderError(error: err))'."
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)  
             throw CmpError(message: msg)
         }
         ret = av_opt_set_chlayout(rawSwrCtxPtr, "in_chlayout", &self.m_audioState.chLayoutIn, 0)        
         if ret < 0 {
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout IN failed with value: \(ret) = '\(errorToString(error: err))'."
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout IN failed with value: \(ret) = '\(renderError(error: err))'."
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)  
             throw CmpError(message: msg)
@@ -243,7 +243,7 @@ internal class M4aAudioPlayer {
         av_channel_layout_default(&self.m_audioState.chLayoutOut, 2);
         ret = av_opt_set_chlayout(rawSwrCtxPtr, "out_chlayout", &self.m_audioState.chLayoutOut, 0)
         if ret < 0 {
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout OUT failed with value: \(ret) = '\(errorToString(error: err))'."
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout OUT failed with value: \(ret) = '\(renderError(error: err))'."
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)  
             throw CmpError(message: msg)
