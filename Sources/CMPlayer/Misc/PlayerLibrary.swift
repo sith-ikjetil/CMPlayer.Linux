@@ -21,8 +21,7 @@ internal class PlayerLibrary {
     //
     private let filename: String = "CMPLayer.Library.xml"
     private var nextSongNo: Int = 1
-    private var dictionary: [String: Int] = [:]
-    var invalidEntriesCount: Int = 0
+    private var dictionary: [String: Int] = [:]    
     //
     // variables
     //
@@ -129,13 +128,12 @@ internal class PlayerLibrary {
                                 self.dictionary[url] = self.library.count-1
                             }
                         }
-                        catch let error as CmpError {
-                            self.invalidEntriesCount += 1
+                        catch let error as CmpError {                            
                             let msg = "Error adding song to library. Message: \(error.message)"
                             PlayerLog.ApplicationLog?.logWarning(title: "[PlayerLibrary].load()", text: msg)
                         }
                         catch {
-                            self.invalidEntriesCount += 1
+                            
                         }
                     }
                 }

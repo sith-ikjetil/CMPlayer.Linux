@@ -50,9 +50,9 @@ internal var g_rows: Int = -1
 internal var g_cols: Int = -1
 internal var g_quit: Bool = false
 internal var g_doNotPaint: Bool = false
-//
+//======================================
 // Startup code
-//
+//======================================
 // Handle command line arguments
 CommandLineHandler.processCommandLine()
 

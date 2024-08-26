@@ -931,11 +931,13 @@ func printALSAInfo() {
 /// 
 func PrintAndExecutePlayerLibrary() {
     print("Player Library:")    
-    do {
+    do {        
         let lib: PlayerLibrary = PlayerLibrary()
-        try lib.load()
-        print(" > Number of valid entries     \(lib.library.count)")    
-        print(" > Number of invalid entries   \(lib.invalidEntriesCount)")    
+        try lib.load()        
+        print(" > Number of valid entries              \(lib.library.count)")    
+        print(" > Number of distinct artists           \(g_artists.count)") 
+        print(" > Number of distinct genres            \(g_genres.count)")    
+        print(" > Number of distinct recording years   \(g_recordingYears.count)")                
     }
     catch let error as CmpError {
         print(" > (e): Could not load library. Message: '\(error.message)'")
