@@ -69,7 +69,7 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
             }
         }
         
-        self.preferencesText.append(" Audio Output")
+        self.preferencesText.append(" Audio Output API")
         self.preferencesText.append(" :: \(PlayerPreferences.outputSoundLibrary.rawValue)")
         self.preferencesText.append(" Music Formats")
         self.preferencesText.append(" :: \(PlayerPreferences.musicFormats)")

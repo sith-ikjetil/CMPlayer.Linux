@@ -53,12 +53,9 @@ internal class Player {
         PlayerLog.ApplicationLog = PlayerLog(autoSave: true, loadOldLog: false, logSaveType: PlayerLogSaveType.plainText)
 
         let pathLogFile: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenamePlainText, isDirectory: false)                
-        do {
-            try FileManager.default.removeItem(at: pathLogFile)
-        }
-        catch {
-
-        }        
+        if FileManager.default.fileExists(atPath: pathLogFile.path) {
+            try FileManager.default.removeItem(at: pathLogFile)     
+        }           
         
         PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Started.")
         
@@ -68,13 +65,8 @@ internal class Player {
             let wnd: SetupWindow = SetupWindow()
             wnd.showWindow()
         }
-        
-        do {
-            try g_library.load()
-        }
-        catch {
-            
-        }
+                
+        try g_library.load()
         
         let wnd = InitializeWindow()
         wnd.showWindow()        
