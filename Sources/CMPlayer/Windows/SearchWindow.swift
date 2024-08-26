@@ -188,15 +188,15 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         if type == SearchType.Genre {
             var index: Int = 0
             for name in terms {
-                let name = name.lowercased()
-                if g_genres[name] != nil {
-                    if g_genres[name]!.count >= 1 {
-                        self.searchResult.append(contentsOf: g_genres[name]!)
-                        self.stats[index] += g_genres[name]!.count
+                let name = name.lowercased()                
+                if let genre = g_genres[name] {                                        
+                    if genre.count >= 1 {
+                        self.searchResult.append(contentsOf: genre)
+                        self.stats[index] += genre.count
                     }
                 }
                 index += 1
-            }
+            }            
         }
         else if type == SearchType.RecordedYear {
             let currentYear = Calendar.current.component(.year, from: Date()) + 1
