@@ -416,15 +416,7 @@ internal class Mp3AudioPlayer {
     static func gatherMetadata(path: URL) throws -> CmpMetadata {
         if path.path.lowercased().hasSuffix(".mp3") {
             let metadata = CmpMetadata()
-
-            let renderMpg123Error: (Int32) -> String = { error in
-                if let errorMessage = mpg123_plain_strerror(error) {        
-                    return "\(String(cString: errorMessage))"
-                }
-                return ""
-            }                
-
-
+           
             //print("URL: \(self.fileURL!.path)")
             guard let handle = mpg123_new(nil, nil) else {
                 let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_new failed. File: \(path.lastPathComponent)"
@@ -438,7 +430,7 @@ internal class Mp3AudioPlayer {
 
             var err = mpg123_open(handle, path.path)
             guard err == 0 else {                
-                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_open failed with value: \(err) = '\(renderMpg123Error(err))'. File: \(path.lastPathComponent)"
+                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_open failed with value: \(err) = '\(renderMpg123Error(error: err))'. File: \(path.lastPathComponent)"
                 throw CmpError(message: msg)
             }      
 
@@ -452,7 +444,7 @@ internal class Mp3AudioPlayer {
             //       
             err = mpg123_scan(handle)
             if  err != 0 {                                                
-                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_scan failed with value: \(err) = '\(renderMpg123Error(err))'. File: \(path.lastPathComponent)"
+                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_scan failed with value: \(err) = '\(renderMpg123Error(error: err))'. File: \(path.lastPathComponent)"
                 throw CmpError(message: msg)                
             }
 
@@ -468,7 +460,7 @@ internal class Mp3AudioPlayer {
             var encoding: Int32 = 0
             err = mpg123_getformat(handle, &rate, &channels, &encoding)            
             if err != 0 {
-                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_getformat failed with value: \(err) = '\(renderMpg123Error(err))'. File: \(path.lastPathComponent)"
+                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_getformat failed with value: \(err) = '\(renderMpg123Error(error: err))'. File: \(path.lastPathComponent)"
                 throw CmpError(message: msg)
             }
 
@@ -628,24 +620,5 @@ internal class Mp3AudioPlayer {
         
         let msg = "[Mp3AudioPlayer].gatherMetadata(path:). Unknown file type. File: \(path.lastPathComponent)"
         throw CmpError(message: msg)
-    }
-    /// 
-    /// - Parameter error: 
-    /// - Returns: 
-    func renderMpg123Error(error: Int32) -> String {
-        if let errorMessage = mpg123_plain_strerror(error) {        
-            return "\(String(cString: errorMessage))"
-        }        
-        return ""
-    }
-    /// 
-    /// Renders ALSA error.
-    /// - Parameter error: 
-    /// - Returns: 
-    func renderAlsaError(error: Int32) -> String {
-        if let errorMessage = snd_strerror(error) {        
-            return "\(String(cString: errorMessage))"
-        }
-        return ""
-    }
+    }    
 }// AudioPlayer

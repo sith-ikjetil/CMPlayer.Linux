@@ -13,31 +13,6 @@ import Cao
 import Casound
 
 ///
-/// Alsa output state struct.
-///
-internal struct AlsaState {
-    let pcmDeviceName = "default"
-    var pcmHandle: OpaquePointer? = nil
-    var channels: UInt32 = 2
-    var sampleRate: UInt32 = 44100
-    var bufferSize: snd_pcm_uframes_t = 1024
-}
-
-///
-/// CmpMetadata
-/// Container for metadata.
-///
-internal class CmpMetadata {
-    var songNo: Int = 0
-    var artist: String = ""    
-    var title: String = ""    
-    var duration: UInt64 = 0    
-    var genre: String = ""    
-    var albumName: String = ""    
-    var recordingYear: Int = 0
-    var trackNo: Int = 0        
-}
-///
 /// Enum exit codes
 ///
 internal enum ExitCodes: Int32 {
@@ -111,19 +86,6 @@ internal func isCommandInCommands(_ command: String, _ commands: [String]) -> Bo
         if command == c {
             return true
         }
-    }
-    return false
-}
-///
-/// Validates if crossfade time is a valid crossfade time.
-///
-/// parameter ctis: Crossfade time in seconds.
-///
-/// returns: True if crossfade time is valid. False otherwise.
-///
-internal func isCrossfadeTimeValid(seconds: Int) -> Bool {    
-    if seconds >= g_crossfadeMinTime && seconds <= g_crossfadeMaxTime {
-        return true
     }
     return false
 }
@@ -583,24 +545,3 @@ func restore_stderr(_ stderr_copy: Int32) {
     dup2(stderr_copy, fileno(stderr)) // Restore stderr
     close(stderr_copy) // Close the backup
 }
-///
-/// window size container.
-/// 
-//struct winsize {
-//    var ws_row: UInt16 = 0
-//    var ws_col: UInt16 = 0
-//    var ws_xpixel: UInt16 = 0
-//    var ws_ypixel: UInt16 = 0
-//}
-/// 
-/// Gets terminal size
-///
-//func getTerminalSize() -> (rows: Int, cols: Int)? {
-//    var w = winsize()
-//    let result = ioctl(STDOUT_FILENO, UInt(TIOCGWINSZ), &w)
-//    if result == 0 {
-//        return (rows: Int(w.ws_row), cols: Int(w.ws_col))
-//    } else {
-//        return nil
-//    }
-//}

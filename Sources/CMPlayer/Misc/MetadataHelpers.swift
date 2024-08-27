@@ -1,5 +1,20 @@
 import Foundation
 
+///
+/// CmpMetadata
+/// Container for metadata.
+///
+internal class CmpMetadata {
+    var songNo: Int = 0
+    var artist: String = ""    
+    var title: String = ""    
+    var duration: UInt64 = 0    
+    var genre: String = ""    
+    var albumName: String = ""    
+    var recordingYear: Int = 0
+    var trackNo: Int = 0        
+}
+
 /// 
 /// Extracts track number from aac metadata track field.
 /// 
