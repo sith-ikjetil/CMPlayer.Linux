@@ -82,11 +82,14 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     private var isTooSmall: Bool = false
     private var showCursor: Bool = false
     private var cursorTimeout: UInt64 = 0
+    private var commandHistory: [String] = []
+    private var commandHistoryIndex: Int = -1
     ///
     /// priate constants
     /// 
     private let concurrentQueue1 = DispatchQueue(label: "dqueue.cmp.linux.main-window.1", attributes: .concurrent)
     private let concurrentQueue2 = DispatchQueue(label: "dqueue.cmp.linux.main-window.2", attributes: .concurrent)     
+    //private let commandHistoryFilename = ".history"
     ///
     /// Shows this MainWindow on screen.
     ///
@@ -475,9 +478,35 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
+            if self.commandHistory.count > 0 {
+                self.commandHistoryIndex += 1
+                if self.commandHistoryIndex >= 0 {
+                    if self.commandHistoryIndex < self.commandHistory.count {
+                        self.currentCommand = self.commandHistory[self.commandHistoryIndex]                    
+                        self.renderCommandLine()                    
+                    }
+                }
+                if self.commandHistoryIndex > self.commandHistory.count {
+                    self.commandHistoryIndex = self.commandHistory.count
+                    self.currentCommand = ""
+                    self.renderCommandLine()
+                }
+            }
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
+            if self.commandHistory.count > 0 {
+                self.commandHistoryIndex -= 1
+                if self.commandHistoryIndex >= 0 {
+                    if self.commandHistoryIndex < self.commandHistory.count {
+                        self.currentCommand = self.commandHistory[self.commandHistoryIndex]                    
+                        self.renderCommandLine()                    
+                    }
+                }
+                if self.commandHistoryIndex < 0 {
+                    self.commandHistoryIndex = 0
+                }
+            }
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
@@ -496,6 +525,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_ENTER.rawValue, closure: { () -> Bool in            
             if self.currentCommand.count > 0 {
+                self.commandHistory.append(self.currentCommand)
+                self.commandHistoryIndex = self.commandHistory.count
                 self.processCommand(command: self.currentCommand)                
             }
             self.currentCommand.removeAll()
