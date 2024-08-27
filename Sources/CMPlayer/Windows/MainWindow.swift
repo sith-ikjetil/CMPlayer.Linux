@@ -486,7 +486,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                         self.renderCommandLine()                    
                     }
                 }
-                if self.commandHistoryIndex > self.commandHistory.count {
+                if self.commandHistoryIndex >= self.commandHistory.count {
                     self.commandHistoryIndex = self.commandHistory.count
                     self.currentCommand = ""
                     self.renderCommandLine()
