@@ -186,7 +186,7 @@ internal class PlayerLog {
         guard PlayerPreferences.logOther else { return }
         if self.entries.count >= PlayerPreferences.logMaxSize {
             if PlayerPreferences.logMaxSizeReached == LogMaxSizeReached.EmptyLog {
-                self.clear()
+                self.clear()                
             }
             else {
                 return
@@ -209,6 +209,20 @@ internal class PlayerLog {
     ///
     func clear() {        
         self.entries.removeAll()
+        if PlayerLog.saveType == .plainText {
+             let path: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenamePlainText, isDirectory: false)
+
+            do {                
+                // Check if file exists
+                if FileManager.default.fileExists(atPath: path.path) {
+                    // If file exist, empty it
+                    try "".write(to: path, atomically: true, encoding: .utf8)
+                } 
+            }
+            catch {
+
+            }
+        }
     }    
     ///
     /// Saves the log as an XML document
