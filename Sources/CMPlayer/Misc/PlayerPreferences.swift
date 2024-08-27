@@ -77,7 +77,6 @@ internal class PlayerPreferences {
     static var logOther: Bool = true
     static var logMaxSize: Int = 100
     static var logMaxSizeReached: LogMaxSizeReached = LogMaxSizeReached.EmptyLog
-    static var logApplicationStartLoadType: LogApplicationStartLoadType = LogApplicationStartLoadType.DoNotLoadOldLog    
     ///
     /// Default initializer.
     ///
@@ -173,14 +172,8 @@ internal class PlayerPreferences {
                 
                 if let aLogMaxSizeReached = xeLog.attribute(forName: "logMaxSizeReached") {
                     PlayerPreferences.logMaxSizeReached = LogMaxSizeReached(rawValue: aLogMaxSizeReached.stringValue ?? "StopLogging") ?? LogMaxSizeReached.StopLogging
-                }
-                
-                if let aLogApplicationStartLoadType = xeLog.attribute(forName: "logApplicationStartLoadType") {
-                    PlayerPreferences.logApplicationStartLoadType = LogApplicationStartLoadType(rawValue: aLogApplicationStartLoadType.stringValue ?? "LoadOldLog") ?? LogApplicationStartLoadType.LoadOldLog
-                }
-                
-            }
-            
+                }                                                
+            }            
         }
         catch {
             
@@ -285,12 +278,7 @@ internal class PlayerPreferences {
         xnLogMaxSizeReached.name = "logMaxSizeReached"
         xnLogMaxSizeReached.setStringValue(self.logMaxSizeReached.rawValue, resolvingEntities: false)
         xeLog.addAttribute(xnLogMaxSizeReached)
-        
-        let xnLogApplicationStartLoadType: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
-        xnLogApplicationStartLoadType.name = "logApplicationStartLoadType"
-        xnLogApplicationStartLoadType.setStringValue(self.logApplicationStartLoadType.rawValue, resolvingEntities: false)
-        xeLog.addAttribute(xnLogApplicationStartLoadType)
-        
+                
         //
         // save
         //
