@@ -12,6 +12,7 @@ func PrintAndExecuteIntegrityCheck() {
     //PrintAndExecuteLibraryFiles()
     PrintAndExecutePlayerHomeDirectory()
     PrintAndExecutePlayerLibrary()
+    PrintAndExecutePlayerPreferences()
 }
 ///
 /// Prints information about output devices.
@@ -95,6 +96,9 @@ func printALSAInfo() {
         }
     }
 }
+///
+/// Prints some info about cmplayer's home directory and its files.
+/// 
 func PrintAndExecutePlayerHomeDirectory() {
     print("Player Home:")
     let path = PlayerDirectories.consoleMusicPlayerDirectory
@@ -157,7 +161,7 @@ func PrintAndExecutePlayerLibrary() {
             print(" > Number of distinct recording years   \(g_recordingYears.count)")                
         }
         else {
-            print(" > (w): Could not find library.")    
+            print(" > (e): Could not find library.")    
         }
     }
     catch let error as CmpError {
@@ -165,6 +169,42 @@ func PrintAndExecutePlayerLibrary() {
     }
     catch {
         print(" > (e): Unknown error. Could not load library. Message: '\(error)'")
+    }
+
+    print("")
+}
+///
+/// Prints some info on cmplayers preferences if file exists.
+/// 
+func PrintAndExecutePlayerPreferences()
+{
+    print("Player Preferences:")        
+    let path: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerPreferences.preferencesFilename, isDirectory: false)
+    if FileManager.default.fileExists(atPath: path.path) {
+        PlayerPreferences.loadPreferences(path)
+        print(" > musicRootPath:")
+        for rp in PlayerPreferences.musicRootPath {
+            print("   > \(rp)")
+        }
+        print(" > exclusionPaths:")
+        for ep in PlayerPreferences.exclusionPaths {
+            print("   > \(ep)")
+        }
+        print(" > musicFormats             \(PlayerPreferences.musicFormats)")            
+        print(" > autoplayOnStartup        \(PlayerPreferences.autoplayOnStartup)")
+        print(" > crossfadeSongs           \(PlayerPreferences.crossfadeSongs)")
+        print(" > crossfadeTimeInSeconds   \(PlayerPreferences.crossfadeTimeInSeconds)")
+        print(" > viewType                 \(PlayerPreferences.viewType.rawValue)" )
+        print(" > colorTheme:              \(PlayerPreferences.colorTheme.rawValue)")
+        print(" > outputSoundLibrary       \(PlayerPreferences.outputSoundLibrary.rawValue)")
+        print(" > logInformation           \(PlayerPreferences.logInformation)")
+        print(" > logWarning               \(PlayerPreferences.logWarning)")
+        print(" > logError                 \(PlayerPreferences.logError)")
+        print(" > logDebug                 \(PlayerPreferences.logDebug)")
+        print(" > logOther                 \(PlayerPreferences.logOther)")            
+    }
+    else {
+        print(" > (e): Could not find preferences.")    
     }
 
     print("")

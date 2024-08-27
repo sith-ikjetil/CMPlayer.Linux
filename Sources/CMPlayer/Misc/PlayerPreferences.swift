@@ -90,7 +90,10 @@ internal class PlayerPreferences {
     ///
     /// parameter fileUrl: Path to preferences file.
     ///
-    static func loadPreferences(_ fileUrl: URL ) {
+    static func loadPreferences(_ fileUrl: URL ) {        
+        PlayerPreferences.musicRootPath.removeAll()
+        PlayerPreferences.exclusionPaths.removeAll()
+        
         do {
             let xd: XMLDocument = try XMLDocument(contentsOf: fileUrl)
             let xeRoot = xd.rootElement()!
