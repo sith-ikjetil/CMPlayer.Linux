@@ -112,32 +112,21 @@ func PrintAndExecutePlayerHomeDirectory() {
         else {
             print(" > \(PlayerLibrary.filename)     NOT found")
         }
-
-        if PlayerLog.saveType == .plainText {
-            let pathLog = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenamePlainText, isDirectory: false)
-            if FileManager.default.fileExists(atPath: pathLog.path) {
-                print(" > \(PlayerLog.logFilenamePlainText)         found")
-            }
-            else {
-                print(" > \(PlayerLog.logFilenamePlainText)         NOT found")
-            }
-        }
-        else if PlayerLog.saveType == .xml {
-            let pathLog = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenameXml, isDirectory: false)
-            if FileManager.default.fileExists(atPath: pathLog.path) {
-                print(" > \(PlayerLog.logFilenameXml) found")
-            }
-            else {
-                print(" > \(PlayerLog.logFilenameXml) NOT found")
-            }
-        }
-
-        let pathPref = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerPreferences.preferencesFilename, isDirectory: false)
-        if FileManager.default.fileExists(atPath: pathPref.path) {
-            print(" > \(PlayerPreferences.preferencesFilename) found")
+    
+        let pathLog = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.filename, isDirectory: false)
+        if FileManager.default.fileExists(atPath: pathLog.path) {
+            print(" > \(PlayerLog.filename)         found")
         }
         else {
-            print(" > \(PlayerPreferences.preferencesFilename) NOT found")
+            print(" > \(PlayerLog.filename)         NOT found")
+        }
+    
+        let pathPref = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerPreferences.filename, isDirectory: false)
+        if FileManager.default.fileExists(atPath: pathPref.path) {
+            print(" > \(PlayerPreferences.filename) found")
+        }
+        else {
+            print(" > \(PlayerPreferences.filename) NOT found")
         }
     }
     else {
@@ -179,7 +168,7 @@ func PrintAndExecutePlayerLibrary() {
 func PrintAndExecutePlayerPreferences()
 {
     print("Player Preferences:")        
-    let path: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerPreferences.preferencesFilename, isDirectory: false)
+    let path: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerPreferences.filename, isDirectory: false)
     if FileManager.default.fileExists(atPath: path.path) {
         PlayerPreferences.loadPreferences(path)
         print(" > musicRootPath:")

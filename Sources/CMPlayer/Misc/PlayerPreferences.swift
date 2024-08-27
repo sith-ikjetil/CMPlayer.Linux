@@ -60,7 +60,7 @@ internal class PlayerPreferences {
     //
     // Static variables
     //
-    static let preferencesFilename: String = "preferences.xml"
+    static let filename: String = "preferences.xml"
     static var musicRootPath: [String] = []
     static var exclusionPaths: [String] = []
     static var musicFormats: String = "mp3;m4a"
@@ -75,9 +75,8 @@ internal class PlayerPreferences {
     static var logError: Bool = true
     static var logDebug: Bool = true
     static var logOther: Bool = true
-    static var logMaxSize: Int = 50
+    static var logMaxSize: Int = 100
     static var logMaxSizeReached: LogMaxSizeReached = LogMaxSizeReached.EmptyLog
-    //static let logMaxSizes: [Int] = [100, 500, 1000, 2000, 3000, 4000, 5000]
     static var logApplicationStartLoadType: LogApplicationStartLoadType = LogApplicationStartLoadType.DoNotLoadOldLog    
     ///
     /// Default initializer.
@@ -296,7 +295,7 @@ internal class PlayerPreferences {
         // save
         //
         let url: URL = PlayerDirectories.consoleMusicPlayerDirectory
-        let fileUrl = url.appendingPathComponent(PlayerPreferences.preferencesFilename, isDirectory: false)
+        let fileUrl = url.appendingPathComponent(PlayerPreferences.filename, isDirectory: false)
         
         let xd: XMLDocument = XMLDocument(rootElement: xeRoot)
         do {
@@ -312,7 +311,7 @@ internal class PlayerPreferences {
     ///
     static func ensureLoadPreferences()
     {
-        let dir = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerPreferences.preferencesFilename, isDirectory: false)
+        let dir = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerPreferences.filename, isDirectory: false)
         if FileManager.default.fileExists(atPath: dir.path) == false {
             PlayerPreferences.savePreferences()
         }

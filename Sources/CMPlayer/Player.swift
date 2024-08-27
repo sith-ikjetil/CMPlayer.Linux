@@ -47,12 +47,12 @@ internal class Player {
     ///
     /// Initializes the application.
     ///
-    func initialize() throws -> Void {        
+    func initialize() throws -> Void {                        
         PlayerDirectories.ensureDirectoriesExistence()
         PlayerPreferences.ensureLoadPreferences()        
-        PlayerLog.ApplicationLog = PlayerLog(autoSave: true, loadOldLog: false, logSaveType: PlayerLogSaveType.plainText)
+        PlayerLog.ApplicationLog = PlayerLog(autoSave: true)
 
-        let pathLogFile: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenamePlainText, isDirectory: false)                
+        let pathLogFile: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.filename, isDirectory: false)
         if FileManager.default.fileExists(atPath: pathLogFile.path) {
             try FileManager.default.removeItem(at: pathLogFile)     
         }           
