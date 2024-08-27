@@ -34,6 +34,7 @@ internal class CommandLineHandler {
             case "--set-output-api-ao": return CommandLineHandler.execute__set_output_api_ao()
             case "--set-output-api-alsa": return CommandLineHandler.execute__set_output_api_alsa()
             case "--get-output-api": return CommandLineHandler.execute__get_output_api()
+            case "--set-max-log-entries": return CommandLineHandler.execute__set_max_log_entries()
             default: return CommandLineHandler.execute__help();
         }        
     }
@@ -42,6 +43,7 @@ internal class CommandLineHandler {
     /// 
     private static func execute__integrity_check()
     {
+        PlayerDirectories.ensureDirectoriesExistence()
         PlayerPreferences.ensureLoadPreferences()                    
         ao_initialize()  // initialize libao
         PrintAndExecuteIntegrityCheck()            
@@ -99,6 +101,7 @@ internal class CommandLineHandler {
     {
         print("CMPlayer Set Output")
         print("=========================")
+        PlayerDirectories.ensureDirectoriesExistence()
         PlayerPreferences.ensureLoadPreferences()
         PlayerPreferences.outputSoundLibrary = OutputSoundLibrary.ao
         PlayerPreferences.savePreferences()
@@ -113,6 +116,7 @@ internal class CommandLineHandler {
     {
         print("CMPlayer Set Output")
         print("=========================")
+        PlayerDirectories.ensureDirectoriesExistence()
         PlayerPreferences.ensureLoadPreferences()
         PlayerPreferences.outputSoundLibrary = OutputSoundLibrary.alsa
         PlayerPreferences.savePreferences()
@@ -125,8 +129,9 @@ internal class CommandLineHandler {
     /// 
     private static func execute__get_output_api()
     {
+        PlayerDirectories.ensureDirectoriesExistence()
         PlayerPreferences.ensureLoadPreferences()
-        print("CMPlayer Get Output")
+        print("CMPlayer Get Output API")
         print("=========================")
         if PlayerPreferences.outputSoundLibrary == OutputSoundLibrary.ao {
             print("(i): Output api is: ao")
@@ -134,6 +139,38 @@ internal class CommandLineHandler {
         else if PlayerPreferences.outputSoundLibrary == OutputSoundLibrary.alsa {
             print("(i): Output api is: alsa")
         }                   
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    ///
+    /// execute --set-max-log-size
+    /// 
+    private static func execute__set_max_log_entries()
+    {
+        if CommandLine.argc < 3 {
+            CommandLineHandler.execute__help()
+            return
+        }        
+
+        PlayerDirectories.ensureDirectoriesExistence()
+        PlayerPreferences.ensureLoadPreferences()
+        print("CMPlayer Set Max Log Entries")
+        print("============================")
+        if let n = Int(CommandLine.arguments[2]) {
+            if n >= 25 && n <= 1000 {
+                PlayerPreferences.logMaxEntries = n
+                PlayerPreferences.savePreferences()
+                print("(i): Max log entries set to: \(n)")
+            }
+            else {
+                print("(e): Invalid log entries: \(n).")
+                print("(i): Must be a number between 25 and 1000.")
+            }
+        }
+        else {
+            print("(e): Invalid log entries.")
+            print("(i): Must be a number between 25 and 1000.")
+        }
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
@@ -146,14 +183,15 @@ internal class CommandLineHandler {
         print("=========================")
         print("Usage: cmplayer <options>")
         print("<options>")
-        print(" --help                = show this help screen")
-        print(" --version             = show version numbers")
-        print(" --integrity-check     = do an integrity check")
-        print(" --purge               = remove all stored data")
-        print(" --set-output-api-ao   = sets audio output api to libao (ao)")
-        print(" --set-output-api-alsa = sets audio output api to libasound (alsa)")
-        print(" --get-output-api      = gets audio output api")
+        print(" --help                        = show this help screen")
+        print(" --version                     = show version numbers")
+        print(" --integrity-check             = do an integrity check")
+        print(" --purge                       = remove all stored data")
+        print(" --set-output-api-ao           = sets audio output api to libao (ao)")
+        print(" --set-output-api-alsa         = sets audio output api to libasound (alsa)")
+        print(" --get-output-api              = gets audio output api")
+        print(" --set-max-log-entries <limit> = sets max log entries (limit between 25 and 1000)")
         print("")        
         exit(ExitCodes.SUCCESS.rawValue)
-    }
+    }    
 }// internal class CommandLineHandler

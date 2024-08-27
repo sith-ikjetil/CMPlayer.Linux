@@ -91,11 +91,9 @@ internal class PlayerLogEntry {
     /// - Returns: 
     func toPlainText() -> String {
         var text: String = ""    
-        text += "[\(self.type)] \(self.timeStamp)"
+        text += "[\(self.type)] [\(self.timeStamp.itsToString())] Title: \(self.title)"
         text += "\n"
-        text += "\(self.title)"
-        text += "\n"
-        text += "\(self.text)"
+        text += "Text: \(self.text)"
         text += "\n\n"
 
         return text

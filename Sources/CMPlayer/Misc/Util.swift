@@ -545,3 +545,18 @@ func restore_stderr(_ stderr_copy: Int32) {
     dup2(stderr_copy, fileno(stderr)) // Restore stderr
     close(stderr_copy) // Close the backup
 }
+///
+/// Date extension methods.
+///
+internal extension Date {
+    ///
+    /// Convert a Date into a YYYY-MM-DD HH:mm:ss string.
+    ///
+    /// returns: Date as string.
+    ///
+    func itsToString() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return dateFormatter.string(from: self)
+    }
+}

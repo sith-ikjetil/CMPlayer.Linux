@@ -75,7 +75,7 @@ internal class PlayerPreferences {
     static var logError: Bool = true
     static var logDebug: Bool = true
     static var logOther: Bool = true
-    static var logMaxSize: Int = 100
+    static var logMaxEntries: Int = 100
     static var logMaxSizeReached: LogMaxSizeReached = LogMaxSizeReached.EmptyLog
     ///
     /// Default initializer.
@@ -166,8 +166,8 @@ internal class PlayerPreferences {
                     PlayerPreferences.logOther = Bool(aLogOther.stringValue ?? "false") ?? false
                 }
                 
-                if let aLogMaxSize = xeLog.attribute(forName: "logMaxSize") {
-                    PlayerPreferences.logMaxSize = Int(aLogMaxSize.stringValue ?? "1000") ?? 1000
+                if let aLogMaxEntries = xeLog.attribute(forName: "logMaxEntries") {
+                    PlayerPreferences.logMaxEntries = Int(aLogMaxEntries.stringValue ?? "100") ?? 100
                 }
                 
                 if let aLogMaxSizeReached = xeLog.attribute(forName: "logMaxSizeReached") {
@@ -269,10 +269,10 @@ internal class PlayerPreferences {
         xnLogOther.setStringValue(String(self.logOther), resolvingEntities: false)
         xeLog.addAttribute(xnLogOther)
         
-        let xnLogMaxSize: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
-        xnLogMaxSize.name = "logMaxSize"
-        xnLogMaxSize.setStringValue(String(self.logMaxSize), resolvingEntities: false)
-        xeLog.addAttribute(xnLogMaxSize)
+        let xnLogMaxEntries: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnLogMaxEntries.name = "logMaxEntries"
+        xnLogMaxEntries.setStringValue(String(self.logMaxEntries), resolvingEntities: false)
+        xeLog.addAttribute(xnLogMaxEntries)
         
         let xnLogMaxSizeReached: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
         xnLogMaxSizeReached.name = "logMaxSizeReached"

@@ -45,7 +45,10 @@ internal class PlayerLog {
             return 
         }
         
-        if self.entries.count >= PlayerPreferences.logMaxSize {
+        if self.entries.count >= PlayerPreferences.logMaxEntries {
+            if PlayerPreferences.logMaxSizeReached == .StopLogging {
+                return;
+            }
             self.clear()
         }
 
@@ -66,7 +69,10 @@ internal class PlayerLog {
             return 
         }
         
-        if self.entries.count >= PlayerPreferences.logMaxSize {
+        if self.entries.count >= PlayerPreferences.logMaxEntries {
+            if PlayerPreferences.logMaxSizeReached == .StopLogging {
+                return;
+            }
             self.clear()
         }
 
@@ -87,7 +93,10 @@ internal class PlayerLog {
             return 
         }
         
-        if self.entries.count >= PlayerPreferences.logMaxSize {
+        if self.entries.count >= PlayerPreferences.logMaxEntries {
+            if PlayerPreferences.logMaxSizeReached == .StopLogging {
+                return;
+            }
             self.clear()
         }
 
@@ -108,7 +117,10 @@ internal class PlayerLog {
             return 
         }
         
-        if self.entries.count >= PlayerPreferences.logMaxSize {
+        if self.entries.count >= PlayerPreferences.logMaxEntries {
+            if PlayerPreferences.logMaxSizeReached == .StopLogging {
+                return;
+            }
             self.clear()
         }
 
@@ -129,7 +141,10 @@ internal class PlayerLog {
             return 
         }
         
-        if self.entries.count >= PlayerPreferences.logMaxSize {
+        if self.entries.count >= PlayerPreferences.logMaxEntries {
+            if PlayerPreferences.logMaxSizeReached == .StopLogging {
+                return;
+            }
             self.clear()
         }
 
