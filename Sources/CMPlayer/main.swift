@@ -18,19 +18,19 @@ import Glibc
 //
 // Global constants.
 //
-internal let g_fieldWidthSongNo: Int = 9   // fixed
-internal let g_fieldWidthArtist: Int = 33  // min
-internal let g_fieldWidthTitle: Int = 33   // min
-internal let g_fieldWidthDuration: Int = 5 // fixed
-internal let g_player: Player = Player()   // main application object
-internal let g_versionString: String = "1.5.5.0"
-internal let g_lock = NSLock()     // global lock 
-internal let g_crossfadeMinTime: Int = 1   // seconds
-internal let g_crossfadeMaxTime: Int = 20  // seconds
-internal let g_asyncCompletionDelay: Float = 0.2
-internal let g_metadataNotFoundName: String = "--unknown--"
-internal let g_minCols: Int = 80
-internal let g_minRows: Int = 24
+internal let g_fieldWidthSongNo: Int = 9            // fixed
+internal let g_fieldWidthArtist: Int = 33           // min
+internal let g_fieldWidthTitle: Int = 33            // min
+internal let g_fieldWidthDuration: Int = 5          // fixed
+internal let g_player: Player = Player()            // main application object
+internal let g_versionString: String = "1.5.5.0"    // current working version
+internal let g_lock = NSLock()              // global lock 
+internal let g_crossfadeMinTime: Int = 1            // seconds
+internal let g_crossfadeMaxTime: Int = 20           // seconds
+internal let g_asyncCompletionDelay: Float = 0.35   // 350 ms
+internal let g_metadataNotFoundName: String = "--unknown--" // metadata not found or invalid has this string
+internal let g_minCols: Int = 80 // minimum supported columns terminal size
+internal let g_minRows: Int = 24 // minimum supported rows terminal size
 //
 // Global variables/properties
 //
@@ -48,10 +48,10 @@ internal var g_library: PlayerLibrary = PlayerLibrary() // library
 internal var g_mainWindow: MainWindow?                  // main window
 internal var g_tscpStack: [TerminalSizeHasChangedProtocol] = [] // each window as they appear is added, then when close removed
 internal var g_termSizeIsChanging: Bool = false         // Terminal size is changing
-internal var g_rows: Int = -1
-internal var g_cols: Int = -1
-internal var g_quit: Bool = false
-internal var g_doNotPaint: Bool = false
+internal var g_rows: Int = -1                           // current terminal size rows
+internal var g_cols: Int = -1                           // current terminal size columns
+internal var g_quit: Bool = false                       // are we quitting?
+internal var g_doNotPaint: Bool = false                 // do no repaint mainwindow during this flag
 //======================================
 // Startup code
 //======================================
