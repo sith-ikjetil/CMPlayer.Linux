@@ -18,24 +18,24 @@ internal class PlayerLog {
     ///
     /// static constants/variables
     /// 
-    static let logFilenameXml: String = "CMPlayer.Log.xml"
-    static let logFilenamePlainText: String = "CMPlayer.Log.txt"
+    static let logFilenameXml: String = "log.txt"
+    static let logFilenamePlainText: String = "log.txt"
     static var ApplicationLog: PlayerLog? = nil 
+    static var saveType: PlayerLogSaveType = PlayerLogSaveType.plainText
     ///
     /// variables
     /// 
-    var entries: [PlayerLogEntry] = []
+    var entries: [PlayerLogEntry] = []   
     ///
     /// private variables
     /// 
-    private var autoSave: Bool = true    
-    private var saveType: PlayerLogSaveType = PlayerLogSaveType.plainText
+    private var autoSave: Bool = true        
     ///
     /// Overloaded initializer.
     ///
     init(autoSave: Bool, loadOldLog: Bool, logSaveType: PlayerLogSaveType ){
         self.autoSave = autoSave
-        self.saveType = logSaveType
+        PlayerLog.saveType = logSaveType
 
         if loadOldLog {
             self.loadOldLog()
@@ -45,7 +45,7 @@ internal class PlayerLog {
     /// Loads old log into memory
     ///
     func loadOldLog() {
-        guard self.saveType == .xml else {
+        guard PlayerLog.saveType == .xml else {
             return
         }
         
@@ -84,10 +84,10 @@ internal class PlayerLog {
         let logEntry = PlayerLogEntry(type: PlayerLogEntryType.Error, title: title, text: text, timeStamp: Date())
         self.entries.append(logEntry)
         if self.autoSave {
-            if saveType == .xml {
+            if PlayerLog.saveType == .xml {
                 self.saveLog()
             }
-            else if saveType == .plainText {
+            else if PlayerLog.saveType == .plainText {
                 self.appendToPlainTextLog(logEntry: logEntry)
             }
         }    
@@ -112,10 +112,10 @@ internal class PlayerLog {
         let logEntry = PlayerLogEntry(type: PlayerLogEntryType.Warning, title: title, text: text, timeStamp: Date())
         self.entries.append(logEntry)
         if self.autoSave {
-            if saveType == .xml {
+            if PlayerLog.saveType == .xml {
                 self.saveLog()
             }
-            else if saveType == .plainText {
+            else if PlayerLog.saveType == .plainText {
                 self.appendToPlainTextLog(logEntry: logEntry)
             }
         }    
@@ -140,10 +140,10 @@ internal class PlayerLog {
         let logEntry =  PlayerLogEntry(type: PlayerLogEntryType.Information, title: title, text: text, timeStamp: Date())   
         self.entries.append(logEntry)
         if self.autoSave {
-            if saveType == .xml {
+            if PlayerLog.saveType == .xml {
                 self.saveLog()
             }
-            else if saveType == .plainText {
+            else if PlayerLog.saveType == .plainText {
                 self.appendToPlainTextLog(logEntry: logEntry)
             }
         }    
@@ -168,10 +168,10 @@ internal class PlayerLog {
         let logEntry = PlayerLogEntry(type: PlayerLogEntryType.Debug, title: title, text: text, timeStamp: Date())
         self.entries.append(logEntry)
         if self.autoSave {
-            if saveType == .xml {
+            if PlayerLog.saveType == .xml {
                 self.saveLog()
             }
-            else if saveType == .plainText {
+            else if PlayerLog.saveType == .plainText {
                 self.appendToPlainTextLog(logEntry: logEntry)
             }
         }    
@@ -196,10 +196,10 @@ internal class PlayerLog {
         let logEntry = PlayerLogEntry(type: PlayerLogEntryType.Other, title: title, text: text, timeStamp: Date())
         self.entries.append(logEntry)
         if self.autoSave {
-            if saveType == .xml {
+            if PlayerLog.saveType == .xml {
                 self.saveLog()
             }
-            else if saveType == .plainText {
+            else if PlayerLog.saveType == .plainText {
                 self.appendToPlainTextLog(logEntry: logEntry)
             }
         }
@@ -257,7 +257,7 @@ internal class PlayerLog {
     /// 
     /// - Parameter type: format to save to
     internal func saveLog() {
-        switch self.saveType {
+        switch PlayerLog.saveType {
             case .xml:
                 self.saveLogAsXml() 
             case .plainText:
@@ -291,7 +291,7 @@ internal class PlayerLog {
     /// parameter url: file to save.
     ///
     func saveLogAs(path: URL) {
-        switch self.saveType {
+        switch PlayerLog.saveType {
             case .xml:
                 saveLogAsXml(path: path)            
             case .plainText:

@@ -22,7 +22,7 @@ internal class PlayerDirectories {
         return FileManager.default.homeDirectoryForCurrentUser
     }
     internal static var consoleMusicPlayerDirectory: URL {
-        return PlayerDirectories.homeDirectory.appendingPathComponent(".CMPlayer", isDirectory: true)
+        return PlayerDirectories.homeDirectory.appendingPathComponent(".cmplayer", isDirectory: true)
     }    
     ///
     /// Ensures that directories needed exists. Is called upon application startup.

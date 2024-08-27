@@ -60,7 +60,7 @@ internal class PlayerPreferences {
     //
     // Static variables
     //
-    static let preferencesFilename: String = "CMPlayer.Preferences.xml"
+    static let preferencesFilename: String = "preferences.xml"
     static var musicRootPath: [String] = []
     static var exclusionPaths: [String] = []
     static var musicFormats: String = "mp3;m4a"

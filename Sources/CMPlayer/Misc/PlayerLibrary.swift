@@ -19,7 +19,7 @@ internal class PlayerLibrary {
     //
     // Private properties/constants
     //
-    private let filename: String = "CMPLayer.Library.xml"
+    static let filename: String = "library.xml"
     private var nextSongNo: Int = 1
     private var dictionary: [String: Int] = [:]    
     //
@@ -65,7 +65,7 @@ internal class PlayerLibrary {
     /// Loads the CMPlayer.Library.xml song library for faster song initialization load time.
     ///
     func load() throws {
-        let fileUrl: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent("CMPlayer.Library.xml", isDirectory: false)
+        let fileUrl: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLibrary.filename, isDirectory: false)
         if FileManager.default.fileExists(atPath: fileUrl.path) {            
             do {
                 self.dictionary.removeAll()
@@ -203,7 +203,7 @@ internal class PlayerLibrary {
         //
         // save
         //
-        let fileUrl: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent("CMPlayer.Library.xml", isDirectory: false)
+        let fileUrl: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLibrary.filename, isDirectory: false)
         
         let xd: XMLDocument = XMLDocument(rootElement: xeRoot)
         do {

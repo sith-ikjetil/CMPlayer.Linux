@@ -9,7 +9,8 @@ func PrintAndExecuteIntegrityCheck() {
     print("CMPlayer Integrity Check")
     print("========================")
     PrintAndExecuteOutputDevices()
-    PrintAndExecuteLibraryFiles()
+    //PrintAndExecuteLibraryFiles()
+    PrintAndExecutePlayerHomeDirectory()
     PrintAndExecutePlayerLibrary()
 }
 ///
@@ -94,18 +95,70 @@ func printALSAInfo() {
         }
     }
 }
+func PrintAndExecutePlayerHomeDirectory() {
+    print("Player Home:")
+    let path = PlayerDirectories.consoleMusicPlayerDirectory
+    if FileManager.default.fileExists(atPath: path.path) {
+        print(" > (i): Found at: \(path.path)")
+
+        let pathLibrary = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLibrary.filename, isDirectory: false)
+        if FileManager.default.fileExists(atPath: pathLibrary.path) {
+            print(" > \(PlayerLibrary.filename)     found")
+        }
+        else {
+            print(" > \(PlayerLibrary.filename)     NOT found")
+        }
+
+        if PlayerLog.saveType == .plainText {
+            let pathLog = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenamePlainText, isDirectory: false)
+            if FileManager.default.fileExists(atPath: pathLog.path) {
+                print(" > \(PlayerLog.logFilenamePlainText)         found")
+            }
+            else {
+                print(" > \(PlayerLog.logFilenamePlainText)         NOT found")
+            }
+        }
+        else if PlayerLog.saveType == .xml {
+            let pathLog = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.logFilenameXml, isDirectory: false)
+            if FileManager.default.fileExists(atPath: pathLog.path) {
+                print(" > \(PlayerLog.logFilenameXml) found")
+            }
+            else {
+                print(" > \(PlayerLog.logFilenameXml) NOT found")
+            }
+        }
+
+        let pathPref = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerPreferences.preferencesFilename, isDirectory: false)
+        if FileManager.default.fileExists(atPath: pathPref.path) {
+            print(" > \(PlayerPreferences.preferencesFilename) found")
+        }
+        else {
+            print(" > \(PlayerPreferences.preferencesFilename) NOT found")
+        }
+    }
+    else {
+        print(" > (e): Did not find player home at: \(path.path)")
+    }    
+    print("")
+}
 ///
 /// Prints some statistics about player library.
 /// 
 func PrintAndExecutePlayerLibrary() {
     print("Player Library:")    
     do {        
-        let lib: PlayerLibrary = PlayerLibrary()
-        try lib.load()        
-        print(" > Number of valid entries              \(lib.library.count)")    
-        print(" > Number of distinct artists           \(g_artists.count)") 
-        print(" > Number of distinct genres            \(g_genres.count)")    
-        print(" > Number of distinct recording years   \(g_recordingYears.count)")                
+        let fileUrl: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLibrary.filename, isDirectory: false)
+        if FileManager.default.fileExists(atPath: fileUrl.path) {
+            let lib: PlayerLibrary = PlayerLibrary()
+            try lib.load()        
+            print(" > Number of valid entries              \(lib.library.count)")    
+            print(" > Number of distinct artists           \(g_artists.count)") 
+            print(" > Number of distinct genres            \(g_genres.count)")    
+            print(" > Number of distinct recording years   \(g_recordingYears.count)")                
+        }
+        else {
+            print(" > (w): Could not find library.")    
+        }
     }
     catch let error as CmpError {
         print(" > (e): Could not load library. Message: '\(error.message)'")
