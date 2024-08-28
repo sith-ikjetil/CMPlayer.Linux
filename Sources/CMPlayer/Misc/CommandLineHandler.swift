@@ -35,7 +35,9 @@ internal class CommandLineHandler {
             case "--set-output-api-alsa": return CommandLineHandler.execute__set_output_api_alsa()
             case "--get-output-api": return CommandLineHandler.execute__get_output_api()
             case "--set-max-log-n": return CommandLineHandler.execute__set_max_log_n()
+            case "--get-max-log-n": return CommandLineHandler.execute__get_max_log_n()
             case "--set-max-history-n": return CommandLineHandler.execute__set_max_history_n()
+            case "--get-max-history-n": return CommandLineHandler.execute__get_max_history_n()
             default: return CommandLineHandler.execute__help();
         }
     }
@@ -84,7 +86,7 @@ internal class CommandLineHandler {
     /// 
     private static func execute__purge()
     {
-        print("CMPlayer Purge")
+        print("CMPlayer: --purge")
         print("=========================")
         if PlayerDirectories.purge() {
             print("(i): Purge success")
@@ -100,8 +102,8 @@ internal class CommandLineHandler {
     /// 
     private static func execute__set_output_api_ao() 
     {
-        print("CMPlayer Set Output")
-        print("=========================")
+        print("CMPlayer: --set-output-api-ao")
+        print("=============================")
         PlayerDirectories.ensureDirectoriesExistence()
         PlayerPreferences.ensureLoadPreferences()
         PlayerPreferences.outputSoundLibrary = OutputSoundLibrary.ao
@@ -115,8 +117,8 @@ internal class CommandLineHandler {
     /// 
     private static func execute__set_output_api_alsa() 
     {
-        print("CMPlayer Set Output")
-        print("=========================")
+        print("CMPlayer: --set-output-api-alsa")
+        print("===============================")
         PlayerDirectories.ensureDirectoriesExistence()
         PlayerPreferences.ensureLoadPreferences()
         PlayerPreferences.outputSoundLibrary = OutputSoundLibrary.alsa
@@ -132,8 +134,8 @@ internal class CommandLineHandler {
     {
         PlayerDirectories.ensureDirectoriesExistence()
         PlayerPreferences.ensureLoadPreferences()
-        print("CMPlayer Get Output API")
-        print("=========================")
+        print("CMPlayer: --get-output-api")
+        print("==========================")
         if PlayerPreferences.outputSoundLibrary == OutputSoundLibrary.ao {
             print("(i): Output api is: ao")
         }
@@ -155,8 +157,8 @@ internal class CommandLineHandler {
 
         PlayerDirectories.ensureDirectoriesExistence()
         PlayerPreferences.ensureLoadPreferences()
-        print("CMPlayer Set Max Log Entries")
-        print("============================")
+        print("CMPlayer: --set-max-log-n")
+        print("=========================")
         if let n = Int(CommandLine.arguments[2]) {
             if n >= 25 && n <= 1000 {
                 PlayerPreferences.logMaxEntries = n
@@ -178,6 +180,19 @@ internal class CommandLineHandler {
     ///
     /// execute --set-max-log-size
     /// 
+    private static func execute__get_max_log_n()
+    {
+        PlayerDirectories.ensureDirectoriesExistence()
+        PlayerPreferences.ensureLoadPreferences()
+        print("CMPlayer: --get-max-log-n")
+        print("=========================")
+        print("(i): Max log entries is: \(PlayerPreferences.logMaxEntries)")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    ///
+    /// execute --set-max-log-size
+    /// 
     private static func execute__set_max_history_n()
     {
         if CommandLine.argc < 3 {
@@ -187,8 +202,8 @@ internal class CommandLineHandler {
 
         PlayerDirectories.ensureDirectoriesExistence()
         PlayerPreferences.ensureLoadPreferences()
-        print("CMPlayer Set Max History Entries")
-        print("================================")
+        print("CMPlayer: --set-max-history-n")
+        print("=============================")
         if let n = Int(CommandLine.arguments[2]) {
             if n >= 25 && n <= 1000 {
                 PlayerPreferences.historyMaxEntries = n
@@ -208,12 +223,25 @@ internal class CommandLineHandler {
         exit(ExitCodes.SUCCESS.rawValue)
     }
     ///
+    /// execute --set-max-log-size
+    /// 
+    private static func execute__get_max_history_n()
+    {
+        PlayerDirectories.ensureDirectoriesExistence()
+        PlayerPreferences.ensureLoadPreferences()
+        print("CMPlayer: --get-max-history-n")
+        print("=============================")
+        print("(i): Max history entries is: \(PlayerPreferences.historyMaxEntries)")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    ///
     /// execute --help and default.
     /// 
     private static func execute__help()
     {
-        print("CMPlayer Help")
-        print("=========================")
+        print("CMPlayer: --help")
+        print("================")
         print("Usage: cmplayer <options>")
         print("<options>")
         print(" --help                    = show this help screen")
@@ -224,7 +252,9 @@ internal class CommandLineHandler {
         print(" --set-output-api-alsa     = sets audio output api to libasound (alsa)")
         print(" --get-output-api          = gets audio output api")
         print(" --set-max-log-n <max>     = sets max log entries [25,1000]")
+        print(" --get-max-log-n           = gets max log entries")
         print(" --set-max-history-n <max> = sets max history entries [25,1000]")
+        print(" --get-max-history-n       = gets max history entries")
         print("")        
         exit(ExitCodes.SUCCESS.rawValue)
     }    
