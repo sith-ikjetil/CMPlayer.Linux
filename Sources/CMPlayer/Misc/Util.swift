@@ -170,6 +170,10 @@ internal extension String {
         if msg.count == 0 || maxLength <= 0 {
             return msg
         }
+
+        if maxLength <= msg.count {
+            return String(msg.prefix(maxLength))
+        }
         
         if msg.count == 0 {
             var result: String = ""
