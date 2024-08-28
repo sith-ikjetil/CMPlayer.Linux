@@ -148,6 +148,7 @@ internal class CommandHistory {
         while self.history.count > PlayerPreferences.historyMaxEntries {
             self.history.remove(at: 0)
         }
+        self.historyIndex = self.history.count
         if historyCount > PlayerPreferences.historyMaxEntries {
             try self.save()
         }
