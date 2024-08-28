@@ -144,7 +144,8 @@ internal class CommandHistory {
 
         let fileContents = try String(contentsOfFile: filePath.path)
         fileContents.enumerateLines { line, _ in
-            self.add(command: line)
+            // do not use add method, it writes to the history file as you add items.
+            self.history.append(line) 
         }
 
         let historyCount = self.history.count
