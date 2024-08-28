@@ -17,6 +17,7 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
     ///
     /// private constants
     ///
+    private let concurrentQueue = DispatchQueue(label: "dqueue.cmp.linux.setup-window.1", attributes: .concurrent)
     private let setupText: [String] = ["CMPlayer needs to have a path to search for music",
                                        "In CMPlayer you can have many root paths.",
                                        "In CMPlayer Use: add mrp <path> or: remove mrp <path> to add remove path.",
@@ -24,12 +25,35 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
     //
     // variables
     //
-    var path: String = ""    
+    var path: String = ""
+    var cursor: String = ""
+    var finished: Bool = false    
     ///
     /// Shows this InitialSetupWindow on screen.
     ///
     func showWindow() -> Void {
         g_tscpStack.append(self)
+
+        let musicDefaultPath: URL = PlayerDirectories.homeDirectory.appendingPathComponent("Music", isDirectory: false)
+        self.path = musicDefaultPath.path
+
+        concurrentQueue.async {
+
+            while !self.finished {
+                if self.cursor.count > 0 {
+                    self.cursor = ""
+                }
+                else {
+                    self.cursor = "_"
+                }
+
+                self.renderInput()
+
+                let second: Double = 1_000_000
+                usleep(useconds_t(0.075 * second))
+            }
+        }
+
         self.run()
         g_tscpStack.removeLast()
     }    
@@ -61,12 +85,18 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             Console.printXY(1, y, txt, g_cols, .center, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             y += 1
         }
-        
-        Console.printXY(1,y+1, ":> \(self.path)", g_cols, .left, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+
+        self.renderInput()                
         
         Console.gotoXY(g_cols,1)
         print("")
-    }    
+    }   
+    ///
+    /// renders path input only
+    ///  
+    func renderInput() {
+        Console.printXY(1,5+self.setupText.count + 1, ":> \(self.path)\(self.cursor)", g_cols, .left, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+    }
     ///
     /// Runs InitialSetupWindow keyboard input and feedback.
     ///
@@ -86,6 +116,10 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_ENTER.rawValue, closure: { () -> Bool in
             if self.path.count > 0 {
+                if !FileManager.default.fileExists(atPath: self.path) {
+                    return false
+                }
+                self.finished = true
                 PlayerPreferences.musicRootPath.append(self.path)
                 PlayerPreferences.savePreferences()
                 return true
