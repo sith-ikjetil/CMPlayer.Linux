@@ -69,7 +69,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     /// static private variables
     /// 
-    static private var timeElapsedMs: UInt64 = 0
+    static private var timeElapsedMs: UInt64 = 0   
     //
     // private variables
     //        
@@ -81,15 +81,12 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     private var updateFileName: String = ""
     private var isTooSmall: Bool = false
     private var showCursor: Bool = false
-    private var cursorTimeout: UInt64 = 0
-    private var commandHistory: [String] = []
-    private var commandHistoryIndex: Int = -1
+    private var cursorTimeout: UInt64 = 0    
     ///
     /// priate constants
     /// 
     private let concurrentQueue1 = DispatchQueue(label: "dqueue.cmp.linux.main-window.1", attributes: .concurrent)
-    private let concurrentQueue2 = DispatchQueue(label: "dqueue.cmp.linux.main-window.2", attributes: .concurrent)     
-    //private let commandHistoryFilename = ".history"
+    private let concurrentQueue2 = DispatchQueue(label: "dqueue.cmp.linux.main-window.2", attributes: .concurrent)         
     ///
     /// Shows this MainWindow on screen.
     ///
@@ -387,7 +384,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                          PlayerCommand(commands: [["restart"]], closure: self.onCommandRestart),
                          PlayerCommand(commands: [["p"]], closure: self.onCommandPlayOrPause),
                          PlayerCommand(commands: [["prev"]], closure: self.onCommandPrev),
-                         PlayerCommand(commands: [["#"]], closure: self.onCommandAddSongToPlaylist)]
+                         PlayerCommand(commands: [["#"]], closure: self.onCommandAddSongToPlaylist),
+                         PlayerCommand(commands: [["clear", "history"]], closure: self.onCommandClearHistory),]
         
         
         //
@@ -478,35 +476,17 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if self.commandHistory.count > 0 {
-                self.commandHistoryIndex += 1
-                if self.commandHistoryIndex >= 0 {
-                    if self.commandHistoryIndex < self.commandHistory.count {
-                        self.currentCommand = self.commandHistory[self.commandHistoryIndex]                    
-                        self.renderCommandLine()                    
-                    }
-                }
-                if self.commandHistoryIndex >= self.commandHistory.count {
-                    self.commandHistoryIndex = self.commandHistory.count
-                    self.currentCommand = ""
-                    self.renderCommandLine()
-                }
-            }
+            if let cmd = CommandHistory.player.pop() {
+                self.currentCommand = cmd
+                self.renderCommandLine()
+            }        
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
-            if self.commandHistory.count > 0 {
-                self.commandHistoryIndex -= 1
-                if self.commandHistoryIndex >= 0 {
-                    if self.commandHistoryIndex < self.commandHistory.count {
-                        self.currentCommand = self.commandHistory[self.commandHistoryIndex]                    
-                        self.renderCommandLine()                    
-                    }
-                }
-                if self.commandHistoryIndex < 0 {
-                    self.commandHistoryIndex = 0
-                }
-            }
+            if let cmd = CommandHistory.player.push() {
+                self.currentCommand = cmd
+                self.renderCommandLine()
+            }        
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
@@ -525,8 +505,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_ENTER.rawValue, closure: { () -> Bool in            
             if self.currentCommand.count > 0 {
-                self.commandHistory.append(self.currentCommand)
-                self.commandHistoryIndex = self.commandHistory.count
+                CommandHistory.player.add(command: self.currentCommand)
                 self.processCommand(command: self.currentCommand)                
             }
             self.currentCommand.removeAll()
@@ -555,7 +534,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             return false
         })
         keyHandler.run()
-    }    
+    }       
     ///
     /// Processes commands
     ///
@@ -1239,4 +1218,17 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     func onCommandUpdate(parts: [String]) -> Void {
         
     }        
+    ///
+    /// Enable crossfade
+    ///
+    /// parameter parts: command array.
+    ///
+    func onCommandClearHistory(parts: [String]) -> Void {
+        do {
+            try CommandHistory.player.clear()
+        }
+        catch {
+
+        }
+    }    
 }// MainWindow

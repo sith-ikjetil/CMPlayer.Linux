@@ -48,36 +48,42 @@ internal class Player {
     /// Initializes the application.
     ///
     func initialize() throws -> Void {                        
+        /// ensure directores exist        
         PlayerDirectories.ensureDirectoriesExistence()
+        // ensure preferences exist and is loaded if it does
         PlayerPreferences.ensureLoadPreferences()        
-        PlayerLog.ApplicationLog = PlayerLog(autoSave: true)
-
+        // set player log
+        PlayerLog.ApplicationLog = PlayerLog(autoSave: true)        
+        // ensure command history exist and is loaded if it does
+        try CommandHistory.player.ensureLoadCommandHistory()
+        // if log file exist delete it.
         let pathLogFile: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.filename, isDirectory: false)
         if FileManager.default.fileExists(atPath: pathLogFile.path) {
             try FileManager.default.removeItem(at: pathLogFile)     
         }           
-        
+        // log we have started
         PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Started.")
-        
+        // initialize console
         Console.initialize()
-        
+        // make sure we show the setup window if we have no musicRootPaths
         if PlayerPreferences.musicRootPath.count == 0 {
             let wnd: SetupWindow = SetupWindow()
             wnd.showWindow()
         }
-                
+        // try load library
         try g_library.load()
-        
+        // initialize CMPlayer
         let wnd = InitializeWindow()
         wnd.showWindow()        
-        
-        g_library.library = g_songs        
+        // set library to songs found
+        g_library.library = g_songs  
+        // save library      
         g_library.save()
-        
+        // if autoplay on startup, start playing
         if PlayerPreferences.autoplayOnStartup && g_playlist.count > 0 {
             self.play(player: 1, playlistIndex: 0)            
         }
-        
+        // clear screen with current theme color
         Console.clearScreenCurrentTheme()           
     }        
     ///

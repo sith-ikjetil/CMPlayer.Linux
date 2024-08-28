@@ -18,7 +18,7 @@ internal class PlayerLog {
     ///
     /// static constants/variables
     /// 
-    static let filename: String = "log.txt"    
+    static let filename: String = "log"    
     static var ApplicationLog: PlayerLog? = nil     
     ///
     /// variables

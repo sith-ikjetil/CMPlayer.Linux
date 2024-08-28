@@ -76,6 +76,7 @@ internal class PlayerPreferences {
     static var logDebug: Bool = true
     static var logOther: Bool = true
     static var logMaxEntries: Int = 100
+    static var historyMaxEntries: Int = 1000
     static var logMaxSizeReached: LogMaxSizeReached = LogMaxSizeReached.EmptyLog
     ///
     /// Default initializer.
@@ -121,6 +122,9 @@ internal class PlayerPreferences {
                 }
                 if let aOutputSoundLibrary = xeGeneral.attribute(forName: "outputSoundLibrary") {
                     PlayerPreferences.outputSoundLibrary = OutputSoundLibrary(rawValue: aOutputSoundLibrary.stringValue ?? "ao") ?? OutputSoundLibrary.ao
+                }
+                if let aHistoryMaxEntries = xeGeneral.attribute(forName: "historyMaxEntries") {
+                    PlayerPreferences.historyMaxEntries = Int(aHistoryMaxEntries.stringValue ?? "1000") ?? 1000
                 }
                 
                 
@@ -237,6 +241,11 @@ internal class PlayerPreferences {
         xnOutputSoundLibrary.name = "outputSoundLibrary"
         xnOutputSoundLibrary.setStringValue(self.outputSoundLibrary.rawValue, resolvingEntities: false)
         xeGeneral.addAttribute(xnOutputSoundLibrary)
+
+        let xnHistoryMaxEntries: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnHistoryMaxEntries.name = "historyMaxEntries"
+        xnHistoryMaxEntries.setStringValue(String(self.historyMaxEntries), resolvingEntities: false)
+        xeGeneral.addAttribute(xnHistoryMaxEntries)
         
         //
         // log
