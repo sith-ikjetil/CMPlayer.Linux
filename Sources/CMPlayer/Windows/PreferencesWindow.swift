@@ -91,6 +91,7 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
     ///
     func renderWindow() -> Void {
         guard isWindowSizeValid() else {
+            renderTerminalTooSmallMessage()
             return
         }
         

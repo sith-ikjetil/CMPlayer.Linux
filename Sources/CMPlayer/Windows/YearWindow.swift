@@ -62,6 +62,7 @@ internal class YearWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     func renderWindow() -> Void {
         guard isWindowSizeValid() else {
+            renderTerminalTooSmallMessage()
             return
         }
         

@@ -307,6 +307,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
     ///
     func renderWindow() -> Void {
         guard isWindowSizeValid() else {
+            renderTerminalTooSmallMessage()
             return
         }
         

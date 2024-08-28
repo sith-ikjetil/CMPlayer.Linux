@@ -89,6 +89,7 @@ internal class InfoWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     func renderWindow() -> Void {
         guard isWindowSizeValid() else {
+            renderTerminalTooSmallMessage()
             return
         }
         

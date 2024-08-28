@@ -560,3 +560,12 @@ internal extension Date {
         return dateFormatter.string(from: self)
     }
 }
+///
+/// render terminal too small message
+/// 
+internal func renderTerminalTooSmallMessage()
+{
+    Console.clearScreenCurrentTheme()
+    Console.gotoXY(1,1)
+    print("Terminal window must be at least \(g_minCols) by \(g_minRows)")
+}

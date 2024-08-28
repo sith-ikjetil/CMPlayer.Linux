@@ -86,6 +86,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     func renderWindow() -> Void {
         guard isWindowSizeValid() else {
+            renderTerminalTooSmallMessage()
             return
         }
         

@@ -63,6 +63,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
     ///
     func renderWindow() -> Void {
         guard isWindowSizeValid() else {
+            renderTerminalTooSmallMessage()
             return
         }
         

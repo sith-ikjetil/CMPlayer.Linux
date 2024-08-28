@@ -47,6 +47,7 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
     ///
     func renderWindow() -> Void {
         guard isWindowSizeValid() else {
+            renderTerminalTooSmallMessage()
             return
         }
         

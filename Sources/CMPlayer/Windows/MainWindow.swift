@@ -316,7 +316,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// Renders screen output. Does not clear screen first.
     ///
     func renderWindow() -> Void {
-        guard isWindowSizeValid() else {
+        guard isWindowSizeValid() else {        
+            renderTerminalTooSmallMessage()
             return
         }
 
@@ -400,7 +401,10 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                             MainWindow.renderHeader(showTime: true)
                             self.renderWindow()
                         }
-                    }
+                    }  
+                    else {
+                        renderTerminalTooSmallMessage()
+                    }                  
                 }
                 
                 g_lock.lock()

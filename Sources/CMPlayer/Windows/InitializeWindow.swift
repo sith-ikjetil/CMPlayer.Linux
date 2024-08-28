@@ -176,6 +176,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     ///
     func renderWindow() -> Void {
         guard isWindowSizeValid() else {
+            renderTerminalTooSmallMessage()
             return
         }
                 
