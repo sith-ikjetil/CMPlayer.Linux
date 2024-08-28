@@ -1,5 +1,8 @@
 import Foundation
 
+///
+/// CommandHistory keeps track of commands and their history.
+/// 
 internal class CommandHistory {
     ///
     /// static constants
