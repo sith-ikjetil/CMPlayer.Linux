@@ -34,10 +34,10 @@ internal class CommandLineHandler {
             case "--set-output-api-ao": return CommandLineHandler.execute__set_output_api_ao()
             case "--set-output-api-alsa": return CommandLineHandler.execute__set_output_api_alsa()
             case "--get-output-api": return CommandLineHandler.execute__get_output_api()
-            case "--set-max-log-entries": return CommandLineHandler.execute__set_max_log_entries()
-            case "--set-max-history-entries": return CommandLineHandler.execute__set_max_history_entries()
+            case "--set-max-log-n": return CommandLineHandler.execute__set_max_log_n()
+            case "--set-max-history-n": return CommandLineHandler.execute__set_max_history_n()
             default: return CommandLineHandler.execute__help();
-        }        
+        }
     }
     ///
     /// execute --integrity-check
@@ -146,7 +146,7 @@ internal class CommandLineHandler {
     ///
     /// execute --set-max-log-size
     /// 
-    private static func execute__set_max_log_entries()
+    private static func execute__set_max_log_n()
     {
         if CommandLine.argc < 3 {
             CommandLineHandler.execute__help()
@@ -178,7 +178,7 @@ internal class CommandLineHandler {
     ///
     /// execute --set-max-log-size
     /// 
-    private static func execute__set_max_history_entries()
+    private static func execute__set_max_history_n()
     {
         if CommandLine.argc < 3 {
             CommandLineHandler.execute__help()
@@ -216,15 +216,15 @@ internal class CommandLineHandler {
         print("=========================")
         print("Usage: cmplayer <options>")
         print("<options>")
-        print(" --help                            = show this help screen")
-        print(" --version                         = show version numbers")
-        print(" --integrity-check                 = do an integrity check")
-        print(" --purge                           = remove all stored data")
-        print(" --set-output-api-ao               = sets audio output api to libao (ao)")
-        print(" --set-output-api-alsa             = sets audio output api to libasound (alsa)")
-        print(" --get-output-api                  = gets audio output api")
-        print(" --set-max-log-entries <limit>     = sets max log entries (limit between 25 and 1000)")
-        print(" --set-max-history-entries <limit> = sets max log entries (limit between 25 and 1000)")
+        print(" --help                    = show this help screen")
+        print(" --version                 = show version numbers")
+        print(" --integrity-check         = do an integrity check")
+        print(" --purge                   = remove all stored data")
+        print(" --set-output-api-ao       = sets audio output api to libao (ao)")
+        print(" --set-output-api-alsa     = sets audio output api to libasound (alsa)")
+        print(" --get-output-api          = gets audio output api")
+        print(" --set-max-log-n <max>     = sets max log entries [25,1000]")
+        print(" --set-max-history-n <max> = sets max history entries [25,1000]")
         print("")        
         exit(ExitCodes.SUCCESS.rawValue)
     }    
