@@ -25,208 +25,12 @@ internal enum ExitCodes: Int32 {
     case ERROR_REDIRECT = 6
     case ERROR_CANCEL = 7
 }
-///
-/// SearchType, type of search
-///
-internal enum SearchType : String {
-    case Artist = "artist"
-    case Title = "title"
-    case ArtistOrTitle = "artist or title"
-    case Album = "album"
-    case Genre = "genre"
-    case RecordedYear = "year"
-}
 //
 // MediaPlayer error
 //
 internal struct CmpError : Error {
     let message: String
 }
-///
-/// Padding alignment types.
-///
-internal enum PrintPaddingTextAlign {
-    case left
-    case right
-    case center
-    case ignore
-}
-///
-/// Protocol for terminal size changed
-///
-internal protocol TerminalSizeHasChangedProtocol {
-    func terminalSizeHasChanged() -> Void
-}
-///
-/// Protocol for windows
-///
-internal protocol PlayerWindowProtocol {
-    func showWindow() -> Void
-}
-/// 
-/// Returnes true if window size is valid, false otherwise.
-/// - Returns: 
-internal func isWindowSizeValid() -> Bool {
-    if g_rows < g_minRows || g_cols < g_minCols {
-        return false
-    }
-
-    return true
-}
-///
-/// Check to see if command is one of the supported given commands.
-///
-/// parameter command: Command to check for.
-/// parameter commands: Commands to check in.
-///
-/// returns: True if command is in commands. False otherwise.
-///
-internal func isCommandInCommands(_ command: String, _ commands: [String]) -> Bool {
-    for c in commands {
-        if command == c {
-            return true
-        }
-    }
-    return false
-}
-///
-/// Reparses the command arguments. Makes sure that commands that are part of "<search term>" are remade into on search term without the " character.
-///
-/// parameter command: The search terms comming from command argument.
-///
-/// returns: The new reparsed command argument array.
-///
-internal func reparseCurrentCommandArguments(_ command: [String]) -> [String] {
-    var retVal: [String] = []
-
-    var temp: String = ""
-    
-    for c in command {
-        if temp.count > 0 {
-            if c.count > 0 {
-                if c.hasSuffix("\"") {
-                    var nc: String = c
-                    nc.remove(at: nc.index(nc.endIndex, offsetBy: -1))
-                    temp.append(" ")
-                    temp.append(nc)
-                    retVal.append(temp)
-                    temp = ""
-                }
-                else {
-                    temp.append(" ")
-                    temp.append(c)
-                }
-            }
-        }
-        else if c.count > 0 {
-            var nc: String = c
-            while nc.hasPrefix(" ") {
-                nc.remove(at: nc.startIndex)
-            }
-            if nc.count > 0 {
-                var i: Int = 0
-                if c.hasPrefix("\"") {
-                    i += 1
-                }
-                if i == 0 {
-                    retVal.append(nc)
-                }
-                else {
-                    nc.remove(at: nc.startIndex)
-                    if nc.count > 0 {
-                        if nc.hasSuffix("\"") {
-                            nc.remove(at: nc.index(nc.endIndex, offsetBy: -1))
-                            if nc.count > 0 {
-                                retVal.append(nc)
-                            }
-                        }
-                        else {
-                            temp = nc
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    return retVal
-}
-///
-/// String extension methods.
-///
-internal extension String {
-    ///
-    /// Converts a string to a padded string of given length.
-    ///
-    /// parameter maxLength: Length of new string.
-    /// parameter padding: Padding type.
-    /// parameter paddingChar: Padding character to use.
-    ///
-    /// returns: New padded string.
-    ///
-    func convertStringToLengthPaddedString(_ maxLength: Int,_ padding: PrintPaddingTextAlign,_ paddingChar: Character) -> String {
-        var msg: String = self
-        
-        if msg.count == 0 || maxLength <= 0 {
-            return msg
-        }
-
-        if maxLength <= msg.count {
-            return String(msg.prefix(maxLength))
-        }
-        
-        if msg.count == 0 {
-            var result: String = ""
-            for _ in 0..<maxLength {
-                result.append(paddingChar)
-            }
-            return result
-        }
-        
-        if msg.count > maxLength {                      
-            let idx = msg.index(msg.startIndex, offsetBy: maxLength)
-            msg = String(msg[msg.startIndex..<idx])
-        }
-        
-        if maxLength == 1 {
-            return String(msg.first!)
-        }
-        
-        switch padding {
-        case .ignore:
-            if msg.count < maxLength {
-                return msg
-            }
-            let idx = msg.index(msg.startIndex, offsetBy: maxLength)
-            return String(msg[msg.startIndex..<idx])
-        case .center:
-            var str = String(repeating: paddingChar, count: maxLength)
-            var len: Double = Double(maxLength)
-            len = len / 2.0
-            let ulen = UInt64(len)
-            if Double(ulen) < len {
-                len -= 1
-            }
-            len -= Double(msg.count) / 2
-            let si = str.index(str.startIndex, offsetBy: Int(len))
-            str.insert(contentsOf: msg, at: si)
-            return String(str[str.startIndex..<str.index(str.startIndex, offsetBy: maxLength)])
-        case .left:
-            var str = String(repeating: paddingChar, count: maxLength)
-            let len = 0
-            let si = str.index(str.startIndex, offsetBy: len)
-            str.insert(contentsOf: msg, at: si)
-            return String(str[str.startIndex..<str.index(str.startIndex, offsetBy: maxLength)])
-        case .right:
-            var str = String(repeating: paddingChar, count: maxLength)
-            let len = maxLength-msg.count
-            let si = str.index(str.startIndex, offsetBy: len)
-            str.insert(contentsOf: msg, at: si)
-            return String(str[str.startIndex..<str.index(str.startIndex, offsetBy: maxLength)]);
-            
-        }
-    }
-}// extension String
 ///
 /// Split ms to its parts.
 ///
@@ -397,22 +201,7 @@ internal func isPathInExclusionPath(path: String) -> Bool {
     }
     return false
 }
-///
-/// Int extension methods.
-///
-internal extension Int {
-    ///
-    /// Convert a Int into a Norwegian style number for text representation. " " as a thousand separator.
-    ///
-    /// returns: The number as a new string.
-    ///
-    func itsToString() -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.locale = Locale(identifier: "nb_NO")
-        return formatter.string(from: NSNumber(value: self))!
-    }
-}
+
 ///
 /// Runs regular expression agains an input string.
 ///
@@ -460,61 +249,6 @@ internal func sortSongEntry(se1: SongEntry, se2: SongEntry) -> Bool {
     return false
 }
 ///
-/// Give current theme color
-///
-internal func getThemeBgColor() -> ConsoleColor {
-  switch PlayerPreferences.colorTheme {
-  case .Default:
-        return ConsoleColor.black
-  case .Blue:
-        return ConsoleColor.blue
-  case .Black:
-        return ConsoleColor.black
-  }
-}
-///
-/// Give song background theme color
-///
-internal func getThemeSongBgColor() -> ConsoleColor {
-  switch PlayerPreferences.colorTheme {
-  case .Default:
-        return ConsoleColor.blue
-  case .Blue:
-        return ConsoleColor.blue
-  case .Black:
-        return ConsoleColor.black
-  }
-}
-///
-/// Get mode information
-///
-/// returns: set of isInMode, mode name, number of songs
-///
-internal func getModeStatus() -> (isInMode: Bool, modeName: [String], numberOfSongsInMode: Int) {
-    var isInMode: Bool = false
-    var modeName: [String] = []
-    let numberOfSongsInMode: Int = g_searchResult.count
-    
-    for type in g_searchType {
-        modeName.append( type.rawValue )
-        isInMode = true
-    }
-
-    return (isInMode: isInMode, modeName: modeName, numberOfSongsInMode: numberOfSongsInMode)
-}
-/// 
-/// Check if SearchType is in g_searchMode
-/// 
-internal func isSearchTypeInMode(_ type: SearchType) -> Bool {
-    for t in g_searchType {
-        if t == type {            
-            return true
-        }
-    }
-    return false
-}
-
-///
 /// Function to redirect stderr to /dev/null
 /// 
 func redirect_stderr() -> Int32 {
@@ -549,27 +283,4 @@ func restore_stderr(_ stderr_copy: Int32) {
     dup2(stderr_copy, fileno(stderr)) // Restore stderr
     close(stderr_copy) // Close the backup
 }
-///
-/// Date extension methods.
-///
-internal extension Date {
-    ///
-    /// Convert a Date into a YYYY-MM-DD HH:mm:ss string.
-    ///
-    /// returns: Date as string.
-    ///
-    func itsToString() -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        return dateFormatter.string(from: self)
-    }
-}
-///
-/// render terminal too small message
-/// 
-internal func renderTerminalTooSmallMessage()
-{
-    Console.clearScreenCurrentTheme()
-    Console.gotoXY(1,1)
-    print("Terminal window must be at least \(g_minCols)x\(g_minRows) (\(g_cols)x\(g_rows)).")
-}
+
