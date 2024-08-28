@@ -123,84 +123,62 @@ Are located at:
  - /usr/include/ (Fedora 40)
  - /usr/include/ (Manjaro 24)
   
-## CMPlayer.Linux (in app) Help Text
+## How to build CMPlayer.Linux
+CMPlayer.Linux is written in Swift. That means that Swift must be  
+installed firstly. See www.swift.org for download and install of Swift.
+  
+Building **cmplayer** is relativly easy. After you clone the  
+project using the following:  
+```bash
+git clone https://github.com/sith-ikjetil/CMPlayer.Linux.git
 ```
-<song no>
-:: adds song to playlist
-exit, quit, q                                                                   
-:: exits application                                                            
-next, skip, n, s, 'TAB'-key                                                           
-:: plays next song                                                              
-play, p
-:: plays, pauses or resumes playback                                            
-pause, p
-:: pauses music
-resume
-:: resumes music playback
-search [<words>]                                                                
-:: searches artist and title for a match. case insensitive                      
-search artist [<words>]                                                         
-:: searches artist for a match. case insensitive                                
-search title [<words>]                                                          
-:: searches title for a match. case insensitive                                 
-search album [<words>]                                                          
-:: searches album name for a match. case insensitive                            
-search genre [<words>]                                                          
-:: searches genre for a match. case insensitive                                 
-search year [<year>]  
-:: searches recorded year for a match.                                          
-mode off                                                                        
-:: clears mode playback. playback now from entire song library                  
-help                                                                            
-:: shows this help information                                                  
-pref                                                                            
-:: shows preferences information                                                
-about                                                                           
-:: show the about information                                                   
-genre                                                                           
-:: shows all genre information and statistics                                   
-year                                                                            
-:: shows all year information and statistics                                    
-mode                                                                            
-:: shows current mode information and statistics                                
-repaint                                                                         
-:: clears and repaints entire console window 
-add mrp <path>                                                                  
-:: adds the path to music root folder                                           
-remove mrp <path>                                                               
-:: removes the path from music root folders                                     
-clear mrp                                                                       
-:: clears all paths from music root folders                                     
-add exp <path>
-:: adds the path to exclusion paths
-remove exp <path>
-:: removes the path from exclusion paths
-clear exp
-:: clears all paths from exclusion paths
-set cft <seconds>                                                               
-:: sets the crossfade time in seconds (1-10 seconds)                            
-enable crossfade                                                                
-:: enables crossfade                                                            
-disable crossfade                                                               
-:: disables crossfade                                                           
-enable aos                                                                      
-:: enables playing on application startup                                       
-disable aos             
-:: disables playing on application startup                                      
-rebuild songno                                                                  
-:: rebuilds song numbers                                                        
-goto <mm:ss>                                                                    
-:: moves playback point to minutes (mm) and seconds (ss) of current song        
-replay                                                                          
-:: starts playing current song from beginning again                             
-reinitialize                                                                    
-:: reinitializes library and should be called after mrp paths are changed       
-info                                                                            
-:: shows information about first song in playlist                               
-info <song no>                                                                  
-:: show information about song with given song number                           
-set viewtype <type>                                                             
-:: sets view type. can be 'default' or 'details'
-set theme <color>                                                               
-:: sets theme color. color can be 'default', 'blue' or 'black'
+You first must edit Package.swift in the CMPlayer.Linux directory.  
+You must uncomment the .define statements that apply, and comment out  
+those that do not apply. Like this:  
+```swift
+cSettings: [
+    .define("CMP_TARGET_UBUNTU_V22_04"),
+    //.define("CMP_TARGET_UBUNTU_V24_04"),
+    //.define("CMP_TARGET_FEDORA_V40"),
+    //.define("CMP_TARGET_MANJARO_V24"),
+    .define("CMP_FFMPEG_V4"),
+    //.define("CMP_FFMPEG_V6"),
+    //.define("CMP_FFMPEG_V7"),
+],
+swiftSettings: [
+    .define("CMP_TARGET_UBUNTU_V22_04"),
+    //.define("CMP_TARGET_UBUNTU_V24_04"),
+    //.define("CMP_TARGET_FEDORA_V40"),
+    //.define("CMP_TARGET_MANJARO_V24"),
+    .define("CMP_FFMPEG_V4"),
+    //.define("CMP_FFMPEG_V6"),
+    //.define("CMP_FFMPEG_V7"),
+]
 ```
+In order to know which version of ffmpeg you have, you type in  
+ffmpeg in your terminal and see which version is installed on your  
+system. Again, uncomment the version that apply, and comment out the versions  
+that does not apply.  
+  
+You should set the CMP_TARGET_? to the closes match to your system. If none of these  
+flags work on you system, you might need to add support for your own system.  
+  
+You then need to stay in the CMPlayer.Linux directory and  execute the  
+following commands:  
+```bash
+swift build
+```
+If you get compiler errors, you might need the **C_INCLUDE_PATH** set in  
+your .bashrc and .bash_profile. If it builds without errors, you can then  
+build for release using the command:  
+```bash
+swift build -c release
+```
+If it once again builds without errors, you can find the binary in  
+the CMPlayer.Linux/.build/release directory. Then it is simply a job  
+to copy **cmplayer** to /usr/bin and execute the application.  
+  
+You might get runtime errors for libraries that **cmplayer** depends on  
+but are not installed. It is written about further up in this README.md  
+file. You might also need to have gcc and g++ installed. See also  
+**LD_LIBRARY_PATH** further up. 
