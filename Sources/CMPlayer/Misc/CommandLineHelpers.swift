@@ -18,7 +18,7 @@ func PrintAndExecuteIntegrityCheck() {
 /// Prints information about output devices.
 /// 
 func PrintAndExecuteOutputDevices() {        
-    print("Audio Output(ao):")
+    print("Audio Output (ao):")
     printAoInfo()    
     print("")
     print("ALSA:")
