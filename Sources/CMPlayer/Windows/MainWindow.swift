@@ -480,14 +480,14 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
-            if let cmd = CommandHistory.player.pop() {
+            if let cmd = PlayerCommandHistory.default.pop() {
                 self.currentCommand = cmd
                 self.renderCommandLine()
             }        
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
-            if let cmd = CommandHistory.player.push() {
+            if let cmd = PlayerCommandHistory.default.push() {
                 self.currentCommand = cmd
                 self.renderCommandLine()
             }        
@@ -509,7 +509,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_ENTER.rawValue, closure: { () -> Bool in            
             if self.currentCommand.count > 0 {
-                CommandHistory.player.add(command: self.currentCommand)
+                PlayerCommandHistory.default.add(command: self.currentCommand)
                 self.processCommand(command: self.currentCommand)                
             }
             self.currentCommand.removeAll()
@@ -1229,7 +1229,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     func onCommandClearHistory(parts: [String]) -> Void {
         do {
-            try CommandHistory.player.clear()
+            try PlayerCommandHistory.default.clear()
         }
         catch {
 

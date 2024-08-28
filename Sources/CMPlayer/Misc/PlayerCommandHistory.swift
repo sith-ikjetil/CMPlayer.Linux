@@ -3,7 +3,7 @@ import Foundation
 ///
 /// CommandHistory keeps track of commands and their history.
 /// 
-internal class CommandHistory {
+internal class PlayerCommandHistory {
     ///
     /// static constants
     /// 
@@ -11,7 +11,7 @@ internal class CommandHistory {
     ///
     /// static variables
     ///
-    static let player: CommandHistory = CommandHistory()
+    static let `default`: PlayerCommandHistory = PlayerCommandHistory()
     //
     // private variables
     //
@@ -76,7 +76,7 @@ internal class CommandHistory {
     /// - Parameter command:  command to write.
     private func writeCommandToHistory(command: String) {        
         let text: String = "\(command)\n"
-        let filePath: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(CommandHistory.filename, isDirectory: false)
+        let filePath: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerCommandHistory.filename, isDirectory: false)
         do {
             // Check if file exists
             if !FileManager.default.fileExists(atPath: filePath.path) {
@@ -121,7 +121,7 @@ internal class CommandHistory {
     /// 
     /// - Throws: 
     func save() throws {
-        let filePath: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(CommandHistory.filename, isDirectory: false)
+        let filePath: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerCommandHistory.filename, isDirectory: false)
         try render().write(to: filePath, atomically: true, encoding: .utf8)
     }
     /// 
@@ -129,14 +129,14 @@ internal class CommandHistory {
     ///     
     func clear() throws {
         self.history.removeAll()
-        let filePath: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(CommandHistory.filename, isDirectory: false)
+        let filePath: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerCommandHistory.filename, isDirectory: false)
         try "".write(to: filePath, atomically: true, encoding: .utf8)        
     }
     ///
     /// ensure history file exists and has no more than PlayerPreferences.historyMaxEntries entries.
     /// 
     func ensureLoadCommandHistory() throws {        
-        let filePath: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(CommandHistory.filename, isDirectory: false)
+        let filePath: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerCommandHistory.filename, isDirectory: false)
         if !FileManager.default.fileExists(atPath: filePath.path) {
             try "".write(to: filePath, atomically: true, encoding: .utf8)
             return

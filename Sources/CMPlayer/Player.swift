@@ -54,8 +54,8 @@ internal class Player {
         PlayerPreferences.ensureLoadPreferences()        
         // set player log
         PlayerLog.ApplicationLog = PlayerLog(autoSave: true)        
-        // ensure command history exist and is loaded if it does
-        try CommandHistory.player.ensureLoadCommandHistory()
+        // ensure command history exist and is loaded if it does        
+        try PlayerCommandHistory.default.ensureLoadCommandHistory()
         // if log file exist delete it.
         let pathLogFile: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.filename, isDirectory: false)
         if FileManager.default.fileExists(atPath: pathLogFile.path) {
