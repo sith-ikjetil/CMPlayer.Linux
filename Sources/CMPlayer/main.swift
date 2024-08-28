@@ -30,7 +30,7 @@ internal let g_crossfadeMaxTime: Int = 20           // seconds
 internal let g_asyncCompletionDelay: Float = 0.35   // 350 ms
 internal let g_metadataNotFoundName: String = "--unknown--" // metadata not found or invalid has this string
 internal let g_minCols: Int = 80 // minimum supported columns terminal size
-internal let g_minRows: Int = 24 // minimum supported rows terminal size
+internal let g_minRows: Int = 12 // minimum supported rows terminal size
 //
 // Global variables/properties
 //

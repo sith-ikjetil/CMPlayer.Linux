@@ -102,7 +102,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     func terminalSizeHasChanged() -> Void {
         Console.clearScreenCurrentTheme()
-        if g_rows >= 24 && g_cols >= 80 {
+        if g_rows >= g_minRows && g_cols >= g_minCols {
             self.isTooSmall = false
             MainWindow.renderHeader(showTime: true)
             self.renderWindow()
