@@ -103,7 +103,7 @@ func PrintAndExecutePlayerHomeDirectory() {
     print("Player Home:")
     let path = PlayerDirectories.consoleMusicPlayerDirectory
     if FileManager.default.fileExists(atPath: path.path) {
-        print(" > (i): Found at: \(path.path)")
+        print(" > (i): Found at:  \(path.path)")
 
         let pathLibrary = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLibrary.filename, isDirectory: false)
         if FileManager.default.fileExists(atPath: pathLibrary.path) {
@@ -115,10 +115,10 @@ func PrintAndExecutePlayerHomeDirectory() {
     
         let pathLog = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.filename, isDirectory: false)
         if FileManager.default.fileExists(atPath: pathLog.path) {
-            print(" > \(PlayerLog.filename)         found")
+            print(" > \(PlayerLog.filename)             found")
         }
         else {
-            print(" > \(PlayerLog.filename)         NOT found")
+            print(" > \(PlayerLog.filename)             NOT found")
         }
     
         let pathPref = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerPreferences.filename, isDirectory: false)
@@ -127,6 +127,14 @@ func PrintAndExecutePlayerHomeDirectory() {
         }
         else {
             print(" > \(PlayerPreferences.filename) NOT found")
+        }
+
+        let pathHistory = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerCommandHistory.filename, isDirectory: false)
+        if FileManager.default.fileExists(atPath: pathHistory.path) {
+            print(" > \(PlayerCommandHistory.filename)         found")
+        }
+        else {
+            print(" > \(PlayerCommandHistory.filename)         NOT found")
         }
     }
     else {
