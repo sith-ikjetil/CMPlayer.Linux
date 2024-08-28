@@ -13,6 +13,10 @@ The applications name is **cmplayer** and the following arguments are supported:
  - --set-output-api-ao (sets audio output api to libao (ao))
  - --set-output-api-alsa (sets audio output api to libasound (alsa))
  - --get-output-api (gets audio output api)
+ - --set-max-log-n max (sets max log entries [25,1000])
+ - --get-max-log-n (gets max log entries)
+ - --set-max-history-n max (sets max history entries [25,1000])
+ - --get-max-history-n (gets max history entries)
   
 ## Supported File Formats
 The following file formats are currently supported:
