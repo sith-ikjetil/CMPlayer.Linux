@@ -571,5 +571,5 @@ internal func renderTerminalTooSmallMessage()
 {
     Console.clearScreenCurrentTheme()
     Console.gotoXY(1,1)
-    print("Terminal window must be at least \(g_minCols) by \(g_minRows)")
+    print("Terminal window must be at least \(g_minCols)x\(g_minRows) (\(g_cols)x\(g_rows)).")
 }
