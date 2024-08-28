@@ -83,6 +83,8 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
         self.preferencesText.append(" :: \(PlayerPreferences.viewType.rawValue)")
         self.preferencesText.append(" Theme")
         self.preferencesText.append(" :: \(PlayerPreferences.colorTheme.rawValue)")        
+        self.preferencesText.append(" History Max Entries")
+        self.preferencesText.append(" :: \(PlayerPreferences.historyMaxEntries)")        
     }    
     ///
     /// Renders screen output. Does clear screen first.

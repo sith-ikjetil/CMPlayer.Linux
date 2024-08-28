@@ -61,7 +61,8 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                                       " info <song no>", " :: show information about song with given song number",
                                       //" update cmplayer", " :: updates cmplayer if new version is found online",
                                       " set viewtype <type>", " :: sets view type. can be 'default' or 'details'",
-                                      " set theme <color>", " :: sets theme color. color can be 'default', 'blue' or 'black'"]
+                                      " set theme <color>", " :: sets theme color. color can be 'default', 'blue' or 'black'",
+                                      " clear history", " :: clears command history"]
                                       //" restart", " :: restarts the application. picks up changes when files are removed or added"]    
     ///
     /// Shows this HelpWindow on screen.q
