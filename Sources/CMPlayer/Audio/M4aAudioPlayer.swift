@@ -52,7 +52,7 @@ internal class M4aAudioPlayer {
     /// constants
     ///
     private let filePath: URL    
-    private let audioQueue = DispatchQueue(label: "dqueue.cmp.linux.aac-audio-player", qos: .background)
+    private let audioQueue = DispatchQueue(label: "dqueue.cmp.linux.m4a-audio-player", qos: .background)
     ///
     /// variables
     ///
@@ -163,6 +163,7 @@ internal class M4aAudioPlayer {
             let durationInSeconds = Double(formatCtx.pointee.duration) / Double(AV_TIME_BASE)                
             if durationInSeconds <= 0 {                    
                 let msg = "[M4aAudioPlayer].play(). duration <= 0. \(durationInSeconds) seconds"
+                avformat_close_input(&self.m_audioState.formatCtx)
                 throw CmpError(message: msg)
             }
             self.m_duration = UInt64(durationInSeconds * 1000)
@@ -229,6 +230,8 @@ internal class M4aAudioPlayer {
         var ret = av_channel_layout_copy(&self.m_audioState.chLayoutIn, &self.m_audioState.codecCtx!.pointee.ch_layout)        
         if ret < 0 {
             let msg = "[M4aAudioPlayer].play(). av_channel_layout_copy failed with value: \(ret) = '\(renderFfmpegError(error: err))'."
+            swr_free(&self.m_audioState.swrCtx)
+            av_frame_free(&self.m_audioState.frame)
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)  
             throw CmpError(message: msg)
@@ -236,6 +239,8 @@ internal class M4aAudioPlayer {
         ret = av_opt_set_chlayout(rawSwrCtxPtr, "in_chlayout", &self.m_audioState.chLayoutIn, 0)        
         if ret < 0 {
             let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout IN failed with value: \(ret) = '\(renderFfmpegError(error: err))'."
+            swr_free(&self.m_audioState.swrCtx)
+            av_frame_free(&self.m_audioState.frame)
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)  
             throw CmpError(message: msg)
@@ -244,6 +249,8 @@ internal class M4aAudioPlayer {
         ret = av_opt_set_chlayout(rawSwrCtxPtr, "out_chlayout", &self.m_audioState.chLayoutOut, 0)
         if ret < 0 {
             let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout OUT failed with value: \(ret) = '\(renderFfmpegError(error: err))'."
+            swr_free(&self.m_audioState.swrCtx)
+            av_frame_free(&self.m_audioState.frame)
             avcodec_free_context(&self.m_audioState.codecCtx)
             avformat_close_input(&self.m_audioState.formatCtx)  
             throw CmpError(message: msg)
@@ -278,6 +285,8 @@ internal class M4aAudioPlayer {
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
                 av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
     #endif
+                swr_free(&self.m_audioState.swrCtx)
+                av_frame_free(&self.m_audioState.frame)
                 avcodec_free_context(&self.m_audioState.codecCtx)
                 avformat_close_input(&self.m_audioState.formatCtx)
                 throw CmpError(message: msg)
@@ -291,6 +300,8 @@ internal class M4aAudioPlayer {
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
                 av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
     #endif
+                swr_free(&self.m_audioState.swrCtx)
+                av_frame_free(&self.m_audioState.frame)
                 avcodec_free_context(&self.m_audioState.codecCtx)
                 avformat_close_input(&self.m_audioState.formatCtx)
                 self.m_isPlaying = false
@@ -304,6 +315,8 @@ internal class M4aAudioPlayer {
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
                 av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
     #endif
+                swr_free(&self.m_audioState.swrCtx)
+                av_frame_free(&self.m_audioState.frame)
                 avcodec_free_context(&self.m_audioState.codecCtx)
                 avformat_close_input(&self.m_audioState.formatCtx)
                 self.m_isPlaying = false                
@@ -323,32 +336,46 @@ internal class M4aAudioPlayer {
     private func playAsync() {
         // Set flags
         self.m_isPlaying = true
-
         // Log that we have started to play
         PlayerLog.ApplicationLog?.logInformation(title: "[M4aAudioPlayer].playAsync()", text: "Started playing: \(self.filePath.lastPathComponent)")
-
         // Clean up using defer
-        defer {            
+        defer {                        
 #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+            // uninit chLayoutIn
             av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
+            // uninit chLayoutOut
             av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
-#endif
+#endif            
+            // free context allocated with swr_alloc
+            swr_free(&self.m_audioState.swrCtx)
+            // free frame allocated with av_frame_alloc
+            av_frame_free(&self.m_audioState.frame)
+            // free codec context
+            avcodec_free_context(&self.m_audioState.codecCtx)
+            // close an opened input AVFormatContext.
+            avformat_close_input(&self.m_audioState.formatCtx)
+            // if we use ao
             if PlayerPreferences.outputSoundLibrary == .ao {
+                // close ao device
                 ao_close(self.m_audioState.device)
             }
+            // else if we use alsa
             else if PlayerPreferences.outputSoundLibrary == .alsa {
+                // drain alsa
                 snd_pcm_drain(self.m_audioState.alsaState.pcmHandle)
+                // close alsa
                 snd_pcm_close(self.m_audioState.alsaState.pcmHandle)
             }
-            swr_free(&self.m_audioState.swrCtx)
-            av_frame_free(&self.m_audioState.frame)
-            avcodec_free_context(&self.m_audioState.codecCtx)
-            avformat_close_input(&self.m_audioState.formatCtx)
+            // set m_timeElapsed to duration, nothing more to play
             self.m_timeElapsed = self.duration
+            // set m_hasPlayed to true
             self.m_hasPlayed = true
+            // set m_isPlaying to false
             self.m_isPlaying = false
+            // set m_isPaused to false
             self.m_isPaused = false
-            self.m_stopFlag = true        
+            // set m_stopFlag to true
+            self.m_stopFlag = true
         }
 
         var timeToStartCrossfade: Bool = false

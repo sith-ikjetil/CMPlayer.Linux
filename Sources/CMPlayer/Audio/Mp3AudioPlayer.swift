@@ -222,9 +222,9 @@ internal class Mp3AudioPlayer {
             err = snd_pcm_set_params(self.m_audioState.alsaState.pcmHandle, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, self.m_audioState.alsaState.channels, self.m_audioState.alsaState.sampleRate, 1, 500000)
             guard err >= 0 else {
                 let msg = "[Mp3AudioPlayer].play(). alsa. snd_pcm_set_params failed with value: \(err) = '\(renderAlsaError(error: err))'"
-                mpg123_close(self.mpg123Handle)
-                mpg123_delete(self.mpg123Handle)
                 snd_pcm_close(self.m_audioState.alsaState.pcmHandle)
+                mpg123_close(self.mpg123Handle)
+                mpg123_delete(self.mpg123Handle)                
                 self.mpg123Handle = nil
                 self.m_isPlaying = false                
                 
@@ -243,29 +243,39 @@ internal class Mp3AudioPlayer {
     private func playAsync() {
         // set flags
         self.m_isPlaying = true
-
         // log we have started to play
         PlayerLog.ApplicationLog?.logInformation(title: "[Mp3AudioPlayer].playAsync()", text: "Started playing file: \(self.filePath.lastPathComponent)")
-        
         // make sure we clean up
-        defer {                  
+        defer {                              
+            // close mpg123 handle
+            mpg123_close(self.mpg123Handle)
+            // delete mpg123 handle
+            mpg123_delete(self.mpg123Handle)
+            // if we use ao
             if PlayerPreferences.outputSoundLibrary == .ao {                 
+                // close ao
                 ao_close(self.m_audioState.aoDevice)            
             }
+            // else if we use alsa
             else if PlayerPreferences.outputSoundLibrary == .alsa {
+                // drain alsa
                 snd_pcm_drain(self.m_audioState.alsaState.pcmHandle)
+                // close alsa
                 snd_pcm_close(self.m_audioState.alsaState.pcmHandle)
             }
-            mpg123_close(self.mpg123Handle)
-            mpg123_delete(self.mpg123Handle)
+            // set m_timeElapsed to duration, nothing more to play
             self.m_timeElapsed = self.duration
+            // set mpg123 handle to nil
             self.mpg123Handle = nil
+            // set m_hasPlayed to true
             self.m_hasPlayed = true
+            // set m_isPlaying to false
             self.m_isPlaying = false
-            self.m_isPaused = false   
-            self.m_stopFlag = true                 
+            // set m_isPaused to false
+            self.m_isPaused = false
+            // set m_stopFlag to true
+            self.m_stopFlag = true
         }
-
         // Buffer for audio output
         let bufferSize = mpg123_outblock(mpg123Handle)
         var buffer = [UInt8](repeating: 0, count: bufferSize)
