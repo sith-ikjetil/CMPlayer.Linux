@@ -376,8 +376,8 @@ internal class M4aAudioPlayer {
             self.m_isPaused = false
             // set m_stopFlag to true
             self.m_stopFlag = true      
-            // todo: remove
-            PlayerLog.ApplicationLog?.logDebug(title: "M4a PlayAsync Defer", text: self.filePath.path)      
+            // log debug
+            PlayerLog.ApplicationLog?.logDebug(title: "[M4aAudioPlayer].playAsync()@defer", text: self.filePath.path)      
         }
 
         var timeToStartCrossfade: Bool = false
@@ -460,21 +460,20 @@ internal class M4aAudioPlayer {
 
                     // Use withUnsafeBufferPointer to pass the array as a pointer
                     inputData.withUnsafeBufferPointer { bufferPointer in
-                        let samples = swr_convert(self.m_audioState.swrCtx, &outputBuffer, self.m_audioState.frame!.pointee.nb_samples, UnsafeMutablePointer(mutating: bufferPointer.baseAddress), self.m_audioState.frame!.pointee.nb_samples)                            
-                        
+                        // return number of samples per channel
+                        let samples = swr_convert(self.m_audioState.swrCtx, &outputBuffer, self.m_audioState.frame!.pointee.nb_samples, UnsafeMutablePointer(mutating: bufferPointer.baseAddress), self.m_audioState.frame!.pointee.nb_samples)                                                    
                         // Ensure resampling was successful
                         guard samples >= 0 else {
                             let msg = "swr_convert returned with value: \(samples) = '\(renderFfmpegError(error: samples))'."
                             PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
                             return
                         }
-
-                        // total bytes of samples: nb_samples * 2 (channels) * 2 (16 bit)
-                        let totalBytes = self.m_audioState.frame!.pointee.nb_samples * self.m_audioState.aoFormat.channels * (self.m_audioState.aoFormat.bits/8)
+                        // total bytes of samples: samples * channels * 2 (16 bit)
+                        let totalBytes: UInt32 = UInt32(samples * self.m_audioState.aoFormat.channels * (self.m_audioState.aoFormat.bits/8))
                         // total samples per channel
-                        let totalBytesPerChannel = UInt64(totalBytes) / UInt64(self.m_audioState.aoFormat.channels)
+                        let totalBytesPerChannel: UInt64 = UInt64(totalBytes) / UInt64(self.m_audioState.aoFormat.channels)
                         // duration of samples
-                        let currentDuration = Double(totalBytesPerChannel) / Double(self.m_audioState.aoFormat.rate)
+                        let currentDuration: Double = Double(totalBytesPerChannel) / Double(self.m_audioState.aoFormat.rate)
                         // time elapsed when these bytes are played
                         self.m_timeElapsed += UInt64(currentDuration * Double(1000/self.m_audioState.aoFormat.channels))                        
                         // set crossfade volume
@@ -484,19 +483,16 @@ internal class M4aAudioPlayer {
 
                             currentVolume = Float(Float(timeLeft)/Float(self.m_targetFadeDuration))                    
                         }
-
                         // adjust crossfade volume
                         if self.m_enableCrossfade && timeToStartCrossfade {
                             adjustVolume(buffer: UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), size: Int(totalBytes), volume: currentVolume)
                         }
-
                         // Write audio data to device
                         if PlayerPreferences.outputSoundLibrary == .ao {
-                            ao_play(self.m_audioState.device, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), UInt32(UInt32(samples) * UInt32(2) * UInt32(MemoryLayout<Int16>.size)))                            
+                            ao_play(self.m_audioState.device, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), totalBytes)                            
                         }
-                        else {
-                            let size = Int(samples)
-                            snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), snd_pcm_uframes_t(size))
+                        else {                            
+                            snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), snd_pcm_uframes_t(samples))
                         }
                     }                                                                                      
 
