@@ -619,19 +619,25 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// returns: Bool true if application should exit. False otherwise.
     ///
     func processCommand(command: String) -> Void {
+        // log process command
         PlayerLog.ApplicationLog?.logInformation(title: "[MainWindow].processCommand(command:)", text: "Command: \(command)")
-        
+        // split parts by space
         let parts = command.components(separatedBy: " ")
-        
+        // create and set a flag isHandled to false, true if we have a command handler for the command
         var isHandled = false
+        // for each command handler setup
         for cmd in self.commands {
+            // try execute command, returns true if current command has handler for the command
             if cmd.execute(command: parts) {
+                // we have handled the command, set isHandled flag to true
                 isHandled = true
+                // discontinue further looping, we have handled the command
                 break
             }
         }
-                    
+        // if did not have any command handlers for the command
         if !isHandled {
+            // log event
             PlayerLog.ApplicationLog?.logInformation(title: "[MainWindow].processCommand(command:)", text: "Command NOT Reckognized: \(command)")
         }           
     }    
@@ -641,6 +647,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandExit(parts: [String]) -> Void {
+        // set g_quit flag to true, we are exiting the application
         g_quit = true
     }    
     ///
@@ -649,28 +656,28 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandRestart(parts: [String]) -> Void {
-        //let fname:String = CommandLine.arguments.first!
         
-        //let _ = NSWorkspace.shared.openFile(fname)
-        
-        //self.commandReturnValue = true
     }    
     ///
     /// Sets main window song bg color
     ///
     func onCommandSetColorTheme(parts: [String]) -> Void {
+        // if request for color theme change is color theme blue
         if ( parts[0] == "blue" ) {
             PlayerPreferences.colorTheme = ColorTheme.Blue
             PlayerPreferences.savePreferences()
         }
+        // else if request for color theme change is color theme black
         else if parts[0] == "black" {
             PlayerPreferences.colorTheme = ColorTheme.Black
             PlayerPreferences.savePreferences()
         }
+        // else if request for color theme change is color theme default
         else if parts[0] == "default" {
             PlayerPreferences.colorTheme = ColorTheme.Default
             PlayerPreferences.savePreferences()
         }
+        // render window
         self.renderWindow()
     }    
     /// 
@@ -678,16 +685,22 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// - Parameter parts:  command array.
     /// 
     func onCommandPrev(parts: [String]) {
+        // lock
         g_lock.lock()
+        // play previous song
         g_player.prev()
+        // unlock
         g_lock.unlock()
     }    
     ///
     /// Sets ViewType on Main Window
     ///
     func onCommandSetViewType(parts: [String]) -> Void {
+        // try to set preferences viewType to command argument, if not set it to default
         PlayerPreferences.viewType = ViewType(rawValue: parts[0].lowercased() ) ?? ViewType.Default
+        // save preferences
         PlayerPreferences.savePreferences()
+        // render frame
         self.renderFrame()
     }    
     ///
@@ -696,19 +709,29 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandReplay(parts: [String]) -> Void {
+        // lock
         g_lock.lock()
+        // if player active is 1
         if g_player.audioPlayerActive == 1 {
+            // if player 1 is not playing
             if ( !g_player.audio1!.isPlaying ) {
-                g_player.resume()
-            }            
-            g_player.audio1?.seekToPos(position: g_player.audio1!.duration)
-        }
-        else if g_player.audioPlayerActive == 2 {
-            if ( !g_player.audio1!.isPlaying ) {
+                // resume playing
                 g_player.resume()
             }
+            // seek to position start of file
+            g_player.audio1?.seekToPos(position: g_player.audio1!.duration)
+        }
+        // else if player active is 2
+        else if g_player.audioPlayerActive == 2 {
+            // if player 2 is not playing
+            if ( !g_player.audio2!.isPlaying ) {
+                // resume playing
+                g_player.resume()
+            }
+            // seek to position start of file
             g_player.audio2?.seekToPos(position: g_player.audio2!.duration)
         }
+        // unlock
         g_lock.unlock()
     }    
     ///
@@ -717,8 +740,11 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandNextSong(parts: [String]) -> Void {
+        // lock
         g_lock.lock()
+        // skip to next song, do not crossfade
         g_player.skip(crossfade: false)
+        // unlock
         g_lock.unlock()
     }    
     ///
@@ -727,13 +753,19 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandPlay(parts: [String]) -> Void {
+        // if audioPlayerActive == -1
         if g_player.audioPlayerActive == -1 {
+            // start playing player 1
             g_player.play(player: 1, playlistIndex: 0)
         }
+        // else if player active is 1
         else if g_player.audioPlayerActive == 1 {
+            // resume playing
             g_player.resume()
         }
+        // else if player active is 2
         else if g_player.audioPlayerActive == 2 {
+            // resume playing
             g_player.resume()
         }
     }    
@@ -743,6 +775,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandPause(parts: [String]) -> Void {
+        // pause playback
         g_player.pause()
     }    
     ///
@@ -751,14 +784,19 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandPlayOrPause(parts: [String]) -> Void {
+        // if audioPlayerActive == -1
         if g_player.audioPlayerActive == -1 {
+            // run command play
             self.onCommandPlay(parts: parts)
         }
-        
+        // if we are paused
         if g_player.isPaused {
+            // resume playback
             g_player.resume()
         }
+        // else if we are playing
         else {
+            // pause playback
             g_player.pause()
         }        
     }    
@@ -768,6 +806,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandResume(parts: [String]) -> Void {
+        // resume playback
         g_player.resume()
     }    
     ///
@@ -776,7 +815,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandRepaint(parts: [String]) -> Void {
+        // clear screen curren theme colors
         Console.clearScreenCurrentTheme()
+        // render window
         self.renderWindow()
     }    
     ///
@@ -786,10 +827,15 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter songNo: song number to add.
     ///
     func onCommandAddSongToPlaylist(parts: [String]) -> Void {
+        // if song identified by number is a valid number
         if let songNo = Int(parts[0]) {
+            // for each song in g_songs
             for se in g_songs {
+                // if song is song we are looking for
                 if se.songNo == songNo {
+                    // append this song to playlist
                     g_playlist.append(se)
+                    // discontinue loop
                     break
                 }
             }
@@ -801,7 +847,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandEnableCrossfade(parts: [String]) -> Void {
+        // set PlayerPreferences crossfadeSongs to true
         PlayerPreferences.crossfadeSongs = true
+        // save PlayerPreferences
         PlayerPreferences.savePreferences()
     }    
     ///
@@ -810,7 +858,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandDisableCrossfade(parts: [String]) -> Void {
+        // set PlayerPreferences crossfadeSongs to false
         PlayerPreferences.crossfadeSongs = false
+        // save PlayerPreferences
         PlayerPreferences.savePreferences()
     }    
     ///
@@ -819,7 +869,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandEnableAutoPlayOnStartup(parts: [String]) -> Void {
+        // set PlayerPreferences autoplayOnStartup to true
         PlayerPreferences.autoplayOnStartup = true
+        // save PlayerPreferences
         PlayerPreferences.savePreferences()
     }    
     ///
@@ -828,7 +880,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandDisableAutoPlayOnStartup(parts: [String]) -> Void {
+        // set PlayerPreferences autoplayOnStartup to false
         PlayerPreferences.autoplayOnStartup = false
+        // save PlayerPreferences
         PlayerPreferences.savePreferences()
     }    
     ///
@@ -837,9 +891,22 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandAddMusicRootPath(parts: [String]) -> Void {
+        // get arguments to command
         let nparts = reparseCurrentCommandArguments(parts)
-        PlayerPreferences.musicRootPath.append(nparts[0])
-        PlayerPreferences.savePreferences()
+        // create a variable for if argument is a directory
+        var isDir: ObjCBool = false
+        // check if path exists and is a directory
+        // nparts[0] == path
+        if FileManager.default.fileExists(atPath: nparts[0], isDirectory: &isDir) {
+            // is path a diectory
+            if isDir.boolValue  {
+                // yes is a directory
+                // add to PlayerPreferences musicRootPath
+                PlayerPreferences.musicRootPath.append(nparts[0])
+                // save PlayerPreferences
+                PlayerPreferences.savePreferences()
+            }
+        }
     }    
     ///
     /// Add path to exclusion paths.
@@ -847,9 +914,22 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandAddExclusionPath(parts: [String]) -> Void {
+        // get arguments to command
         let nparts = reparseCurrentCommandArguments(parts)
-        PlayerPreferences.exclusionPaths.append(nparts[0])
-        PlayerPreferences.savePreferences()
+        // create a variable for if argument is a directory
+        var isDir: ObjCBool = false
+        // check if path exists and is a directory
+        // nparts[0] == path
+        if FileManager.default.fileExists(atPath: nparts[0], isDirectory: &isDir) {
+            // is path a diectory
+            if isDir.boolValue  {
+                // yes is a directory
+                // add to PlayerPreferences exclution paths
+                PlayerPreferences.exclusionPaths.append(nparts[0])
+                // save PlayerPreferences
+                PlayerPreferences.savePreferences()
+            }
+        }
     }    
     ///
     /// Remove root path.
@@ -857,14 +937,22 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandRemoveMusicRootPath(parts: [String]) -> Void {
+        // get arguments to command
         let nparts = reparseCurrentCommandArguments(parts)
+        // create a variable i (index) into PlayerPreferenes.musicRootPath
         var i: Int = 0
+        // loop through all PlayerPreferences.musicRootPath
         while i < PlayerPreferences.musicRootPath.count {
+            // if we find nparts[0] = path
             if PlayerPreferences.musicRootPath[i] == nparts[0] {
+                // remove path from PlayerPreferences.musicRootPath
                 PlayerPreferences.musicRootPath.remove(at: i)
+                // save PlayerPreferences
                 PlayerPreferences.savePreferences()
+                // discontinue loop
                 break
             }
+            // add one to index
             i += 1
         }
     }    
@@ -874,14 +962,22 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandRemoveExclusionPath(parts: [String]) -> Void {
+        // get arguments to command
         let nparts = reparseCurrentCommandArguments(parts)
+        // create a variable i (index) into PlayerPreferenes.exclutionPaths
         var i: Int = 0
+        // loop through all PlayerPreferences.exclutionPaths
         while i < PlayerPreferences.exclusionPaths.count {
+            // if we find nparts[0] = path
             if PlayerPreferences.exclusionPaths[i] == nparts[0] {
+                // remove path from PlayerPreferences.exclutionPaths
                 PlayerPreferences.exclusionPaths.remove(at: i)
+                // save PlayerPreferences
                 PlayerPreferences.savePreferences()
+                // discontinue loop
                 break
             }
+            // add one to index
             i += 1
         }
     }    
@@ -891,21 +987,27 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandSetCrossfadeTimeInSeconds(parts: [String]) -> Void {
+        // create and check ctis constand for a number argument
         if let ctis = Int(parts[0]) {
+            // if ctis is a valid number of seconds for crossfade
             if isCrossfadeTimeValid(seconds: ctis) {
+                // set PlayerPreferences.crossfadeTimeInSeconds
                 PlayerPreferences.crossfadeTimeInSeconds = ctis
+                // save PlayerPreferences
                 PlayerPreferences.savePreferences()
             }
         }
     }    
     ///
     /// Set music formats.
+    /// THIS COMMAND IS NO LONG AVAILABLE.
+    /// MUSIC FORMATS SUPPORTED ARE HARD CODED INTO CMPLAYER.
     ///
     /// parameter parts: command array.
     ///
-    func onCommandSetMusicFormats(parts: [String]) -> Void {
-        PlayerPreferences.musicFormats = parts[0]
-        PlayerPreferences.savePreferences()
+    func onCommandSetMusicFormats(parts: [String]) -> Void {        
+        //PlayerPreferences.musicFormats = parts[0]
+        //PlayerPreferences.savePreferences()
     }    
     ///
     /// Goto playback point of current playing item.
@@ -913,25 +1015,37 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandGoTo(parts: [String]) -> Void {
+        // create a constant tp with time mm, ss
         let tp = parts[0].split(separator: ":" )
+        // if count == 2, which we expect
         if tp.count == 2 {
+            // if part 1 of tp is a number, as we expect
             if let time1 = Int(tp[0]) {
+                // if part 2 of tp is a number, as we expect
                 if let time2 = Int(tp[1]) {
+                    // if time1 and time2 are valid numbers
                     if time1 >= 0 && time2 >= 0 && time2 < 60 {
+                        // convert time1 and time2 to seconds = pos
                         let pos: Int = time1*60 + time2
-                        
+                        // if pos < 0 return
                         guard pos >= 0 else {
                             return;
                         }
-
+                        // get posMs = pos in milliseconds
                         let posMs: UInt64 = UInt64(pos * 1000)
+                        // if audio player active is 1
                         if g_player.audioPlayerActive == 1 {                              
-                            if posMs < g_player.audio1!.duration {                                
+                            // if posMs < player1 duration
+                            if posMs <= g_player.audio1!.duration {                                
+                                // seek to position
                                 g_player.audio1?.seekToPos(position: posMs)
                             }
                         }
+                        // else if audio player active is 2
                         else if g_player.audioPlayerActive == 2 {                             
-                            if posMs < g_player.audio2!.duration {                                
+                            // if posMs < player2 duration
+                            if posMs <= g_player.audio2!.duration {                                
+                                // seek to position
                                 g_player.audio2?.seekToPos(position: posMs)
                             }
                         }
@@ -945,12 +1059,18 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     /// parameter parts: command arrary
     ///
-    func onCommandClearMode(parts: [String]) -> Void {        
+    func onCommandClearMode(parts: [String]) -> Void {       
+        // lock 
         g_lock.lock()
+        // clear search type
         g_searchType.removeAll()
+        // clear search result
         g_searchResult.removeAll()
+        // clear mode search
         g_modeSearch.removeAll()
+        // clear mode search stats
         g_modeSearchStats.removeAll()
+        // unlock
         g_lock.unlock()
     }
     ///
@@ -959,17 +1079,29 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandInfoSong(parts: [String]) -> Void {
+        // if argument is song no and is a number
         if let sno = Int(parts[0]) {
+            // if sno is a number greater than 0
             if sno > 0 {
+                // for each songentry in g_songs
                 for s in g_songs {
+                    // if entry songno is equal to sno
                     if s.songNo == sno {
+                        // set isShowingTopWindow flag to true
                         self.isShowingTopWindow = true
+                        // create InfoWindow
                         let wnd: InfoWindow = InfoWindow()
+                        // set song entry
                         wnd.song = s
+                        // show window
                         wnd.showWindow()
+                        // clear screen current theme
                         Console.clearScreenCurrentTheme()
+                        // render window
                         self.renderWindow()
+                        // set isShowingTopWindow flag to false                        
                         self.isShowingTopWindow = false
+                        // discontinue loop
                         break
                     }
                 }
@@ -982,11 +1114,17 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandHelp(parts: [String]) -> Void {
+        // set isShowingTopWindow flag to true
         self.isShowingTopWindow = true
+        // create a HelpWindow
         let wnd: HelpWindow = HelpWindow()
+        // show the help window
         wnd.showWindow()
+        // clear screen current theme
         Console.clearScreenCurrentTheme()
+        // render window
         self.renderWindow()
+        // set isShowingTopWindow flag to false
         self.isShowingTopWindow = false
     }    
     ///
@@ -995,7 +1133,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandClearMusicRootPath(parts: [String]) -> Void {
+        // clear PlayerPreferences.musicRootPath
         PlayerPreferences.musicRootPath.removeAll()
+        // save PlayerPreferences
         PlayerPreferences.savePreferences()
     }    
     ///
@@ -1004,7 +1144,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandClearExclusionPath(parts: [String]) -> Void {
+        // clear PlayerPreferences.exclutionPaths
         PlayerPreferences.exclusionPaths.removeAll()
+        // save PlayerPreferences
         PlayerPreferences.savePreferences()
     }    
     ///
@@ -1013,11 +1155,17 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandAbout(parts: [String]) -> Void {
+        // set isShowingTopWindow flag to true
         self.isShowingTopWindow = true
+        // create AboutWindow
         let wnd: AboutWindow = AboutWindow()
+        // show about window
         wnd.showWindow()
+        // clear screen current theme
         Console.clearScreenCurrentTheme()
+        // render window
         self.renderWindow()
+        // set isShowingTopWindow flag to false
         self.isShowingTopWindow = false
     }    
     ///
@@ -1026,11 +1174,17 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandArtist(parts: [String]) -> Void {
+        // set isShowingTopWindow flag to true
         self.isShowingTopWindow = true
+        // create ArtistWindow
         let wnd: ArtistWindow = ArtistWindow()
+        // show artist window.
         wnd.showWindow()
+        // clear screen current theme
         Console.clearScreenCurrentTheme()
+        // render window
         self.renderWindow()
+        // set isShowingTopWindow flag to false
         self.isShowingTopWindow = false
     }    
     ///
