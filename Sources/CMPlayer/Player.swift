@@ -2,7 +2,7 @@
 //: Filename    : Player.swift
 //: Date        : 2024-09-24
 //: Author      : "Kjetil Kristoffer Solberg" <post@ikjetil.no>
-//: Version     : *
+//: Version     : 
 //: Description : run method of Player class is where the 
 //:               running of the application happens.
 //

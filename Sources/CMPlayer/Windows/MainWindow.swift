@@ -1,67 +1,13 @@
-//
-//  MainWindow.swift
-//
-//  Created by Kjetil Kr Solberg on 24-09-2024.
-//  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
-//
-
+//////////////////////////////////////////////////////////////
+//: Filename    : MainWindow.swift
+//: Date        : 2024-09-24
+//: Author      : "Kjetil Kristoffer Solberg" <post@ikjetil.no>
+//: Version     : 
+//: Description : Console Music Player main window.
 //
 // import
 //
 import Foundation
-
-//
-// Represent MainWindow fields pos and sizes.
-//
-internal class MainWindowLayout {
-    // cols
-    let songNoCols: Int = g_fieldWidthSongNo
-    var artistCols: Int = 0
-    var titleCols: Int = 0
-    let durationCols: Int = g_fieldWidthDuration    
-    // x
-    let songNoX: Int = 1    
-    var artistX: Int = 0
-    var titleX: Int = 0
-    var durationX: Int = 0
-
-    func getTotalCols() -> Int {
-        return self.songNoCols + self.durationCols + self.artistCols + self.titleCols
-    }
-
-    static func get() -> MainWindowLayout {
-            //
-            // calculate cols
-            //
-            let layout: MainWindowLayout = MainWindowLayout()
-            let ncalc: Int = Int(floor(Double(g_cols - layout.songNoCols - layout.durationCols) / 2.0))
-            layout.artistCols = ncalc
-            layout.titleCols =  ncalc
-
-            var total: Int = layout.getTotalCols()
-            if total < g_cols {
-                while total < g_cols {
-                    layout.titleCols += 1
-                    total = layout.getTotalCols()
-                }
-            }
-            else if total > g_cols {
-                while total > g_cols {
-                    layout.titleCols -= 1
-                    total = layout.getTotalCols()
-                }
-            }
-
-            //
-            // calculate x
-            //
-            layout.artistX = layout.songNoCols + 1
-            layout.titleX = layout.artistX + layout.artistCols 
-            layout.durationX = layout.titleX + layout.titleCols 
-            return layout
-    }
-}
-
 ///
 /// Represents CMPlayer MainWindow.
 ///
@@ -74,8 +20,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     // private variables
     //        
     private var currentCommand: String = ""
-    private var commands: [PlayerCommand] = []
-    //private var commandReturnValue: Bool = false
+    private var commands: [PlayerCommand] = []    
     private var isShowingTopWindow = false
     private var addendumText: String = ""
     private var updateFileName: String = ""
@@ -93,24 +38,32 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// returns: ExitCode,  Int32
     ///
     func showWindow() -> Void {
+        // ensure terminal size change event gets directed here
         g_tscpStack.append(self)
+        // run this window
         self.run()
+        // ensure terminal size change event goes back to previous protocol implementation
         g_tscpStack.removeLast()
     }    
     ///
     /// Handler for TerminalSizeHasChangedProtocol
     ///
     func terminalSizeHasChanged() -> Void {
+        // clear screen current theme
         Console.clearScreenCurrentTheme()
+        // if we have valid size
         if g_rows >= g_minRows && g_cols >= g_minCols {
+            // set flag isTooSmall to false
             self.isTooSmall = false
+            // render header
             MainWindow.renderHeader(showTime: true)
+            // render rest of the window
             self.renderWindow()
         }
+        // we have invalid size
         else {
-            self.isTooSmall = true
-            Console.gotoXY(80,1)
-            print("")
+            // set isTooSmall flag to true
+            self.isTooSmall = true            
         }
     }
     ///
@@ -119,11 +72,13 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter showTime: True if time string is to be shown in header. False otherwise.
     ///
     static func renderHeader(showTime: Bool) -> Void {
+        // set header background color
         let bgColor = ConsoleColor.blue
-        
+        // if we show time render this
         if showTime {
             Console.printXY(1,1,"CMPlayer | v\(g_versionString) | \(itsRenderMsToFullString(MainWindow.timeElapsedMs, false))", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
+        // else we render this without time
         else {
             Console.printXY(1,1,"CMPlayer | v\(g_versionString)", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
@@ -132,43 +87,44 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// Renders main window frame on screen
     ///
     func renderFrame() -> Void {
-        
+        // render header
         MainWindow.renderHeader(showTime: true)
-        
+        // set background color from theme
         let bgColor = getThemeBgColor()
-        
+        // render blank line y = 2
         Console.printXY(1,2," ", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-    
+        // render default view
         if PlayerPreferences.viewType == ViewType.Default {  
+            // get layout info
             let layout: MainWindowLayout = MainWindowLayout.get()    
-
+            // render song no header
             Console.printXY(layout.songNoX,3,"Song No.", layout.songNoCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)                    
-
+            // render artist header
             Console.printXY(layout.artistX,3,"Artist", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        
+            // render title header
             Console.printXY(layout.titleX,3,"Title", layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        
+            // render time header
             Console.printXY(layout.durationX,3,"Time", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        
-            //let sep = String("\u{2550}")
+            // render separator line
             Console.printXY(1,4,"=", g_cols, .left, "=", bgColor, ConsoleColorModifier.none, ConsoleColor.green, ConsoleColorModifier.bold)
         }
+        // else render details view
         else if PlayerPreferences.viewType == ViewType.Details {
+            // get layout info
             let layout: MainWindowLayout = MainWindowLayout.get()    
-
+            // render song no and empty header
             Console.printXY(1,3,"Song No.", layout.songNoCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
             Console.printXY(1,4," ", layout.songNoCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)                        
-
+            // render artist and album name header
             Console.printXY(layout.artistX,3,"Artist", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
             Console.printXY(layout.artistX,4,"Album Name", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        
+            // render title and genre header
             Console.printXY(layout.titleX,3,"Title", layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
             Console.printXY(layout.titleX,4,"Genre", layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        
+            // render time and empty header
             Console.printXY(layout.durationX,3,"Time", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
             Console.printXY(layout.durationX,4," ", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        
-            //let sep = String("\u{2550}")
+            // render separator line
             Console.printXY(1,5,"=", g_cols, .left, "=", bgColor, ConsoleColorModifier.none, ConsoleColor.green, ConsoleColorModifier.bold)
         }
     }
@@ -176,44 +132,49 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// Renders a song on screen
     ///
     /// parameter y: Line where song is to be rendered.
-    /// parameter songNo: SongNo.
-    /// parameter artist. Artist.
-    /// parameter song. Title.
-    /// parameter time. Duration (ms).
+    /// parameter song: SongEntry to render
+    /// parameter time: duration.    
     ///
     func renderSong(_ y: Int, _ song: SongEntry, _ time: UInt64) -> Void
     {
+        // get background color from current theme
         let bgColor = getThemeSongBgColor()
+        // set song no color
         let songNoColor = ConsoleColor.cyan
-        
+        // if viewtype is set to default
         if PlayerPreferences.viewType == ViewType.Default {
+            // get layout info
             let layout: MainWindowLayout = MainWindowLayout.get() 
-
+            // render song no
             Console.printXY(layout.songNoX, y, "\(song.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
-            
+            // render artist
             Console.printXY(layout.artistX, y, song.getArtist(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)            
+            // render title
             Console.printXY(layout.titleX, y, song.getTitle(), layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-            
+            // set time string
             let timeString: String = itsRenderMsToFullString(time, false)
             let endTimePart: String = String(timeString[timeString.index(timeString.endIndex, offsetBy: -5)..<timeString.endIndex])
+            // render duration left
             Console.printXY(layout.durationX, y, endTimePart, layout.durationCols, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
+        // if viewtype is set to details
         else if PlayerPreferences.viewType == ViewType.Details {
+            // get layout info
             let layout: MainWindowLayout = MainWindowLayout.get() 
-
+            // render song no and empty field
             Console.printXY(layout.songNoX, y, "\(song.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
             Console.printXY(layout.songNoX, y+1, " ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-            
+            // render artist and album name
             Console.printXY(layout.artistX, y, song.getArtist(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             Console.printXY(layout.artistX, y+1, song.getAlbumName(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-            
+            // render title and genre
             Console.printXY(layout.titleX, y, song.getTitle(), layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             Console.printXY(layout.titleX, y+1, song.getGenre(), layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-            
+            // set time string
             let timeString: String = itsRenderMsToFullString(time, false)
             let endTimePart: String = String(timeString[timeString.index(timeString.endIndex, offsetBy: -5)..<timeString.endIndex])
-            Console.printXY(layout.durationX, y, endTimePart, layout.durationCols, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-            
+            // render duration and empty field
+            Console.printXY(layout.durationX, y, endTimePart, layout.durationCols, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)            
             Console.printXY(layout.durationX, y+1, " ", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         }
     }
@@ -221,6 +182,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// renders addendum text at g_rows-2
     ///     
     func renderAddendumText() -> Void {
+        // render addendum text from self.addendumText
         Console.printXY(1,g_rows-2, (self.addendumText.count > 0) ? self.addendumText : " ", g_cols, .left, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.none)
     }    
     ///
@@ -228,16 +190,20 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     func renderCommandLine() -> Void
     {
+        // set text = self.currentCommand
         var text = self.currentCommand
+        // if text.count is greater than width on screen
         if text.count > (g_cols-4) {
+            // get subtext visible area
             text = String(text[text.index(text.endIndex, offsetBy: -1*(g_cols-4))..<text.endIndex])
         }
-        
+        // set cursor to empty string
         var cursor = ""
+        // if showCursor flag is set, set cursor to cursor to be shown
         if self.showCursor {
             cursor = "_"
         }
-    
+        // render command line
         Console.printXY(1,g_rows-1,">: \(text)\(cursor)", g_cols, .left, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
     }    
     ///
@@ -245,70 +211,106 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     func renderStatusLine() -> Void
     {
+        // set initial status line text
         var text: String = "\(g_songs.count.itsToString()) Songs"
-        
+        // get mode status
         let modeInfo = getModeStatus()
+        // if we are in mode
         if modeInfo.isInMode {
+            // append mode text
             text.append( " | Mode: ")
+            // set flag for adding , or not
             var b: Bool = false
+            // for each mode
             for mn in modeInfo.modeName {
+                // if we should add ,
                 if b {
+                    // add ,
                     text.append(", ")
                 }
+                // add mode name
                 text.append(mn)
+                // now we will always need to add ,
                 b = true
             }
+            // append rest of mode information and colsxrows and songs in queue
             text.append(" with \(modeInfo.numberOfSongsInMode.itsToString()) Songs | \(g_cols)x\(g_rows) | \(g_playlist.count) Songs in Queue")
         }
         else {
+            // append mod info, colsxrows and songs in queue
             text.append( " | Mode: off | \(g_cols)x\(g_rows) | \(g_playlist.count) Songs in Queue" )
         }
-        
+        // render status line
         Console.printXY(1,g_rows, text, g_cols, .center, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
     }    
     ///
     /// Traverses all songs and ask the screen renderer to render them on screen
     ///
     func renderSongs() -> Void {
+        // set start y coordinate
         var idx: Int = (PlayerPreferences.viewType == ViewType.Default) ? 5 : 6
+        // set row of current moving time = playback item 0
         let timeRow: Int = (PlayerPreferences.viewType == ViewType.Default) ? 5 : 6
+        // index into g_playlist
         var index: Int = 0
+        // max y
         let max: Int = (PlayerPreferences.viewType == ViewType.Default) ? g_rows-7+5 : g_rows-8+6//? 22 : 21
+        // get background color from theme
         let bgColor = getThemeBgColor()
+        // while y coordinate is less than max y coordiante
         while idx < max {
+            // if index is less than g_playlist.count
             if index < g_playlist.count {
+                // get SongEntry from g_playlist[index]
                 let s = g_playlist[index]
-                
+                // if current y coordinate == timeRow (where current moving time is)
                 if idx == timeRow {
+                    // if audio player active is -1 
                     if g_player.audioPlayerActive == -1 && g_playlist.count > 0{
+                        // render song g_playlist[0]
                         renderSong(idx, s, g_playlist[0].duration)
                     }
+                    // else if audio player active is 1
                     else if g_player.audioPlayerActive == 1 {
+                        // render song
                         renderSong(idx, s, g_player.durationAudioPlayer1)
                     }
+                    // else if audio player active is 2
                     else if g_player.audioPlayerActive == 2 {
+                        // render song
                         renderSong(idx, s, g_player.durationAudioPlayer2)
                     }
                 }
+                // we are rendering items 1 to n, that does not have current playback
                 else {
+                    // render song
                     renderSong(idx, s, s.duration)
                 }
             }
+            // we are rendering empty space
             else {
+                // if view type == default
                 if PlayerPreferences.viewType == ViewType.Default {
+                    // render empty line
                     Console.printXY(1, idx, " ", g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                 }
+                // else view type == details
                 else if PlayerPreferences.viewType == ViewType.Details {
+                    // render two empty lines
                     Console.printXY(1, idx, " ", g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                     Console.printXY(1, idx+1, " ", g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
                 }
             }
+            // if view type == default
             if PlayerPreferences.viewType == ViewType.Default {
+                // add y coordinate 
                 idx += 1
             }
             else if PlayerPreferences.viewType == ViewType.Details {
+                // add y coordinate
                 idx += 2
             }
+            // next song in playlist, add 1
             index += 1
         }
     }    
@@ -316,32 +318,37 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// Renders screen output. Does not clear screen first.
     ///
     func renderWindow() -> Void {
+        // if size is invalid
         guard isWindowSizeValid() else {        
+            // render terminal too small message
             renderTerminalTooSmallMessage()
+            // return
             return
-        }
-
-        //Console.clearScreenCurrentTheme()
-
+        }        
+        // render frame        
         renderFrame()
+        // render songs
         renderSongs()
+        // render addendum text
         renderAddendumText()
+        // render command line
         renderCommandLine()
+        // render status line
         renderStatusLine()
-        
+        // goto g_cols, g_rows-3
         Console.gotoXY(g_cols, g_rows-3)
+        // print empty string
         print("")
     }    
     ///
     /// Runs MainWindow keyboard input and feedback. Delegation to other windows and command processing.
     ///
     func run() -> Void {
+        // clear screen with current theme backgorund color
         Console.clearScreenCurrentTheme()        
-        self.renderWindow()
-        
-        //
-        // Setup command processing
-        //
+        // render window
+        self.renderWindow()                
+        // Setup command processing        
         self.commands = [PlayerCommand(commands: [["exit"], ["quit"], ["q"]], closure: self.onCommandExit),
                          PlayerCommand(commands: [["update"], ["cmplayer"]], closure: self.onCommandUpdate),
                          PlayerCommand(commands: [["set", "viewtype"]], closure: self.onCommandSetViewType),
@@ -386,157 +393,222 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                          PlayerCommand(commands: [["p"]], closure: self.onCommandPlayOrPause),
                          PlayerCommand(commands: [["prev"]], closure: self.onCommandPrev),
                          PlayerCommand(commands: [["#"]], closure: self.onCommandAddSongToPlaylist),
-                         PlayerCommand(commands: [["clear", "history"]], closure: self.onCommandClearHistory),]
-        
-        
-        //
-        // Count down and render songs
-        //
+                         PlayerCommand(commands: [["clear", "history"]], closure: self.onCommandClearHistory),]                
+        // Count down and render songs        
         concurrentQueue1.async {
+            // while g_quit flag is false
             while !g_quit {
-                
+                // if no windows on top of this window
                 if !self.isShowingTopWindow {
+                    // if this window is not too small
                     if !self.isTooSmall {
+                        // if we are not in terminal change size and not g_doNotPain flag is set
                         if !g_termSizeIsChanging && !g_doNotPaint {
+                            // render header
                             MainWindow.renderHeader(showTime: true)
+                            // render window
                             self.renderWindow()
                         }
                     }  
+                    // window is too small
                     else {
+                        // render terminal too small message
                         renderTerminalTooSmallMessage()
                     }                  
                 }
-                
+                // lock
                 g_lock.lock()
+                // if g_playlist count is greater than 0
                 if g_playlist.count > 0 {
+                    // if audio player active == 1
                     if g_player.audioPlayerActive == 1 {
+                        // setup a time variable
                         var time: UInt64 = 0
+                        // a is audio player 1
                         if let a = g_player.audio1 {
+                            // set time to elapsed time from audio player 1
                             time = a.timeElapsed
                         }
+                        // if duration of current playing item is greater than or equal to time variable
                         if g_playlist[0].duration >= time {
+                            // set current time left for audio player 1 to
                             g_player.durationAudioPlayer1 = (g_playlist[0].duration - time)
                         }
+                        // something should not happen
                         else {
+                            // set duration audio player 1 to 0
                             g_player.durationAudioPlayer1 = 0
                         }
                     }
+                    // else if audio player active is 2
                     else if g_player.audioPlayerActive == 2 {
+                        // setup a time variable
                         var time: UInt64 = 0
+                        // a is audio player 2
                         if let a = g_player.audio2 {
+                            // set time to elapsed time from audio player 2
                             time = a.timeElapsed
                         }
+                        // if duration of current playing item is greater than or equal to time variable
                         if g_playlist[0].duration >= time {
+                            // set current time left for audio player 2 to
                             g_player.durationAudioPlayer2 = (g_playlist[0].duration - time)
                         }
+                        // something should not happen
                         else {
+                            // set duration audio player 2 to 0
                             g_player.durationAudioPlayer2 = 0
                         }
                     }
-                    
+                    // if audio player 1 is active and not nil
                     if g_player.audioPlayerActive == 1 && g_player.audio1 != nil {
+                        // if condition for skip to next song is met
                         if (PlayerPreferences.crossfadeSongs && g_player.durationAudioPlayer1 <= PlayerPreferences.crossfadeTimeInSeconds * 1000)
                             || g_player.durationAudioPlayer1 <= 1000                             
                             || g_player.audio1?.hasPlayed == true
                         {
+                            // skip to next song
                             g_player.skip(crossfade: PlayerPreferences.crossfadeSongs)
                         }
                     }
+                    // else if audio player 2 is active and not nil
                     else if g_player.audioPlayerActive == 2 && g_player.audio2 != nil {
+                        // if condition for skip to next song is met
                         if (PlayerPreferences.crossfadeSongs && g_player.durationAudioPlayer2 <= PlayerPreferences.crossfadeTimeInSeconds * 1000)
                             || g_player.durationAudioPlayer2 <= 1000                             
                             || g_player.audio2?.hasPlayed == true
                         {
+                            // skip to next song
                             g_player.skip(crossfade: PlayerPreferences.crossfadeSongs)
                         }
-                    }
-                    
+                    }                    
                 }
+                // unlock
                 g_lock.unlock()
-                
-                let second: Double = 1_000_000
-                usleep(useconds_t(0.050 * second))
+                // sleep 50 ms
+                usleep(useconds_t(50_000))
             }
-        }
-        
-        //
-        // Keep up-time in header and blink the cursor.
-        //
+        }                
+        // Keep up-time in header and blink the cursor.        
         concurrentQueue2.async {
-            while !g_quit {
-                let second: Double = 1_000_000
-                usleep(useconds_t(0.150 * second))
+            // while g_quit flag is not set
+            while !g_quit {              
+                // sleep for 150 ms  
+                usleep(useconds_t(150_000))
+                // add elapsed time
                 MainWindow.timeElapsedMs += 150
+                // add cursor timeout with 150 ms
                 self.cursorTimeout += 150
+                // if cursor timeout is greater than 600 ms
                 if self.cursorTimeout >= 600 {
+                    // set cursor timeout to 0
                     self.cursorTimeout = 0
+                    // set showCursor flag to true
                     self.showCursor = true
                 }
+                // else cursor timeout has not yet reached 600 ms
                 else {
+                    // set showCursor flag to false
                     self.showCursor = false
                 }
             }
         }
-        
+        // set keyHandler constant
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
+        // add key handler for key down
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
+            // if command history pop returnes a command
             if let cmd = PlayerCommandHistory.default.pop() {
+                // set currentCommand to pop'd command
                 self.currentCommand = cmd
+                // render command line
                 self.renderCommandLine()
-            }        
+            }  
+            // do not return from run()      
             return false
         })
+        // add key handler for key up
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
+            // if command history push returnes a command
             if let cmd = PlayerCommandHistory.default.push() {
+                // set currentCommand to push'd command
                 self.currentCommand = cmd
+                // render command line
                 self.renderCommandLine()
             }        
+            // do not return from run()
             return false
         })
+        // add key handler for key left
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
+            // do not return from run()
             return false
         })
+        // add key handler for key right
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
+            // do not return from run()
             return false
         })
+        // add key handler for horizontal tab
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_HTAB.rawValue, closure: { () -> Bool in
+            // tab means skip, execute command skip
             self.processCommand(command: "skip")
+            // do not return from run()
             return false
         })
+        // add key handler for shift horizontal tab
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_SHIFT_HTAB.rawValue, closure: { () -> Bool in
+            // shift tab means prev, execute command prev
             self.processCommand(command: "prev")
+            // do not return from run()
             return false
         })
+        // add key handler for enter
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_ENTER.rawValue, closure: { () -> Bool in            
+            // if we have a command
             if self.currentCommand.count > 0 {
+                // add command to command history
                 PlayerCommandHistory.default.add(command: self.currentCommand)
+                // process command
                 self.processCommand(command: self.currentCommand)                
             }
+            // remove current command
             self.currentCommand.removeAll()
-            
+            // render command line
             self.renderCommandLine()
+            // return status line
             self.renderStatusLine()
-            
+            // return g_quit to allow run() to exit if a command exits the application
             return g_quit
         })
+        // add key handler for backspace
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_BACKSPACE.rawValue, closure: { () -> Bool in
+            // if we have a command
             if self.currentCommand.count > 0 {
+                // remove last character
                 self.currentCommand.removeLast()
             }
+            // do not return from run()
             return false
         })
+        // add keyhandler for misc characters typed.
         keyHandler.addCharacterKeyHandler(closure: { (ch: Character) -> Bool in
+            // if do not have a command and character is whitespace
             if self.currentCommand.count == 0 && ch.isWhitespace {
+                // do not return from run()
                 return false
             }
-            
+            // add character to currentCommand
             self.currentCommand.append(ch)
-            
+            // render comamnd line
             self.renderCommandLine()
-            self.renderStatusLine()
-            
+            // render status line
+            self.renderStatusLine()            
+            // do not return from run()
             return false
         })
+        // run key handler, do not return from this function until one 
+        // - of the key handlers return true
         keyHandler.run()
     }       
     ///

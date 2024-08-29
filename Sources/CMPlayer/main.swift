@@ -2,7 +2,7 @@
 //: Filename    : main.swift
 //: Date        : 2024-09-24
 //: Author      : "Kjetil Kristoffer Solberg" <post@ikjetil.no>
-//: Version     : 1.7
+//: Version     : 
 //: Description : Console Music Player main.
 //
 // import.

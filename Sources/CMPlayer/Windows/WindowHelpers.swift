@@ -174,3 +174,54 @@ internal func reparseCurrentCommandArguments(_ command: [String]) -> [String] {
     
     return retVal
 }
+//
+// Represent MainWindow fields pos and sizes.
+//
+internal class MainWindowLayout {
+    // cols
+    let songNoCols: Int = g_fieldWidthSongNo
+    var artistCols: Int = 0
+    var titleCols: Int = 0
+    let durationCols: Int = g_fieldWidthDuration    
+    // x
+    let songNoX: Int = 1    
+    var artistX: Int = 0
+    var titleX: Int = 0
+    var durationX: Int = 0
+
+    func getTotalCols() -> Int {
+        return self.songNoCols + self.durationCols + self.artistCols + self.titleCols
+    }
+
+    static func get() -> MainWindowLayout {
+            //
+            // calculate cols
+            //
+            let layout: MainWindowLayout = MainWindowLayout()
+            let ncalc: Int = Int(floor(Double(g_cols - layout.songNoCols - layout.durationCols) / 2.0))
+            layout.artistCols = ncalc
+            layout.titleCols =  ncalc
+
+            var total: Int = layout.getTotalCols()
+            if total < g_cols {
+                while total < g_cols {
+                    layout.titleCols += 1
+                    total = layout.getTotalCols()
+                }
+            }
+            else if total > g_cols {
+                while total > g_cols {
+                    layout.titleCols -= 1
+                    total = layout.getTotalCols()
+                }
+            }
+
+            //
+            // calculate x
+            //
+            layout.artistX = layout.songNoCols + 1
+            layout.titleX = layout.artistX + layout.artistCols 
+            layout.durationX = layout.titleX + layout.titleCols 
+            return layout
+    }
+}
