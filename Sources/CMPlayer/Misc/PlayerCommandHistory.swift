@@ -143,9 +143,13 @@ internal class PlayerCommandHistory {
         }    
 
         let fileContents = try String(contentsOfFile: filePath.path)
+        var lastCommand: String = ""
         fileContents.enumerateLines { line, _ in
             // do not use add method, it writes to the history file as you add items.
-            self.history.append(line) 
+            if line.count > 0 && line != lastCommand {
+                self.history.append(line) 
+                lastCommand = line
+            }
         }
 
         let historyCount = self.history.count
