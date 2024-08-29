@@ -375,7 +375,7 @@ internal class M4aAudioPlayer {
             // set m_isPaused to false
             self.m_isPaused = false
             // set m_stopFlag to true
-            self.m_stopFlag = true
+            self.m_stopFlag = true            
         }
 
         var timeToStartCrossfade: Bool = false
@@ -421,6 +421,10 @@ internal class M4aAudioPlayer {
                     PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
                     return
                 }
+
+                defer {
+                    av_packet_unref(&self.m_audioState.packet)
+                }
                                     
                 while !g_quit && !m_stopFlag && avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame) >= 0 {                        
                     // Allocate buffer for resampled audio
@@ -432,6 +436,11 @@ internal class M4aAudioPlayer {
                         let msg = "Error allocating buffer for resampled audio."
                         PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
                         return
+                    }
+
+                    defer {
+                        // Free the output buffer
+                        av_freep(&outputBuffer)  
                     }
                     
                     // Cast frame data pointers
@@ -484,16 +493,12 @@ internal class M4aAudioPlayer {
                             let size = Int(samples)
                             snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), snd_pcm_uframes_t(size))
                         }
-                    }
-                                                
-                    // Free the output buffer
-                    av_freep(&outputBuffer)                    
+                    }                                                                                      
 
                     while (self.m_isPaused && !self.m_stopFlag && !g_quit) {
                         usleep(100_000)
                     }                                      
-                }// while    
-                av_packet_unref(&self.m_audioState.packet)                
+                }// while                    
             }// if av_read_frame
             
             while (self.m_isPaused && !self.m_stopFlag && !g_quit) {
