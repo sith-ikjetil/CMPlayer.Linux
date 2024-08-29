@@ -15,18 +15,18 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     /// static private variables
     /// 
-    static private var timeElapsedMs: UInt64 = 0   
+    static private var timeElapsedMs: UInt64 = 0  // up time in ms counter 
     //
     // private variables
     //        
-    private var currentCommand: String = ""
-    private var commands: [PlayerCommand] = []    
-    private var isShowingTopWindow = false
-    private var addendumText: String = ""
-    private var updateFileName: String = ""
-    private var isTooSmall: Bool = false
-    private var showCursor: Bool = false
-    private var cursorTimeout: UInt64 = 0    
+    private var currentCommand: String = ""       // current command typing in
+    private var commands: [PlayerCommand] = []    // array of PlayerCommandObjects set in run()
+    private var isShowingTopWindow = false  // true == window on top of this window, false == this is top window
+    private var addendumText: String = ""         // text added to screen over command line if info needs to be outputted
+    //private var updateFileName: String = ""
+    private var isTooSmall: Bool = false          // true == screen size is invalid too small, false == supported and valid size
+    private var showCursor: Bool = false          // true == should cursor be visible, false == should not be visible
+    private var cursorTimeout: UInt64 = 0         // cursor time in ms counted from 0 to target. used to set showCursor
     ///
     /// priate constants
     /// 
