@@ -65,7 +65,7 @@ internal class PlayerLog {
     /// parameter text: log entry information
     ///
     func logWarning(title: String, text: String) {
-        guard PlayerPreferences.logError else { 
+        guard PlayerPreferences.logWarning else { 
             return 
         }
         
@@ -89,7 +89,7 @@ internal class PlayerLog {
     /// parameter text: log entry information
     ///
     func logInformation(title: String, text: String) {                    
-        guard PlayerPreferences.logError else { 
+        guard PlayerPreferences.logInformation else { 
             return 
         }
         
@@ -113,7 +113,7 @@ internal class PlayerLog {
     /// parameter text: log entry information
     ///
     func logDebug(title: String, text: String) {
-        guard PlayerPreferences.logError else { 
+        guard PlayerPreferences.logDebug else { 
             return 
         }
         
@@ -137,7 +137,7 @@ internal class PlayerLog {
     /// parameter text: log entry information
     ///
     func logOther(title: String, text: String) {
-        guard PlayerPreferences.logError else { 
+        guard PlayerPreferences.logOther else { 
             return 
         }
         

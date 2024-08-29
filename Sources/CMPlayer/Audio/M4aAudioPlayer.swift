@@ -431,10 +431,10 @@ internal class M4aAudioPlayer {
                 while !g_quit && !m_stopFlag && avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame) >= 0 {                        
                     // Allocate buffer for resampled audio
                     var outputBuffer: UnsafeMutablePointer<UInt8>? = nil
-                    let bufferSize = av_samples_alloc(&outputBuffer, nil, 2, self.m_audioState.frame!.pointee.nb_samples, AV_SAMPLE_FMT_S16, 0)
+                    retVal = av_samples_alloc(&outputBuffer, nil, 2, self.m_audioState.frame!.pointee.nb_samples, AV_SAMPLE_FMT_S16, 0)
                     
                     // Ensure the buffer is allocated properly
-                    guard bufferSize >= 0 else {
+                    guard retVal >= 0 else {
                         let msg = "Error allocating buffer for resampled audio."
                         PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
                         return
@@ -469,11 +469,14 @@ internal class M4aAudioPlayer {
                             return
                         }
 
-                        // Update time elapsed                            
-                        let totalPerChannel = UInt64(bufferSize) / UInt64(self.m_audioState.aoFormat.channels)
-                        let currentDuration = Double(totalPerChannel) / Double(self.m_audioState.aoFormat.rate)
-                        self.m_timeElapsed += UInt64(currentDuration * Double(1000/self.m_audioState.aoFormat.channels))
-                        
+                        // total bytes of samples: nb_samples * 2 (channels) * 2 (16 bit)
+                        let totalBytes = self.m_audioState.frame!.pointee.nb_samples * self.m_audioState.aoFormat.channels * (self.m_audioState.aoFormat.bits/8)
+                        // total samples per channel
+                        let totalBytesPerChannel = UInt64(totalBytes) / UInt64(self.m_audioState.aoFormat.channels)
+                        // duration of samples
+                        let currentDuration = Double(totalBytesPerChannel) / Double(self.m_audioState.aoFormat.rate)
+                        // time elapsed when these bytes are played
+                        self.m_timeElapsed += UInt64(currentDuration * Double(1000/self.m_audioState.aoFormat.channels))                        
                         // set crossfade volume
                         let timeLeft: UInt64 = (self.duration >= self.m_timeElapsed) ? self.duration - self.m_timeElapsed : self.duration
                         if timeLeft > 0 && timeLeft <= self.m_targetFadeDuration {
@@ -484,7 +487,7 @@ internal class M4aAudioPlayer {
 
                         // adjust crossfade volume
                         if self.m_enableCrossfade && timeToStartCrossfade {
-                            adjustVolume(buffer: UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), size: Int(bufferSize), volume: currentVolume)                        
+                            adjustVolume(buffer: UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), size: Int(totalBytes), volume: currentVolume)
                         }
 
                         // Write audio data to device
