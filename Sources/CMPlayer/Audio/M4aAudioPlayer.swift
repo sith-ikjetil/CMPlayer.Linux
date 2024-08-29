@@ -478,9 +478,11 @@ internal class M4aAudioPlayer {
                         self.m_timeElapsed += UInt64(currentDuration * Double(1000/self.m_audioState.aoFormat.channels))                        
                         // set crossfade volume
                         let timeLeft: UInt64 = (self.duration >= self.m_timeElapsed) ? self.duration - self.m_timeElapsed : self.duration
+                        // if we should crossfade
                         if timeLeft > 0 && timeLeft <= self.m_targetFadeDuration {
+                            // set timeToStartCrossfade flag to true
                             timeToStartCrossfade = true
-
+                            // calculate volume 100%-0% volume over m_targetFadeDuration
                             currentVolume = Float(Float(timeLeft)/Float(self.m_targetFadeDuration))                    
                         }
                         // adjust crossfade volume
@@ -489,20 +491,24 @@ internal class M4aAudioPlayer {
                         }
                         // Write audio data to device
                         if PlayerPreferences.outputSoundLibrary == .ao {
+                            // send samples to ao for playback
                             ao_play(self.m_audioState.device, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), totalBytes)                            
                         }
                         else {                            
+                            // send samples to alsa for playback
                             snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), snd_pcm_uframes_t(samples))
                         }
                     }                                                                                      
-
+                    // if we are !paused! and not stopping and not quitting
                     while (self.m_isPaused && !self.m_stopFlag && !g_quit) {
+                        // sleep for 100 ms
                         usleep(100_000)
                     }                                      
                 }// while                    
             }// if av_read_frame
-            
+            // if we are !paused! and not stopping and not quitting
             while (self.m_isPaused && !self.m_stopFlag && !g_quit) {
+                // sleep for 100 ms
                 usleep(100_000)
             }
         }// while !self.m_stopFlag
