@@ -375,7 +375,9 @@ internal class M4aAudioPlayer {
             // set m_isPaused to false
             self.m_isPaused = false
             // set m_stopFlag to true
-            self.m_stopFlag = true            
+            self.m_stopFlag = true      
+            // todo: remove
+            PlayerLog.ApplicationLog?.logDebug(title: "M4a PlayAsync Defer", text: self.filePath.path)      
         }
 
         var timeToStartCrossfade: Bool = false

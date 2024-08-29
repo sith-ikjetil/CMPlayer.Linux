@@ -22,6 +22,10 @@ internal class PlayerCommandHistory {
     /// 
     /// - Parameter command: 
     func add(command: String) {
+        if self.history.last == command {
+            self.historyIndex = self.history.count
+            return
+        }
         self.history.append(command)
         self.historyIndex = self.history.count
         self.writeCommandToHistory(command: command)
