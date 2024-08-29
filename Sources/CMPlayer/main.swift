@@ -1,10 +1,9 @@
-//
-//  main.swift
-//
-//  Created by Kjetil Kr Solberg on 24-09-2024.
-//  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
-//
-
+//////////////////////////////////////////////////////////////
+//: Filename    : main.swift
+//: Date        : 2024-09-24
+//: Author      : "Kjetil Kristoffer Solberg" <post@ikjetil.no>
+//: Version     : 1.7
+//: Description : Console Music Player main.
 //
 // import.
 //
@@ -14,7 +13,6 @@ import Cao
 import Casound
 import Termios
 import Glibc
-
 //
 // Global constants.
 //
@@ -57,23 +55,20 @@ internal var g_doNotPaint: Bool = false                 // do no repaint mainwin
 //======================================
 // Handle command line arguments
 CommandLineHandler.processCommandLine()
-
 // initialize libmpg123
 guard mpg123_init() == 0 else {
     print("Failed to initialize libmpg123")
     exit(ExitCodes.ERROR_INIT_LIBMPG.rawValue)
 }
-
 // initialize libao
 ao_initialize()
-
 // ensure we exit/close libmpg123/libao
 atexit( {    
-    // close libraries
+    // close libmpg123
     mpg123_exit()
+    // close libao
     ao_shutdown()
 })
-
 // we have normal startup
 // redirect stderr
 // we do this to remove process_comment messages
@@ -82,67 +77,73 @@ guard stderr_old != -1 else {
     print("Failed to redirect stderr to /dev/null")
     exit(ExitCodes.ERROR_REDIRECT.rawValue)
 }
-
 // stderr redirect successfull
 // normal startup and normal execution continue
 do {
     // initialize CMPlayer.Linux
     try g_player.initialize()    
-    
     // run the program and save exit code
     try g_player.run()
-
     // ensure g_quit is true to let all async code to exit
     g_quit = true
-    
-    // let all players stop playing and clean up
+    // let all players async code stop playing and clean up
     Thread.sleep(forTimeInterval: TimeInterval(g_asyncCompletionDelay))
-
     // restore stderr
     restore_stderr(stderr_old)    
-
     // clear screen
     Console.clearScreen()
+    // goto 1,1
     Console.gotoXY(1, 1)  
+    // reset console colors
     Console.resetConsoleColors()  
+    // clear terminal
     system("clear") 
-    
+    // write exit message
     print("CMPlayer exited normally.")
-
     // log exit
-    PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Exited Normally.")        
-    
+    PlayerLog.ApplicationLog?.logInformation(title: "CMPlayer", text: "Application Exited Normally.")            
     // exit with exit code
     exit(ExitCodes.SUCCESS.rawValue)
 } catch let error as CmpError {
-    // allow for concurrent threads to exit
+    // ensure g_quit is true to let all async code to exit
     g_quit = true
+    // let all players async code stop playing and clean up
     Thread.sleep(forTimeInterval: TimeInterval(g_asyncCompletionDelay))
-
+    // create message
     let msg = "CMPlayer ABEND.\nException caught.\nMessage: \(error.message)"    
-
+    // clear screen
     Console.clearScreen()
+    // goto 1,1
     Console.gotoXY(1, 1)
+    // reset console colors
     Console.resetConsoleColors()
+    // clear terminal
     system("clear")    
-    
+    // write error message
     print(msg)
-
+    // log error
     PlayerLog.ApplicationLog?.logError(title: "CMPlayer", text: msg)
+    // exit with exit code
     exit(ExitCodes.ERROR_UNKNOWN.rawValue)
 } catch {        
-    // allow for concurrent threads to exit
+    // ensure g_quit is true to let all async code to exit
     g_quit = true
+    // let all players async code stop playing and clean up
     Thread.sleep(forTimeInterval: TimeInterval(g_asyncCompletionDelay))
-
+    // create message
     let msg = "CMPlayer ABEND.\nUnknown exception caught.\nMessage: \(error)"
-
+    // clear screen
     Console.clearScreen()
+    // goto 1,1
     Console.gotoXY(1, 1)
+    // reset console colors
     Console.resetConsoleColors()
-    system("clear")    
+    // clear terminal
+    system("clear")  
+    // write error message
     print(msg) 
-
+    // log error
     PlayerLog.ApplicationLog?.logError(title: "CMPlayer", text: msg)
+    // exit with exit code
     exit(ExitCodes.ERROR_UNKNOWN.rawValue)
 }
