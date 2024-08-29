@@ -1093,11 +1093,11 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                         let wnd: InfoWindow = InfoWindow()
                         // set song entry
                         wnd.song = s
-                        // show window
+                        // show window, modal call
                         wnd.showWindow()
                         // clear screen current theme
                         Console.clearScreenCurrentTheme()
-                        // render window
+                        // render this window
                         self.renderWindow()
                         // set isShowingTopWindow flag to false                        
                         self.isShowingTopWindow = false
@@ -1118,11 +1118,11 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         self.isShowingTopWindow = true
         // create a HelpWindow
         let wnd: HelpWindow = HelpWindow()
-        // show the help window
+        // show the help window, modal call
         wnd.showWindow()
         // clear screen current theme
         Console.clearScreenCurrentTheme()
-        // render window
+        // render this window
         self.renderWindow()
         // set isShowingTopWindow flag to false
         self.isShowingTopWindow = false
@@ -1159,11 +1159,11 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         self.isShowingTopWindow = true
         // create AboutWindow
         let wnd: AboutWindow = AboutWindow()
-        // show about window
+        // show about window, modal call
         wnd.showWindow()
         // clear screen current theme
         Console.clearScreenCurrentTheme()
-        // render window
+        // render this window
         self.renderWindow()
         // set isShowingTopWindow flag to false
         self.isShowingTopWindow = false
@@ -1178,11 +1178,11 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         self.isShowingTopWindow = true
         // create ArtistWindow
         let wnd: ArtistWindow = ArtistWindow()
-        // show artist window.
+        // show artist window, modal call
         wnd.showWindow()
         // clear screen current theme
         Console.clearScreenCurrentTheme()
-        // render window
+        // render this window
         self.renderWindow()
         // set isShowingTopWindow flag to false
         self.isShowingTopWindow = false
@@ -1193,11 +1193,17 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandGenre(parts: [String]) -> Void {
+        // set isShowingTopWindow flag to true
         self.isShowingTopWindow = true
+        // create GenreWindow
         let wnd: GenreWindow = GenreWindow()
+        // show genre window, modal call
         wnd.showWindow()
+        // clear screen current theme
         Console.clearScreenCurrentTheme()
+        // render this window
         self.renderWindow()
+        // set isShowingTopWindow flag to false
         self.isShowingTopWindow = false
     }    
     ///
@@ -1206,11 +1212,17 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandMode(parts: [String]) -> Void {
+        // set isShowingTopWindow flag to true
         self.isShowingTopWindow = true
+        // create ModeWindow
         let wnd: ModeWindow = ModeWindow()
+        // show mode window, modal call
         wnd.showWindow()
+        // clear screen curren theme
         Console.clearScreenCurrentTheme()
+        // render this window
         self.renderWindow()
+        // set isShowingTopWindow flag to false
         self.isShowingTopWindow = false
     }
     ///
@@ -1219,19 +1231,32 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandInfo(parts: [String]) -> Void {
+        // if command parts has 1 element
         if parts.count == 1 {
+            // render info song
             self.onCommandInfoSong(parts: parts)
+            // return
             return
         }
+        // set isShowingTopWindow flag to true
         self.isShowingTopWindow = true
+        // create InfoWindow
         let wnd: InfoWindow = InfoWindow()
+        // lock
         g_lock.lock()
+        // get currently playing song, first item in playlist.
         let song = g_playlist[0]
+        // unlock
         g_lock.unlock()
+        // set song to info window
         wnd.song = song
+        // show info window, modal call
         wnd.showWindow()
+        // clear screen current theme
         Console.clearScreenCurrentTheme()
+        // render this window
         self.renderWindow()
+        // set isShowingTopWindow to false
         self.isShowingTopWindow = false
     }    
     ///
@@ -1240,49 +1265,75 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandReinitialize(parts: [String]) -> Void {
+        // pause playback
         g_player.pause()
-                
+        // lock
         g_lock.lock()
-        
+        // clear g_searchType
         g_searchType.removeAll()
+        // clear g_genres
         g_genres.removeAll()
+        // clear g_artists
         g_artists.removeAll()
+        // clear g_recordingYears
         g_recordingYears.removeAll()
+        // clear g_serachResult
         g_searchResult.removeAll()
+        // clear g_modeSearch
         g_modeSearch.removeAll()
+        // clear g_modeSearchStats
         g_modeSearchStats.removeAll()
+        // clear g_songs
         g_songs.removeAll()
+        // clear g_playlist
         g_playlist.removeAll()
+        // set library to empty array
         g_library.library = []
+        // save library
         g_library.save()
+        // set next available song to 1, we are starting over
         g_library.setNextAvailableSongNo(1)
-        
+        // set audio player active to -1, restart player
         g_player.audioPlayerActive = -1
+        // set audio player 1 to nil, restart player
         g_player.audio1 = nil
+        // set audio player 2 to nil, restart player
         g_player.audio2 = nil
-        
+        // if Playpreferences have 0 items
         if PlayerPreferences.musicRootPath.count == 0 {
+            // set isShowingTopWindow flag to true
             self.isShowingTopWindow = true
+            // create SetupWindow
             let wndS: SetupWindow = SetupWindow()
+            // show setup window, modal call.
             wndS.showWindow()
+            // set isShowingTopWindow flag to true again
             self.isShowingTopWindow = true
+            // create InitializeWindow
             let wndI = InitializeWindow()
+            // show setup window, modal call
             wndI.showWindow()
         }
+        // we have music root path
         else {
+            // set isShowingTopWindow flag to true
             self.isShowingTopWindow = true
+            // create InitializeWindow            
             let wnd = InitializeWindow()
+            // show initialize window, modal call.
             wnd.showWindow()
         }
+        // set isShowingTopWindow flag to false
         self.isShowingTopWindow = false
-        
+        // set library to g_songs found
         g_library.library = g_songs
+        // save library
         g_library.save()
-        
+        // render this window
         self.renderWindow()
-        
+        // unlock
         g_lock.unlock()
-        
+        // start playing again if PlayerPreferences.autoPlayOnStartup is true
         g_player.skip(play: PlayerPreferences.autoplayOnStartup)
     }    
     ///
@@ -1291,13 +1342,20 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandRebuildSongNo(parts: [String]) -> Void {
+        // create song index variable, start with 1
         var i: Int = 1
+        // for each SongEntry in g_songs
         for s in g_songs {
+            // set song no to i
             s.songNo = i
+            // increase i with 1
             i += 1
         }
+        // set next available song no
         g_library.setNextAvailableSongNo(i)
+        // set library to g_songs (updated now)
         g_library.library = g_songs
+        // save library with updated song no
         g_library.save()
     }    
     ///
@@ -1306,11 +1364,17 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandPreferences(parts: [String]) -> Void {
+        // set isShowingTopWindow flag to true
         self.isShowingTopWindow = true
+        // create PreferencesWindow
         let wnd: PreferencesWindow = PreferencesWindow()
+        // show preferences window, modal call.
         wnd.showWindow()
+        // clear screen curren theme
         Console.clearScreenCurrentTheme()
+        // render this window
         self.renderWindow()
+        // set isShowingTopWindow flag to false
         self.isShowingTopWindow = false
     }    
     ///
@@ -1319,11 +1383,17 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandYear(parts: [String]) -> Void {
+        // set isShowingTopWindow flag to true
         self.isShowingTopWindow = true
+        // create YearWindow
         let wnd: YearWindow = YearWindow()
+        // show year window, modal call.
         wnd.showWindow()
+        // clear screen current theme.
         Console.clearScreenCurrentTheme()
+        // render this window
         self.renderWindow()
+        // set isShowingTopWindow flag to false
         self.isShowingTopWindow = false
     }    
     ///
@@ -1332,16 +1402,25 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandSearch(parts: [String]) -> Void {
+        // get command arguments
         let nparts = reparseCurrentCommandArguments(parts)
-        
+        // if arguments has values
         if nparts.count > 0 {
+            // set isShowingTopWindow flag to true
             self.isShowingTopWindow = true
+            // create SearchWindow
             let wnd: SearchWindow = SearchWindow()
+            // set command arguments to search window
             wnd.parts = nparts
+            // set what type of search is to be done.
             wnd.type = SearchType.ArtistOrTitle
+            // show search window, modal call.
             wnd.showWindow()
+            // clear screen current theme
             Console.clearScreenCurrentTheme()
+            // render this window
             self.renderWindow()
+            // set isShowingTopeWindow flag to false
             self.isShowingTopWindow = false
         }
     }    
@@ -1351,16 +1430,25 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandSearchArtist(parts: [String]) -> Void {
+        // get command arguments
         let nparts = reparseCurrentCommandArguments(parts)
-        
+        // if command arguments has values
         if nparts.count > 0 {
+            // set isShowingTopWindow flag to true
             self.isShowingTopWindow = true
+            // create SearchWindow
             let wnd: SearchWindow = SearchWindow()
+            // set command arguments to search window
             wnd.parts = nparts
+            // set what type of search is to be done
             wnd.type = SearchType.Artist
+            // show search window, modal call.
             wnd.showWindow()
+            // clear screen current theme
             Console.clearScreenCurrentTheme()
+            // render this window
             self.renderWindow()
+            // set isShowingTopWindow flag to false
             self.isShowingTopWindow = false
         }
     }    
@@ -1370,16 +1458,25 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandSearchTitle(parts: [String]) -> Void {
+        // get command arguments
         let nparts = reparseCurrentCommandArguments(parts)
-        
+        // if command arguments has values
         if nparts.count > 0 {
+            // set isShowingTopWindow flag to true
             self.isShowingTopWindow = true
+            // create SearchWindow
             let wnd: SearchWindow = SearchWindow()
+            // set command arguments to search window
             wnd.parts = nparts
+            // set what type of search is to be done
             wnd.type = SearchType.Title
+            // show search window, modal call.
             wnd.showWindow()
+            // clear screen current theme
             Console.clearScreenCurrentTheme()
+            // render this window
             self.renderWindow()
+            // set isShowingTopWindow flag to false
             self.isShowingTopWindow = false
         }
     }    
@@ -1389,16 +1486,25 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandSearchAlbum(parts: [String]) -> Void {
+        // get command arguments
         let nparts = reparseCurrentCommandArguments(parts)
-        
+        // if command arguments has values
         if nparts.count > 0 {
+            // set isShowingTopWindow flag to true
             self.isShowingTopWindow = true
+            // create SearchWindow
             let wnd: SearchWindow = SearchWindow()
+            // set command arguments to search window
             wnd.parts = nparts
+            // set what type of search is to be done
             wnd.type = SearchType.Album
+            // show search window, modal call.
             wnd.showWindow()
+            // clear screen current theme
             Console.clearScreenCurrentTheme()
+            // render this window
             self.renderWindow()
+            // set isShowingTopWindow flag to false
             self.isShowingTopWindow = false
         }
     }    
@@ -1408,16 +1514,25 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandSearchGenre(parts: [String]) -> Void {
+        // get command arguments
         let nparts = reparseCurrentCommandArguments(parts)
-        
+        // if command arguments has values
         if nparts.count > 0 {
+            // set isShowingTopWindow flag to true
             self.isShowingTopWindow = true
+            // create SearchWindow
             let wnd: SearchWindow = SearchWindow()
+            // set command arguments to search window
             wnd.parts = nparts
+            // set what type of search is to be done
             wnd.type = SearchType.Genre
+            // show search window, modal call.
             wnd.showWindow()
+            // clear screen curren theme
             Console.clearScreenCurrentTheme()
+            // render this window
             self.renderWindow()
+            // set isShowingTopWindow flag to false
             self.isShowingTopWindow = false
         }
     }    
@@ -1427,16 +1542,25 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter parts: command array.
     ///
     func onCommandSearchYear(parts: [String]) -> Void {
+        // get command arguments
         let nparts = reparseCurrentCommandArguments(parts)
-        
+        // if command arguments has values
         if nparts.count > 0 {
+            // set isShowingTopWindow flag to true
             self.isShowingTopWindow = true
+             // create SearchWindow
             let wnd: SearchWindow = SearchWindow()
+             // set command arguments to search window
             wnd.parts = nparts
+            // set what type of search is to be done
             wnd.type = SearchType.RecordedYear
+            // show search window, modal call.
             wnd.showWindow()
+             // clear screen curren theme
             Console.clearScreenCurrentTheme()
+            // render this window
             self.renderWindow()
+            // set isShowingTopWindow flag to false
             self.isShowingTopWindow = false
         }
     }    
@@ -1455,6 +1579,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     func onCommandClearHistory(parts: [String]) -> Void {
         do {
+            // try to clear command history
             try PlayerCommandHistory.default.clear()
         }
         catch {
