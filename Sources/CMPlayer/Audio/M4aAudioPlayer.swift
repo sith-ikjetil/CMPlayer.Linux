@@ -4,7 +4,6 @@
 //  Created by Kjetil Kr Solberg on 24-09-2024.
 //  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
 //
-
 //
 // import.
 //
@@ -12,9 +11,6 @@ import Foundation
 import Cffmpeg
 import Cao
 import Casound
-
-let g_fver: Int32 = getFFmpegMajorVersion()
-
 ///
 /// Audio state variables.
 ///
@@ -36,14 +32,10 @@ internal struct M4aAudioState {
     var aoFormat = ao_sample_format()
     var alsaState: AlsaState = AlsaState()
 }
-
-
-
 //
 // av_ch_layout_stereo
 //
 let av_ch_layout_stereo: Int32 = 1|2
-
 //
 // Represents CMPlayer AudioPlayer.
 //
@@ -111,221 +103,340 @@ internal class M4aAudioPlayer {
     func play() throws {
         // if we are already playing, return
         if (self.m_isPlaying) {
+            // return
             return;
-        }
-        
+        }        
         // if we have paused playback, then resume on play again
         if (self.m_isPaused) {
+            // resume
             self.resume()
+            // return
             return;
         }
-
+        // reset m_hasPlayer to false
         self.m_hasPlayed = false
+        // reset m_stopFlag to false
         self.m_stopFlag = false
-
-        // Open audio file
+        // open input stream and read header
         var err = avformat_open_input(&self.m_audioState.formatCtx, self.filePath.path, nil, nil)
+        // if error
         if err != 0 {
+            // create error message
             let msg = "[M4aAudioPlayer].play(). avformat_open_input failed with value \(err) = '\(renderFfmpegError(error: err))'. Could not open file \(self.filePath.path)."
+            // throw error
             throw CmpError(message: msg)
         }
-        
+        // if formatCtx pointer is invalid
         if self.m_audioState.formatCtx == nil {
-            // Handle the nil case appropriately
+            // create error message
             let msg = "[M4aAudioPlayer].play(). m_audioState.formatCtx is nil."
+            // throw error
             throw CmpError(message: msg)
-        }
-        
-        // Retrieve stream information
+        }        
+        // get stream information
         err = avformat_find_stream_info(self.m_audioState.formatCtx, nil)
-        if err < 0 {            
+        // if error
+        if err < 0 {
+            // create error message
             let msg = "[M4aAudioPlayer].play(). avformat_find_stream_info failed with value: \(err) = '\(renderFfmpegError(error: err))'. Could not find stream information."
+            // close opened input
             avformat_close_input(&m_audioState.formatCtx)
+            // throw error
             throw CmpError(message: msg)
         }                
-        
-        // Find the audio stream
+        // find the audio stream
         for i in 0..<Int32(self.m_audioState.formatCtx!.pointee.nb_streams) {
             if self.m_audioState.formatCtx!.pointee.streams![Int(i)]!.pointee.codecpar.pointee.codec_type == AVMEDIA_TYPE_AUDIO {
+                // set audio stream index to index
                 self.m_audioState.audioStreamIndex = i
+                // found stream, exit loop
                 break
             }
         }
-        
+        // if not find audio stream then error
         if self.m_audioState.audioStreamIndex < 0 {
+            // create error message
             let msg = "[M4aAudioPlayer].play(). m_audioState.audioStreamIndex invalid with value: \(self.m_audioState.audioStreamIndex)."
+            // close opened input
             avformat_close_input(&m_audioState.formatCtx)
+            // throw error
             throw CmpError(message: msg)
         }
-
-        // Calculate duration in seconds
-        if let formatCtx = self.m_audioState.formatCtx, formatCtx.pointee.duration != 0x00 { // AV_NOPTS_VALUE {
+        // if audioState is valid, calculate duration in seconds
+        if let formatCtx = self.m_audioState.formatCtx, formatCtx.pointee.duration != 0x00 { 
+            // get duration
             let durationInSeconds = Double(formatCtx.pointee.duration) / Double(AV_TIME_BASE)                
+            // if invalid duration
             if durationInSeconds <= 0 {                    
+                // create error message
                 let msg = "[M4aAudioPlayer].play(). duration <= 0. \(durationInSeconds) seconds"
+                // close opened input
                 avformat_close_input(&self.m_audioState.formatCtx)
+                // throw error
                 throw CmpError(message: msg)
             }
+            // set m_duration to duration in ms
             self.m_duration = UInt64(durationInSeconds * 1000)
         }
+        // audioState invalid
         else {
+            // create error message
             let msg = "[M4aAudioPlayer].play(). Cannot find duration."
+            // close opened input
             avformat_close_input(&self.m_audioState.formatCtx)
+            // throw error
             throw CmpError(message: msg)
         }              
-        
-        // Get codec parameters
+        // get codec parameters
         let codecpar = self.m_audioState.formatCtx!.pointee.streams![Int(self.m_audioState.audioStreamIndex)]!.pointee.codecpar
-        
-        // Find the decoder for the audio stream 
+        // find the decoder for the audio stream 
 #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
         self.m_audioState.codec = avcodec_find_decoder(codecpar!.pointee.codec_id)
 #elseif CMP_FFMPEG_V4
         self.m_audioState.codec = UnsafeMutablePointer(mutating: avcodec_find_decoder(codecpar!.pointee.codec_id))
 #endif
+        // if audio codec is invalid
         if self.m_audioState.codec == nil {
+            // create error message
             let msg = "[M4aAudioPlayer].play(). avcodec_find_decoder failed with value: nil. Unsupported codec: \(codecpar!.pointee.codec_id)."
+            // close opened input
             avformat_close_input(&self.m_audioState.formatCtx)            
+            // throw error
             throw CmpError(message: msg)
-        }    
-        
-        // Allocate codec context
+        }            
+        // allocate codec context and set fields to default values
         self.m_audioState.codecCtx = avcodec_alloc_context3(self.m_audioState.codec)
+        // if codec context is invalid
         if self.m_audioState.codecCtx == nil {
+            // create error message
             let msg = "[M4aAudioPlayer].play(). avcodec_alloc_context3 failed with value: nil. Could not allocate codec context."
+            // close opened input
             avformat_close_input(&self.m_audioState.formatCtx)            
+            // throw error
             throw CmpError(message: msg)
         }
-        
+        // fill codec context based on codec parameters
         err = avcodec_parameters_to_context(self.m_audioState.codecCtx, codecpar)
         if err < 0 {
+            // create error message
             let msg = "[M4aAudioPlayer].play(). avcodec_parameters_to_context failed with value: \(err) = '\(renderFfmpegError(error: err))'. Could not copy codec context."
+            // free codec context
             avcodec_free_context(&self.m_audioState.codecCtx)
+            // close opened input
             avformat_close_input(&self.m_audioState.formatCtx)            
+            // throw error
             throw CmpError(message: msg)
         }
-        
-        // Open codec
+        // initialize codec context by given codec
         err = avcodec_open2(self.m_audioState.codecCtx, self.m_audioState.codec, nil)
+        // if error
         if err < 0 {
+            // create error message
             let msg = "[M4aAudioPlayer].play(). avcodec_open2 failed with value: \(err) = '\(renderFfmpegError(error: err))'. Could not open codec."
+            // free codec context
             avcodec_free_context(&self.m_audioState.codecCtx)
+            // close opened input
             avformat_close_input(&self.m_audioState.formatCtx)
+            // throw error
             throw CmpError(message: msg)
-        }
-        
-        // Allocate frame
+        }        
+        // allocate frame and set default values
         self.m_audioState.frame = av_frame_alloc()
+        // if frame invalid
         if self.m_audioState.frame == nil {
+            // create error message
             let msg = "[M4aAudioPlayer].play(). av_frame_alloc failed with value: nil. Could not allocate audio frame."
+            // free codec context
             avcodec_free_context(&self.m_audioState.codecCtx)
+            // free opened input
             avformat_close_input(&self.m_audioState.formatCtx)            
+            // throw error
             throw CmpError(message: msg)
-        }
-        
-        // Set up resampling context
+        }        
+        // allocate SwrContext
         self.m_audioState.swrCtx = swr_alloc()
+        // create a mutable raw pointer
         let rawSwrCtxPtr: UnsafeMutableRawPointer? = UnsafeMutableRawPointer(self.m_audioState.swrCtx)
-#if CMP_FFMPEG_V6 || CMP_FFMPEG_V7        
-        var ret = av_channel_layout_copy(&self.m_audioState.chLayoutIn, &self.m_audioState.codecCtx!.pointee.ch_layout)        
-        if ret < 0 {
-            let msg = "[M4aAudioPlayer].play(). av_channel_layout_copy failed with value: \(ret) = '\(renderFfmpegError(error: err))'."
+#if CMP_FFMPEG_V6 || CMP_FFMPEG_V7     
+        // copy channel layout from ch_layout to chLayoutIn
+        err = av_channel_layout_copy(&self.m_audioState.chLayoutIn, &self.m_audioState.codecCtx!.pointee.ch_layout)        
+        // if error
+        if err < 0 {
+            // create error message
+            let msg = "[M4aAudioPlayer].play(). av_channel_layout_copy failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            // free swrCtx
             swr_free(&self.m_audioState.swrCtx)
+            // free frame
             av_frame_free(&self.m_audioState.frame)
+            // free codec context
             avcodec_free_context(&self.m_audioState.codecCtx)
+            // free opened input
             avformat_close_input(&self.m_audioState.formatCtx)  
+            // throw error
             throw CmpError(message: msg)
         }
-        ret = av_opt_set_chlayout(rawSwrCtxPtr, "in_chlayout", &self.m_audioState.chLayoutIn, 0)        
-        if ret < 0 {
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout IN failed with value: \(ret) = '\(renderFfmpegError(error: err))'."
+        // set channel layout to swrCtx
+        err = av_opt_set_chlayout(rawSwrCtxPtr, "in_chlayout", &self.m_audioState.chLayoutIn, 0)        
+        // if error
+        if err < 0 {
+            // create error message
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout IN failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            // free swrCtx
             swr_free(&self.m_audioState.swrCtx)
+            // free frame
             av_frame_free(&self.m_audioState.frame)
+            // free codec context
             avcodec_free_context(&self.m_audioState.codecCtx)
+            // close opened input
             avformat_close_input(&self.m_audioState.formatCtx)  
+            // throw error
             throw CmpError(message: msg)
         }
+        // set default values to chLayoutOut
         av_channel_layout_default(&self.m_audioState.chLayoutOut, 2);
-        ret = av_opt_set_chlayout(rawSwrCtxPtr, "out_chlayout", &self.m_audioState.chLayoutOut, 0)
+        // set channel layout to SwrCtx
+        err = av_opt_set_chlayout(rawSwrCtxPtr, "out_chlayout", &self.m_audioState.chLayoutOut, 0)
         if ret < 0 {
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout OUT failed with value: \(ret) = '\(renderFfmpegError(error: err))'."
+            // create error message
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout OUT failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            // free swrCtx
             swr_free(&self.m_audioState.swrCtx)
+            // free frame
             av_frame_free(&self.m_audioState.frame)
+            // free codec context
             avcodec_free_context(&self.m_audioState.codecCtx)
+            // close opened input
             avformat_close_input(&self.m_audioState.formatCtx)  
+            // throw error
             throw CmpError(message: msg)
         }        
 #elseif CMP_FFMPEG_V4
+        // set in channel layout to swrCtx
         av_opt_set_int(rawSwrCtxPtr, "in_channel_layout", Int64(self.m_audioState.codecCtx!.pointee.channel_layout), 0)
+        // set out channel layout to swrCtx
         av_opt_set_int(rawSwrCtxPtr, "out_channel_layout", Int64(av_ch_layout_stereo), 0)
 #endif        
+        // set input sample rate to swrCtx
         av_opt_set_int(rawSwrCtxPtr, "in_sample_rate", Int64(self.m_audioState.codecCtx!.pointee.sample_rate), 0)
+        // set out sample rate to swrCtx
         av_opt_set_int(rawSwrCtxPtr, "out_sample_rate", 44100, 0)
+        // set in sample format to swrCtx
         av_opt_set_sample_fmt(rawSwrCtxPtr, "in_sample_fmt", self.m_audioState.codecCtx!.pointee.sample_fmt, 0)
+        // set out sample format to swrCtx
         av_opt_set_sample_fmt(rawSwrCtxPtr, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0)
-        swr_init(self.m_audioState.swrCtx)
-        
+        // initialize context
+        err = swr_init(self.m_audioState.swrCtx)
+        // if error
+        if err < 0 {
+            // create error message
+            let msg = "[M4aAudioPlayer].play(). swr_init failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            // free swrCtx
+            swr_free(&self.m_audioState.swrCtx)
+            // free frame
+            av_frame_free(&self.m_audioState.frame)
+            // free codec context
+            avcodec_free_context(&self.m_audioState.codecCtx)
+            // close opened input
+            avformat_close_input(&self.m_audioState.formatCtx)  
+            // throw error
+            throw CmpError(message: msg)
+        }
         // Set up libao format
+        // bits per sample
         self.m_audioState.aoFormat.bits = 16
+        // number of channels, 2 = stereo
         self.m_audioState.aoFormat.channels = 2
+        // sample rate
         self.m_audioState.aoFormat.rate = 44100
+        // byte format
         self.m_audioState.aoFormat.byte_format = AO_FMT_NATIVE
+        // matrix
         self.m_audioState.aoFormat.matrix = nil
-        // Set up libasound format        
+        // Set up libasound (alsa) format        
+        // number of channels, 2 = stereo
         self.m_audioState.alsaState.channels = 2
+        // sample rate
         self.m_audioState.alsaState.sampleRate = 44100 
-        self.m_audioState.alsaState.bufferSize = 1024 
-        
-        // Open libao device
+        // buffer size
+        self.m_audioState.alsaState.bufferSize = 1024         
+        // if .ao, open libao device
         if PlayerPreferences.outputSoundLibrary == .ao {
+            // open ao with default driver id and set ao format
             self.m_audioState.device = ao_open_live(ao_default_driver_id(), &self.m_audioState.aoFormat, nil)
+            // if device returned is invalid
             if self.m_audioState.device == nil {
+                // create error message
                 let msg = "[M4aAudioPlayer].play(). ao_open_live failed with value: nil. Error opening audio device."
     #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+                // uninitialize ch layout in
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
+                // uninitialize ch layout out
                 av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
     #endif
+                // free swrCtx
                 swr_free(&self.m_audioState.swrCtx)
+                // free frame
                 av_frame_free(&self.m_audioState.frame)
+                // free codec context
                 avcodec_free_context(&self.m_audioState.codecCtx)
+                // close opened input
                 avformat_close_input(&self.m_audioState.formatCtx)
+                // throw error
                 throw CmpError(message: msg)
             }
         }
+        // else if .alsa, open alsa device
         else if PlayerPreferences.outputSoundLibrary == .alsa {
+            // open alsa with device name = pcmDeviceName
             var err = snd_pcm_open(&self.m_audioState.alsaState.pcmHandle, self.m_audioState.alsaState.pcmDeviceName, SND_PCM_STREAM_PLAYBACK, 0)
+            // if error
             guard err >= 0 else {
+                // create error message
                 let msg = "[M4aAudioPlayer].play(). alsa. snd_pcm_open failed with value: \(err) = '\(renderAlsaError(error: err))'"
     #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+                // uninitialize ch layout in
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
+                // uninitialize ch layout out
                 av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
     #endif
+                // free swrCtx
                 swr_free(&self.m_audioState.swrCtx)
+                // free frame
                 av_frame_free(&self.m_audioState.frame)
+                // free codec context
                 avcodec_free_context(&self.m_audioState.codecCtx)
+                // close opened input
                 avformat_close_input(&self.m_audioState.formatCtx)
-                self.m_isPlaying = false
-
+                // throw error
                 throw CmpError(message: msg)
             }
+            // set alsa pcm parameters
             err = snd_pcm_set_params(self.m_audioState.alsaState.pcmHandle, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, self.m_audioState.alsaState.channels, self.m_audioState.alsaState.sampleRate, 1, 500000)
+            // if error
             guard err >= 0 else {
+                // create error message
                 let msg = "[M4aAudioPlayer].play(). alsa. snd_pcm_set_params failed with value: \(err) = '\(renderAlsaError(error: err))'"
     #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+                // uninitialize ch layout in
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
+                // uninitialize ch layout out
                 av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
     #endif
+                // free swrCtx
                 swr_free(&self.m_audioState.swrCtx)
+                // free frame
                 av_frame_free(&self.m_audioState.frame)
+                // free codec context
                 avcodec_free_context(&self.m_audioState.codecCtx)
+                // close opened input
                 avformat_close_input(&self.m_audioState.formatCtx)
-                self.m_isPlaying = false                
-                
+                // throw error                     
                 throw CmpError(message: msg)
             }
         }
-
+        // run code async
         self.audioQueue.async { [weak self] in            
+            // play audio
             self?.playAsync()
         }
     }
@@ -379,74 +490,86 @@ internal class M4aAudioPlayer {
             // log debug
             PlayerLog.ApplicationLog?.logDebug(title: "[M4aAudioPlayer].playAsync()@defer", text: self.filePath.path)      
         }
-
+        // should we do crossfade now or not
         var timeToStartCrossfade: Bool = false
+        // set current volume to 100%
         var currentVolume: Float = 1
-
+        // reset m_timeElapsed to 0
         self.m_timeElapsed = 0
-
         // Main decoding and playback loop
-        while !self.m_stopFlag && !g_quit {    
-           if (self.m_doSeekToPos) {
+        while !self.m_stopFlag && !g_quit {
+            // we are to seek to position   
+            if (self.m_doSeekToPos) {
+                // do not seek at next loop
                 self.m_doSeekToPos = false
-
                 // Access the stream and its time_base
                 let audioStream = self.m_audioState.formatCtx!.pointee.streams[Int(self.m_audioState.audioStreamIndex)]!
+                // get num seconds of frame timestamps
                 let timeBase = audioStream.pointee.time_base
-
                 // Convert the time_base to a human-readable format
                 let timeBaseNum = timeBase.num
                 let timeBaseDen = timeBase.den
-
+                // calculate seconds at where to seek to
                 let seconds: UInt64 = (self.duration - self.m_seekPos) / 1000                                
+                // calculate frame seconds to where to seek
                 let newPos: Int64 = Int64(seconds) * Int64(timeBaseDen/timeBaseNum)
+                // seek to timeframe at newPos 
                 if av_seek_frame(self.m_audioState.formatCtx, self.m_audioState.audioStreamIndex, newPos, AVSEEK_FLAG_ANY) == 0 {                
+                    // update m_timeElapsed to new value
                     self.m_timeElapsed = (seconds * 1000)
                 }            
             }
-
+            // return next frame of stream
             var retVal: Int32 = av_read_frame(self.m_audioState.formatCtx, &self.m_audioState.packet)
-            if retVal < 0 { // ERROR OR EOF < 0
+            // if error or EOF
+            if retVal < 0 {
+                // return 
                 return
             }
-
+            // if codecCtx and frame are invalid pointers
             guard let _ = self.m_audioState.codecCtx, let _ = self.m_audioState.frame else {
+                // create log messsge
                 let msg = "Codec context or frame is nil."
+                // log message
                 PlayerLog.ApplicationLog?.logError(title: "[M4aPlayer].playAsync()", text: msg)
+                // return
                 return
             }
-            
+            // if stream is audio
             if self.m_audioState.packet.stream_index == self.m_audioState.audioStreamIndex {
+                // supply raw packet data as input to a decoder.
                 retVal = avcodec_send_packet(self.m_audioState.codecCtx, &self.m_audioState.packet)
+                // if error
                 if retVal < 0 {
+                    // create log message
                     let msg = "[M4aAudioPlayer].playAsync(). avcodec_send_packet failed with value: \(retVal) = '\(renderFfmpegError(error: retVal))'."
+                    // log error
                     PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
+                    // return
                     return
                 }
-
+                // ensure cleanup by defer
                 defer {
                     av_packet_unref(&self.m_audioState.packet)
                 }
-                                    
-                while !g_quit && !m_stopFlag && avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame) >= 0 {                        
-                    // Allocate buffer for resampled audio
+                // while we are not quitting, stopping or 
+                while !g_quit && !m_stopFlag && (avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame) == 0) {
+                    // create a read/write pointer to outputBuffer
                     var outputBuffer: UnsafeMutablePointer<UInt8>? = nil
-                    retVal = av_samples_alloc(&outputBuffer, nil, 2, self.m_audioState.frame!.pointee.nb_samples, AV_SAMPLE_FMT_S16, 0)
-                    
+                    // allocate a samples buffer for nb_samples samples
+                    retVal = av_samples_alloc(&outputBuffer, nil, 2, self.m_audioState.frame!.pointee.nb_samples, AV_SAMPLE_FMT_S16, 0)                    
                     // Ensure the buffer is allocated properly
                     guard retVal >= 0 else {
                         let msg = "Error allocating buffer for resampled audio."
                         PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
                         return
                     }
-
+                    // ensure cleanup by defer
                     defer {
-                        // Free the output buffer
+                        // free the output buffer
                         av_freep(&outputBuffer)  
-                    }
-                    
-                    // Cast frame data pointers
-                    // Manually create an array from the tuple
+                    }                    
+                    // create a read only pointer
                     let inputData: [UnsafePointer<UInt8>?] = [
                         UnsafePointer(self.m_audioState.frame!.pointee.data.0),
                         UnsafePointer(self.m_audioState.frame!.pointee.data.1),
@@ -457,10 +580,9 @@ internal class M4aAudioPlayer {
                         UnsafePointer(self.m_audioState.frame!.pointee.data.6),
                         UnsafePointer(self.m_audioState.frame!.pointee.data.7)
                     ]                    
-
                     // Use withUnsafeBufferPointer to pass the array as a pointer
                     inputData.withUnsafeBufferPointer { bufferPointer in
-                        // return number of samples per channel
+                        // convert audio, return number of samples per channel
                         let samples = swr_convert(self.m_audioState.swrCtx, &outputBuffer, self.m_audioState.frame!.pointee.nb_samples, UnsafeMutablePointer(mutating: bufferPointer.baseAddress), self.m_audioState.frame!.pointee.nb_samples)                                                    
                         // Ensure resampling was successful
                         guard samples >= 0 else {
@@ -489,11 +611,12 @@ internal class M4aAudioPlayer {
                         if self.m_enableCrossfade && timeToStartCrossfade {
                             adjustVolume(buffer: UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), size: Int(totalBytes), volume: currentVolume)
                         }
-                        // Write audio data to device
+                        // if ao
                         if PlayerPreferences.outputSoundLibrary == .ao {
                             // send samples to ao for playback
                             ao_play(self.m_audioState.device, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), totalBytes)                            
                         }
+                        // if alsa
                         else {                            
                             // send samples to alsa for playback
                             snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), snd_pcm_uframes_t(samples))
@@ -594,6 +717,11 @@ internal class M4aAudioPlayer {
                 throw CmpError(message: msg)
             }
 
+            defer {
+                // close opened input
+                avformat_close_input(&formatContext)
+            }
+
             // Retrieve stream information
             err = avformat_find_stream_info(formatContext, nil)
             if err < 0 {
@@ -647,15 +775,7 @@ internal class M4aAudioPlayer {
                     }                    
                 }
                 tag = nextTag
-            }            
-            
-            // Clean up
-            avformat_close_input(&formatContext)
-            
-            // Log we found metadatda
-            // this is a preformance issue
-            //PlayerLog.ApplicationLog?.logInformation(title: "[M4aAudioPlayer].gatherMetadata()", text: "Found metadata for: \(path.path)")
-
+            }                                                
             return metadata         
         }
 
