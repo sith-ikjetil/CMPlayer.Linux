@@ -1,9 +1,9 @@
-//////////////////////////////////////////////////////////////
-//: Filename    : AboutWindow.swift
-//: Date        : 2024-09-24
-//: Author      : "Kjetil Kristoffer Solberg" <post@ikjetil.no>
-//: Version     : 
-//: Description : Console Music Player about window.
+//
+//  AboutWindow.swift
+//
+//  Created by Kjetil Kr Solberg on 24-09-2024.
+//  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
+//
 //
 // import
 //
