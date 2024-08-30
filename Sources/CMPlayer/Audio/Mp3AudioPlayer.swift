@@ -88,113 +88,152 @@ internal class Mp3AudioPlayer {
     /// initiates playback of the audio file from init(path)
     /// 
     func play() throws {
-        // if we are already playing, return
+        // if we are already playing
         if (self.m_isPlaying) {
+            // return
             return;
-        }
-        
-        // if we have paused playback, then resume on play again
+        }        
+        // if we have paused playback
         if (self.m_isPaused) {
+            // resume
             self.resume()
+            // return
             return;
         }
-
-        // set flags
+        // set m_hasPlayed flag to false
         self.m_hasPlayed = false
+        // set m_stopFlag to false
         self.m_stopFlag = false
-
         // make sure mpg123Handle is not already set
-        guard mpg123Handle == nil else {            
+        guard mpg123Handle == nil else {
+            // else error
+            // create error message            
             let msg = "[Mp3AudioPlayer].play(). Already playing a file."            
+            // throw error
             throw CmpError(message: msg)
         }        
-
-        // Initialize mpg123 handle
+        // create return value variable
         var err: Int32 = 0
+        // create a handle with mpg123_new
         self.mpg123Handle = mpg123_new(nil, &err)
-        guard err == 0 else { // MPG123_OK
+        // guard err is 0
+        guard err == 0, self.mpg123Handle != nil else { 
+            // else error
+            // create error message
             let msg = "[Mp3AudioPlayer].play(). mpg123_new failed with value: \(err) = '\(renderMpg123Error(error: err))'. Failed to create mpg123 handle"
+            // throw error
             throw CmpError(message: msg)
         }
-
-        // Open the file
+        // open and prepare to decode path file
         err = mpg123_open(self.mpg123Handle, self.filePath.path)
-        if err != 0 { // MPG123_OK
+        // guard err is 0
+        guard err == 0 else { 
+            // else error
+            // create error message
             let msg = "[Mp3AudioPlayer].play(). mpg123_open failed with value: \(err) = '\(renderMpg123Error(error: err))'. Failed to open MP3 file: \(self.filePath.lastPathComponent)"
-
+            // delete handle
             mpg123_delete(self.mpg123Handle)
+            // set handle to nil
             self.mpg123Handle = nil
-
+            // throw error
             throw CmpError(message: msg)
         }
-
-        //
-        // find duration
-        //                      
+        // scan through file so we can get proper length
         err = mpg123_scan(self.mpg123Handle)
-        if err != 0 {                
+        // guard err is 0
+        guard err == 0 else {                
+            // else error
+            // create error message
             let msg = "[Mp3AudioPlayer].play(). mpg123_scan failed with value: \(err) = '\(renderMpg123Error(error: err))'. File: \(self.filePath.path.lastPathComponent)"
+            // close handle
             mpg123_close(self.mpg123Handle)
+            // delete handle
             mpg123_delete(self.mpg123Handle)            
+            // throw error
             throw CmpError(message: msg)                
         }
-
+        // get full length of file in frames
         self.m_length = mpg123_length(self.mpg123Handle)
-        if self.m_length <= 0 {
+        // guard length is > 0
+        guard self.m_length > 0 else {
+            // else error
             let msg = "[Mp3AudioPlayer].play(). mpg123_length failed with value: \(self.m_length)"
+            // close handle
             mpg123_close(self.mpg123Handle)
+            // delete handle
             mpg123_delete(self.mpg123Handle)
+            // throw error
             throw CmpError(message: msg)
         }
-
-        // Get the rate and channels to calculate duration
+        // create rate variable
         var rate: CLong = 0
+        // create channels variable
         var channels: Int32 = 0
+        // create encoding variable
         var encoding: Int32 = 0
-
+        // get current output format
         err = mpg123_getformat(mpg123Handle, &rate, &channels, &encoding)
-        if err != 0 { // MPG123_OK
+        // guard err is 0
+        guard err == 0 else {
+            // else error
+            // create error message
             let msg = "[Mp3AudioPlayer].play(). mpg123_getformat failed with value: \(err) = '\(renderMpg123Error(error: err))'. Failed to get MP3 format."
-
+            // close handle
             mpg123_close(self.mpg123Handle)
+            // delete handle
             mpg123_delete(self.mpg123Handle)
+            // set handle variable to nil
             self.mpg123Handle = nil
-            
+            // throw error
             throw CmpError(message: msg)
         }        
-
+        // set self.m_rate to rate
         self.m_rate = rate
+        // set self.m_channels to channels
         self.m_channels = channels
-
-        // Calculate duration in seconds
+        // calculate duration in seconds
         let duration = Double(self.m_length) / Double(self.m_rate)
+        // calculate and set m_duration (ms)
         self.m_duration = UInt64(duration * 1000)
-        
+        // guard duration > 0
         guard self.m_duration > 0 else {
+            // else error
+            // create error message
             let msg = "[Mp3AudioPlayer].play(). Duration was invalid with value: \(self.m_duration)"                        
+            // close handle
+            mpg123_close(self.mpg123Handle)
+            // delete handle
+            mpg123_delete(self.mpg123Handle)
+            // set handle variable to nil
+            self.mpg123Handle = nil
+            // throw error
             throw CmpError(message: msg)
         }
-
-
-        // Ensure the output format doesn't change
+        // configure to set no format
         mpg123_format_none(mpg123Handle)
-        mpg123_format(mpg123Handle, rate, channels, encoding)
-
-        // get default libao playback driver
+        // set audio format 
+        mpg123_format(mpg123Handle, 44100, 2, encoding);//rate, channels, encoding)
+        // get default libao playback driver id
         let defaultDriver = ao_default_driver_id()
-
         // Set up libao format        
+        // set bits per sample
         self.m_audioState.aoFormat.bits = 16
-        self.m_audioState.aoFormat.channels = channels
-        self.m_audioState.aoFormat.rate = Int32(rate)
+        // set channels, 2 = stereo
+        self.m_audioState.aoFormat.channels = 2
+        // set sample rate
+        self.m_audioState.aoFormat.rate = 44100
+        // set byte format
         self.m_audioState.aoFormat.byte_format = AO_FMT_NATIVE
+        // set matrix
         self.m_audioState.aoFormat.matrix = nil
         // Set up libasound format        
+        // set channels, 2 = stereo
         self.m_audioState.alsaState.channels = 2
+        // set sample rate
         self.m_audioState.alsaState.sampleRate = 44100 
+        // set buffer size
         self.m_audioState.alsaState.bufferSize = 1024 
-
-        // open for playing
+        // if output sound library is .ao
         if PlayerPreferences.outputSoundLibrary == .ao {
             self.m_audioState.aoDevice = ao_open_live(defaultDriver, &self.m_audioState.aoFormat, nil)
             if self.m_audioState.aoDevice == nil {
@@ -208,7 +247,8 @@ internal class Mp3AudioPlayer {
                 throw CmpError(message:msg)
             }
         }
-        else {
+        // else if output sound library is .alsa
+        else if PlayerPreferences.outputSoundLibrary == .alsa {
             var err = snd_pcm_open(&self.m_audioState.alsaState.pcmHandle, self.m_audioState.alsaState.pcmDeviceName, SND_PCM_STREAM_PLAYBACK, 0)
             guard err >= 0 else {
                 let msg = "[Mp3AudioPlayer].play(). alsa. snd_pcm_open failed with value: \(err) = '\(renderAlsaError(error: err))'. Failed to open ALSA PCM device."
@@ -231,8 +271,9 @@ internal class Mp3AudioPlayer {
                 throw CmpError(message: msg)
             }
         }
-
+        // run code async
         self.audioQueue.async { [weak self] in
+            // play audio
             self?.playAsync()
         }
     }
@@ -275,82 +316,113 @@ internal class Mp3AudioPlayer {
             self.m_isPaused = false
             // set m_stopFlag to true
             self.m_stopFlag = true
+            // log debug
+            PlayerLog.ApplicationLog?.logDebug(title: "[Mp3AudioPlayer].playAsync()@defer", text: self.filePath.path)      
         }
-        // Buffer for audio output
+        // buffer size for audio output
         let bufferSize = mpg123_outblock(mpg123Handle)
+        // buffer of bufferSize
         var buffer = [UInt8](repeating: 0, count: bufferSize)
-        var done: Int = 0
+        // bytes read from mpg123_read
+        var bytesRead: Int = 0
+        // flag for when it is time for a crossfade
         var timeToStartCrossfade: Bool = false
+        // current volume for crossfade
         var currentVolume: Float = 1
-
+        // reset m_timeElapsed
         self.m_timeElapsed = 0
-
         // Decode and play the file        
         while !self.m_stopFlag && !g_quit {
+            // are we supposed to do a seek
             if (self.m_doSeekToPos) {
+                // set m_doSeekToPos flag to false
                 self.m_doSeekToPos = false
-                
+                // calculate sekk pos seconds
                 let seconds: UInt64 = (self.duration - self.m_seekPos) / 1000
+                // calculate new position
                 let newPos: off_t = off_t(seconds) * self.m_rate
+                // seek to desired sample offset
                 let offset: off_t = mpg123_seek(self.mpg123Handle, newPos, SEEK_SET)
+                // check for success
                 if offset >= 0 {
+                    // success, calculate seconds
                     let offsetSeconds: Double = Double(offset) / Double(self.m_rate)
+                    // calculate ms
                     let offsetMs: UInt64 = UInt64(offsetSeconds) * 1000
+                    // set m_timeElapsed
                     self.m_timeElapsed = offsetMs
                 }
             }
-            let err = mpg123_read(self.mpg123Handle, &buffer, bufferSize, &done)
+            // read from stream and decode
+            let err = mpg123_read(self.mpg123Handle, &buffer, bufferSize, &bytesRead)
+            // if we are done
             if err == -12 { // MPG123_DONE
+                // return, we are finished
                 return
             }
+            // check for error
             if (err != 0) { // MPG123_OK
-                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: "mpg123_read failed with value: \(err) = '\(renderMpg123Error(error: err))'. File: \(self.filePath.lastPathComponent)")
+                // create error message
+                let msg = "mpg123_read failed with value: \(err) = '\(renderMpg123Error(error: err))'. File: \(self.filePath.lastPathComponent)"
+                // log message
+                PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: msg)
+                // return
                 return
             }
-            if done <= 0 {                 
+            // if bytes read is 0 or negative
+            if bytesRead <= 0 {              
+                // invalid read, return   
                 return;
             }
-
-            // Update time elapsed                
-            let totalPerChannel = done / Int(self.m_channels)
-            let currentDuration = Double(totalPerChannel) / Double(self.m_rate)
+            // calculate total current number of bytes per channel
+            let totalCurrentBytesPerChannel = bytesRead / Int(self.m_channels)
+            // calculate current duration of read samples
+            let currentDuration = Double(totalCurrentBytesPerChannel) / Double(self.m_rate)
+            // update time elapsed
             self.m_timeElapsed += UInt64(currentDuration * Double(1000/self.m_channels))
-
-            // set crossfade volume
+            // calculate time left
             let timeLeft: UInt64 = (self.duration >= self.m_timeElapsed) ? self.duration - self.m_timeElapsed : self.duration
+            // if time left is inside fade duration
             if timeLeft > 0 && timeLeft <= self.m_targetFadeDuration {
+                // set timeToStartCrossfade flag to true
                 timeToStartCrossfade = true
-
+                // calculate current volume
                 currentVolume = Float(Float(timeLeft)/Float(self.m_targetFadeDuration))                    
             }            
-
-            // check buffer
+            // guard buffer is not empty
             guard !buffer.isEmpty else {
+                // else create an error message
                 let msg = "Buffer is empty"
+                // log error
                 PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: msg)
+                // return
                 return
             }
-
-            // play samples
+            // get read/write pointer
             buffer.withUnsafeMutableBytes { bufferPointer in
+                // set pointer to buffer
                 let pointer = bufferPointer.baseAddress!.assumingMemoryBound(to: Int8.self)
-
-                // adjust crossfade volume
+                // if we are to crossfade
                 if self.m_enableCrossfade && timeToStartCrossfade {
-                    adjustVolume(buffer: pointer, size: Int(done), volume: currentVolume)                        
+                    // adjust volume
+                    adjustVolume(buffer: pointer, size: Int(bytesRead), volume: currentVolume)                        
                 }
-
-                // play audio samples
+                // if .ao
                 if PlayerPreferences.outputSoundLibrary == .ao {
-                    ao_play(self.m_audioState.aoDevice, pointer, UInt32(done))
+                    // play audio through ao
+                    ao_play(self.m_audioState.aoDevice, pointer, UInt32(bytesRead))
                 }
+                // else if .alsa
                 else if PlayerPreferences.outputSoundLibrary == .alsa {
-                    let frames = Int(done) / 2 / Int(self.m_audioState.alsaState.channels)
+                    // calculate frames
+                    let frames = Int(bytesRead) / 2 / Int(self.m_audioState.alsaState.channels)
+                    // play audio through alsa
                     snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, pointer, snd_pcm_uframes_t(frames))
                 }
             }            
-
+            // if we are !paused! and not stopping and not quitting
             while (self.m_isPaused && !self.m_stopFlag && !g_quit) {
+                // sleep for 100 ms
                 usleep(100_000)
             }
         }
