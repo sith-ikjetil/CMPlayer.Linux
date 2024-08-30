@@ -191,10 +191,16 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
         
         Console.printXY(1, 5, "Current Path: " + self.currentPath, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        let pstFiles: String = "\(self.filesFoundCompleted)% (\(self.countFindSongs) files)"
+        var pstFiles: String = "\(self.filesFoundCompleted)"
+        if self.countFindSongs > 0 {
+            pstFiles += " (\(self.countFindSongs) files found)"
+        } 
         Console.printXY(1, 6, "Finding Song Files: " + pstFiles, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        let pstLib: String = "\(self.libraryLoadedCompleted)% (\(self.countFoundMetadata) files)"
+        var pstLib: String = "\(self.libraryLoadedCompleted)%"
+        if self.countFoundMetadata > 0 {
+            pstLib += " (gathered metadata from \(self.countFoundMetadata) files)"
+        } 
         Console.printXY(1, 7, "Updating Song Library: " + pstLib, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         Console.printXY(1,g_rows-1,"PLEASE BE PATIENT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
@@ -206,14 +212,17 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     /// Runs HelpWindow keyboard input and feedback.
     ///
     func run() -> Void {
+        // clear screen current theme
         Console.clearScreenCurrentTheme()
+        // loop while we are not finished
         while !self.isFinished {
+            // if we can paint
             if !g_doNotPaint {
+                // render window
                 self.renderWindow()
-            }
-    
-            let second: Double = 1_000_000
-            usleep(useconds_t(0.050 * second))
+            }    
+            // sleep 100 ms
+            usleep(100_000)
         }
     }// run
 }// InitializeWindow
