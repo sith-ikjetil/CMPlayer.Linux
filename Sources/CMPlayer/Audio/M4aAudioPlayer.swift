@@ -35,7 +35,7 @@ internal struct M4aAudioState {
 //
 // av_ch_layout_stereo
 //
-let av_ch_layout_stereo: Int32 = 1|2
+let av_ch_layout_stereo: Int32 = 1|2    // constant stereo layout
 //
 // Represents CMPlayer AudioPlayer.
 //
@@ -43,49 +43,51 @@ internal class M4aAudioPlayer {
     ///
     /// constants
     ///
-    private let filePath: URL    
+    private let filePath: URL    // file path to song we are playing
     private let audioQueue = DispatchQueue(label: "dqueue.cmp.linux.m4a-audio-player", qos: .background)
     ///
     /// variables
     ///
-    private var m_length: off_t = 0
-    private var m_rate: CLong = 0    
-    private var m_stopFlag: Bool = false
-    private var m_isPlaying: Bool = false
-    private var m_isPaused: Bool = false
-    private var m_hasPlayed: Bool = false
-    private var m_timeElapsed: UInt64 = 0
-    private var m_duration: UInt64 = 0
-    private var m_channels: Int32 = 2
-    private var m_audioState: M4aAudioState = M4aAudioState()
-    private var m_targetFadeVolume: Float = 1
-    private var m_targetFadeDuration: UInt64 = 0
-    private var m_enableCrossfade: Bool = false
-    private var m_seekPos: UInt64 = 0
-    private var m_doSeekToPos: Bool = false
+    private var m_stopFlag: Bool = false        // true == we must stop playing
+    private var m_isPlaying: Bool = false       // true == we are currently in playing process
+    private var m_isPaused: Bool = false        // true == we are currently playing, but are paused
+    private var m_hasPlayed: Bool = false       // true == we have played
+    private var m_timeElapsed: UInt64 = 0       // amount (milliseconds) of time we have played
+    private var m_duration: UInt64 = 0          // amount (milliseconds) of time in song we are playing
+    private var m_audioState: M4aAudioState = M4aAudioState()   // ao/alsa/ffmpeg audio state
+    private var m_targetFadeVolume: Float = 1       // target fade volume. 1 = 100%, 0 = 0% (muted) 
+    private var m_targetFadeDuration: UInt64 = 0    // duration (milliseconds) the crossfade should take
+    private var m_enableCrossfade: Bool = false     // true == we are doing a crossfade
+    private var m_seekPos: UInt64 = 0               // position (milliseconds) of time left in the song we shoudl jump/seek to
+    private var m_doSeekToPos: Bool = false         // true == we are doing a seek
     ///
     /// get properties
     ///
+    // return if we are currently playing
     var isPlaying: Bool {
         get {
             return self.m_isPlaying
         }
     }
+    // return if we are playing but are paused
     var isPaused: Bool {
         get {
             return self.m_isPaused
         }
     }
+    // return if we have played and have finished
     var hasPlayed: Bool {
         get {
             return self.m_hasPlayed
         }
     }    
+    // return time elapsed in currently playing song
     var timeElapsed: UInt64 {
         get {
             return self.m_timeElapsed
         }
     }
+    // return duration of currently playing song
     var duration: UInt64 {
         get {
             return self.m_duration
@@ -95,6 +97,7 @@ internal class M4aAudioPlayer {
     /// Only initializer
     ///
     init(path: URL) {
+        // set filePath to path
         self.filePath = path        
     }
     ///
@@ -642,23 +645,29 @@ internal class M4aAudioPlayer {
     /// - Parameter position: ms from start
     func seekToPos(position: UInt64)
     {
+        // check position is valid
         guard position <= self.duration else {
+            // else return
             return
         }
-
+        // set m_seekPos to position
         self.m_seekPos = position
+        // set m_doSeekToPos flag to true
         self.m_doSeekToPos = true
     }
     /// 
     /// Adjusts volume in the sample buffer to a factor 0.0-1.0
     ///     
     func adjustVolume(buffer: UnsafeMutablePointer<Int8>, size: Int, volume: Float) {
+        // number of samples
         let sampleCount = size / MemoryLayout<Int16>.size
+        // pointer to samples
         let samples = buffer.withMemoryRebound(to: Int16.self, capacity: sampleCount) { $0 }
-
+        // for each sample
         for i in 0..<sampleCount {
+            // adjusted sample
             let adjustedSample = Float(samples[i]) * volume
-            // Ensure the value is within the Int16 range
+            // ensure the value is within the Int16 range
             samples[i] = Int16(max(min(adjustedSample, Float(Int16.max)), Float(Int16.min)))
         }
     }
@@ -668,28 +677,35 @@ internal class M4aAudioPlayer {
     ///   - volume: target volume. usually 0.
     ///   - duration: time from end of song, fading should be done.
     func setCrossfadeVolume(volume: Float, fadeDuration: UInt64) {
+        // if volume is valid
         guard volume >= 0 && volume <= 1 else {
+            // else return
             return
         }
-        
+        // if crossfade time is valid
         guard isCrossfadeTimeValid(seconds: Int(fadeDuration / 1000)) else {
+            // else return
             return
         }
-
+        // set target volume
         self.m_targetFadeVolume = volume
+        // set crossfade duration
         self.m_targetFadeDuration = fadeDuration
+        // set m_enableCrossfade flag to true
         self.m_enableCrossfade = true
     }
     ///
     /// stops playback if we are playing.
     /// 
     func stop() {
+        // we are stopping so set the m_stopFlag to true
         self.m_stopFlag = true
     }
     ///
     /// pauses playback if we are playing
     /// 
     func pause() {
+        // we are pausing so set the m_isPaused to true
         self.m_isPaused = true
     }
     ///
@@ -705,56 +721,81 @@ internal class M4aAudioPlayer {
     /// - Returns: CmpMetadata
     /// 
     static func gatherMetadata(path: URL) throws -> CmpMetadata {
+        // create a metadata instance
         let metadata = CmpMetadata()              
+        // if path points to a m4a file
         if path.path.lowercased().hasSuffix(".m4a") {
+            // set filename
             let filename = path.path
-            var formatContext: UnsafeMutablePointer<AVFormatContext>? = nil            
-            
-            // Open the file
+            // create a pointer read/write variable
+            var formatContext: UnsafeMutablePointer<AVFormatContext>? = nil                        
+            // open input stream
             var err = avformat_open_input(&formatContext, filename, nil, nil)
+            // if error
             if err != 0 {
+                // create error message
                 let msg = "[M4aAudioPlayer].gatherMetadata(). avformat_open_input failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+                // throw error
                 throw CmpError(message: msg)
             }
-
+            // ensure cleanup by defer
             defer {
                 // close opened input
                 avformat_close_input(&formatContext)
             }
-
             // Retrieve stream information
             err = avformat_find_stream_info(formatContext, nil)
+            // if error
             if err < 0 {
-                avformat_close_input(&formatContext)
+                // create error message
                 let msg = "[M4aAudioPlayer].gatherMetadata(). avformat_find_stream_info failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+                // close opened input
+                avformat_close_input(&formatContext)
+                // throw error                
                 throw CmpError(message: msg)
             }
-
-            // Calculate duration in seconds
+            // if formatCtx is valid and it has a duration
             if let formatCtx = formatContext, formatCtx.pointee.duration != 0x00 { // AV_NOPTS_VALUE {
+                // set duration in seconds
                 let durationInSeconds = Double(formatCtx.pointee.duration) / Double(AV_TIME_BASE)                
-                if durationInSeconds <= 0 {                    
+                // if duration in seconds is negative or 0
+                if durationInSeconds <= 0 {               
+                    // create error message     
                     let msg = "[M4aAudioPlayer].gatherMetadata(). duration <= 0. \(durationInSeconds) seconds"
+                    // close opened input
+                    avformat_close_input(&formatContext)
+                    // throw error
                     throw CmpError(message: msg)
                 }
                 metadata.duration = UInt64(durationInSeconds * 1000)
             }
+            // else formatCtx is invalid or duration is 0
             else {
+                // create error message
                 let msg = "[M4aAudioPlayer].gatherMetadata(). Cannot find duration."
+                // close opened input
+                avformat_close_input(&formatContext)
+                // throw error
                 throw CmpError(message: msg)
             }      
-
+            // if formatContext is invalid or formatContext metadata is invalid
             if formatContext == nil || formatContext?.pointee.metadata == nil {
-                // Handle the nil case appropriately
+                // create error message
                 let msg = "[M4aAudioPlayer].gatherMetadata(). formatContext/metadata is nil."
+                // close opened input
+                avformat_close_input(&formatContext)
+                // throw error
                 throw CmpError(message: msg)
             }
-
-            // Print metadata
+            // create a read/write pointer
             var tag: UnsafeMutablePointer<AVDictionaryEntry>? = nil
+            // loop so long as av_dict_get returns a valid nextTag pointer
             while let nextTag = av_dict_get(formatContext?.pointee.metadata, "", tag, AV_DICT_IGNORE_SUFFIX) {
+                // if key and value are valid pointers
                 if let key = nextTag.pointee.key, let value = nextTag.pointee.value {
+                    // set checkKey to key
                     let checkKey = String(cString: key).lowercased()
+                    // switch checkKey
                     switch checkKey {
                         case "artist":
                             metadata.artist = String(cString: value)
@@ -771,15 +812,19 @@ internal class M4aAudioPlayer {
                                 metadata.recordingYear = extractMetadataYear(text: String(cString: value))
                             }                
                         default:
+                            // set tag to next tag
                             tag = nextTag                            
                     }                    
                 }
+                // set tag to next tag
                 tag = nextTag
-            }                                                
+            }         
+            // return metadata                                       
             return metadata         
         }
-
+        // create error message
         let msg = "[M4aAudioPlayer].gatherMetadata(). Unknown file type from file: \(path.path)"
+        // throw error
         throw CmpError(message: msg)
     }
 }// AudioPlayer
