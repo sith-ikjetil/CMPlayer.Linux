@@ -299,7 +299,7 @@ internal class M4aAudioPlayer {
         av_channel_layout_default(&self.m_audioState.chLayoutOut, 2);
         // set channel layout to SwrCtx
         err = av_opt_set_chlayout(rawSwrCtxPtr, "out_chlayout", &self.m_audioState.chLayoutOut, 0)
-        if ret < 0 {
+        if err < 0 {
             // create error message
             let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout OUT failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // free swrCtx
