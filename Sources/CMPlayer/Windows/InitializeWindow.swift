@@ -22,6 +22,8 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     private var isFinished: Bool = false
     private var currentPath: String = ""    
     private var musicFormats: [String] = []
+    private var countFindSongs: Int = 0
+    private var countFoundMetadata: Int = 0
     ///
     /// private constants
     /// 
@@ -78,7 +80,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
                     do {
                         // Attempt to create a song entry object
                         let songEntry = try SongEntry(path: URL(fileURLWithPath: r),songNo: nasno)
-                        
+                        self.countFoundMetadata += 1
                         // If successfull add to g_songs
                         g_songs.append(songEntry)
                     }
@@ -136,6 +138,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
                     if FileManager.default.isReadableFile(atPath: nr) {
                         for f in self.musicFormats {
                             if r.hasSuffix(f) {
+                                self.countFindSongs += 1 // count variable
                                 results.append(nr)                 
                                 break
                             }
@@ -188,10 +191,10 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
         
         Console.printXY(1, 5, "Current Path: " + self.currentPath, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        let pstFiles: String = "\(self.filesFoundCompleted)%"
+        let pstFiles: String = "\(self.filesFoundCompleted)% (\(self.countFindSongs) files)"
         Console.printXY(1, 6, "Finding Song Files: " + pstFiles, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
-        let pstLib: String = "\(self.libraryLoadedCompleted)%"
+        let pstLib: String = "\(self.libraryLoadedCompleted)% (\(self.countFoundMetadata) files)"
         Console.printXY(1, 7, "Updating Song Library: " + pstLib, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         
         Console.printXY(1,g_rows-1,"PLEASE BE PATIENT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
