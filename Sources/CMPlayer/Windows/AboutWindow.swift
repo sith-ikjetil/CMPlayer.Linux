@@ -36,7 +36,7 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
     /// Shows this AboutWindow on screen.
     ///
     func showWindow() -> Void {
-        // set aboutIndex to frist aboutText item
+        // set aboutIndex to first aboutText item
         self.aboutIndex = 0
         // add to top this window to terminal size change protocol stack
         g_tscpStack.append(self)
