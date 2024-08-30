@@ -17,7 +17,7 @@ import Casound
 internal struct M4aAudioState {
     var formatCtx: UnsafeMutablePointer<AVFormatContext>?
     var codecCtx: UnsafeMutablePointer<AVCodecContext>?   
-#if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+#if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
     var codec: UnsafePointer<AVCodec>?          // ffmpeg version 6    
     var chLayoutIn: AVChannelLayout = AVChannelLayout()
     var chLayoutOut: AVChannelLayout = AVChannelLayout()
@@ -193,7 +193,7 @@ internal class M4aAudioPlayer {
         // get codec parameters
         let codecpar = self.m_audioState.formatCtx!.pointee.streams![Int(self.m_audioState.audioStreamIndex)]!.pointee.codecpar
         // find the decoder for the audio stream 
-#if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+#if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
         self.m_audioState.codec = avcodec_find_decoder(codecpar!.pointee.codec_id)
 #elseif CMP_FFMPEG_V4
         self.m_audioState.codec = UnsafeMutablePointer(mutating: avcodec_find_decoder(codecpar!.pointee.codec_id))
@@ -260,7 +260,7 @@ internal class M4aAudioPlayer {
         self.m_audioState.swrCtx = swr_alloc()
         // create a mutable raw pointer
         let rawSwrCtxPtr: UnsafeMutableRawPointer? = UnsafeMutableRawPointer(self.m_audioState.swrCtx)
-#if CMP_FFMPEG_V6 || CMP_FFMPEG_V7     
+#if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7     
         // copy channel layout from ch_layout to chLayoutIn
         err = av_channel_layout_copy(&self.m_audioState.chLayoutIn, &self.m_audioState.codecCtx!.pointee.ch_layout)        
         // if error
@@ -370,7 +370,7 @@ internal class M4aAudioPlayer {
             if self.m_audioState.device == nil {
                 // create error message
                 let msg = "[M4aAudioPlayer].play(). ao_open_live failed with value: nil. Error opening audio device."
-    #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+    #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
                 // uninitialize ch layout in
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
                 // uninitialize ch layout out
@@ -396,7 +396,7 @@ internal class M4aAudioPlayer {
             guard err >= 0 else {
                 // create error message
                 let msg = "[M4aAudioPlayer].play(). alsa. snd_pcm_open failed with value: \(err) = '\(renderAlsaError(error: err))'"
-    #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+    #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
                 // uninitialize ch layout in
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
                 // uninitialize ch layout out
@@ -419,7 +419,7 @@ internal class M4aAudioPlayer {
             guard err >= 0 else {
                 // create error message
                 let msg = "[M4aAudioPlayer].play(). alsa. snd_pcm_set_params failed with value: \(err) = '\(renderAlsaError(error: err))'"
-    #if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+    #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
                 // uninitialize ch layout in
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
                 // uninitialize ch layout out
@@ -454,7 +454,7 @@ internal class M4aAudioPlayer {
         PlayerLog.ApplicationLog?.logInformation(title: "[M4aAudioPlayer].playAsync()", text: "Started playing: \(self.filePath.lastPathComponent)")
         // Clean up using defer
         defer {                        
-#if CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+#if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
             // uninit chLayoutIn
             av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
             // uninit chLayoutOut
