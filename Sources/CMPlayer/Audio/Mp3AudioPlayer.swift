@@ -320,9 +320,9 @@ internal class Mp3AudioPlayer {
             PlayerLog.ApplicationLog?.logDebug(title: "[Mp3AudioPlayer].playAsync()@defer", text: self.filePath.path)      
         }
         // buffer size for audio output
-        let bufferSize = mpg123_outblock(mpg123Handle)
+        let bufferSize: Int = max(mpg123_outblock(self.mpg123Handle), 1024*2*2)
         // buffer of bufferSize
-        var buffer = [UInt8](repeating: 0, count: bufferSize)
+        var buffer: [UInt8] = [UInt8](repeating: 0, count: bufferSize)
         // bytes read from mpg123_read
         var bytesRead: Int = 0
         // flag for when it is time for a crossfade
@@ -354,7 +354,7 @@ internal class Mp3AudioPlayer {
                 }
             }
             // read from stream and decode
-            let err = mpg123_read(self.mpg123Handle, &buffer, bufferSize, &bytesRead)
+            let err: Int32 = mpg123_read(self.mpg123Handle, &buffer, bufferSize, &bytesRead)
             // if we are done
             if err == -12 { // MPG123_DONE
                 // return, we are finished
