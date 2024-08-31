@@ -14,7 +14,7 @@ import Cao
 import Casound
 
 ///
-/// Audio state variables.
+/// Mp3 Audio state.
 ///
 internal struct Mp3AudioState {    
     var aoDevice: OpaquePointer? = nil
