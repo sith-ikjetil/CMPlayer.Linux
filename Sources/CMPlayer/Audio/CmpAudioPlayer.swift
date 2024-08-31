@@ -118,9 +118,11 @@ internal class CmpAudioPlayer {
         self.filePath = path       
         if path.path.lowercased().hasSuffix(".mp3") {
             self.mp3Player = Mp3AudioPlayer(path: path);            
+            return
         }
         else if path.path.lowercased().hasSuffix(".m4a") {
             self.m4aPlayer = M4aAudioPlayer(path: path);            
+            return
         }
 
         let msg: String = "[CmpAudioPlayer].init. Invalid media type. Not supported. File: \(path.path)"
