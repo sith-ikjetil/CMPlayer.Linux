@@ -327,7 +327,7 @@ internal class Mp3AudioPlayer {
         }
         // set minimum buffer size for audio output 
         // mpg123_outblock = maximum decoded data size in bytes, minimum buffer size
-        let bufferSize: Int = max(mpg123_outblock(self.mpg123Handle), 4096*2*2)//1024
+        let bufferSize: Int = max(mpg123_outblock(self.mpg123Handle), 1024*2*2)
         // buffer of bufferSize
         var buffer: [UInt8] = [UInt8](repeating: 0, count: bufferSize)
         // bytes read from mpg123_read
