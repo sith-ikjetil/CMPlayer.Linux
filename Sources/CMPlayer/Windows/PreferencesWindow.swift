@@ -18,7 +18,7 @@ internal class PreferencesWindow : TerminalSizeHasChangedProtocol, PlayerWindowP
     // private variables
     //
     private var preferencesIndex: Int = 0           // index int preferencesText
-    private var preferencesText: [String] = []    
+    private var preferencesText: [String] = []      // preferences text to show on screen
     ///
     /// Shows this HelpWindow on screen.
     ///
