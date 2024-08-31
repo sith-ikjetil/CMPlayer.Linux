@@ -114,7 +114,7 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         print("")
     }    
     ///
-    /// Runs AboutWindow keyboard input and feedback.
+    /// Runs this window keyboard input and feedback.
     ///
     func run() -> Void {
         // clear screen current theme
@@ -125,8 +125,7 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         self.renderWindow()
         // create a ConsoleKeyboardHandler constant
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
-        // add key handler for key down
-        // move down one line
+        // add key handler for key down (move down one line)        
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
             // if we have rendered less than abouText.count
             if (self.aboutIndex + (g_rows-7)) <= self.aboutText.count {
@@ -138,8 +137,7 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             // do not return from run()
             return false
         })
-        // add key handler for key up
-        // move up one line
+        // add key handler for key up (move up one line)        
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
             // if aboutIndex is greater than 0
             if self.aboutIndex > 0 {
@@ -151,8 +149,7 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             // do not return from run()
             return false
         })
-        // add key handler for key left
-        // move up one page
+        // add key handler for key left (move up one page)        
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
             // if abouIndex > 0 and we have more text in aboutText than fits the window
             if self.aboutIndex > 0 && self.aboutText.count > (g_rows-7) {
@@ -172,7 +169,7 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             // do not return from run()
             return false
         })
-        // add key handler for key right
+        // add key handler for key right (move down one page)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
             // if aboutIndex > 0 we have more text left in aboutText then next window size
             if self.aboutIndex >= 0 && self.aboutText.count > (g_rows-7) {

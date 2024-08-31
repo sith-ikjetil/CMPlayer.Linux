@@ -41,7 +41,7 @@ internal class ErrorWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         self.renderWindow()
     }    
     //
-    // Run method.
+    // Runs this window keyboard input and feedback.
     //
     func run() -> Void {     
          // clear screen current theme

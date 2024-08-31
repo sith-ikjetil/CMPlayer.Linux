@@ -155,7 +155,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         print("")
     }    
     ///
-    /// Runs HelpWindow keyboard input and feedback.
+    /// Runs this window keyboard input and feedback.
     ///
     func run() -> Void {
         // clear screen current theme
@@ -166,7 +166,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         self.renderWindow()
         // create a ConsoleKeyboardHandler constant
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
-        // add key handler for key down
+        // add key handler for key down (move down one line)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
             // if helpIndex + page size is less than helpText count
             if (self.helpIndex+(g_rows-7)) <= self.helpText.count {
@@ -178,7 +178,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // do not return from keyHandler.run()
             return false
         })
-        // add key handler for key up
+        // add key handler for key up (move up one line)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
             // if helpIndex >= 1
             if self.helpIndex >= 1 {
@@ -190,7 +190,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // do not return from keyHandler.run()
             return false
         })
-        // add key handler for key left
+        // add key handler for key left (move up one page)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
             // if helpIndex count is larger than a page size
             if self.helpIndex > 0  && self.helpText.count > (g_rows-7) {
@@ -210,7 +210,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // do not return from keyHandler.run()
             return false
         })
-        // add key handler for key right
+        // add key handler for key right (move down one page)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
             // if helpText count is greater than a page size
             if self.helpIndex >= 0  && self.helpText.count > (g_rows-7) {

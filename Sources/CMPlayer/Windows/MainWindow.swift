@@ -341,7 +341,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         print("")
     }    
     ///
-    /// Runs MainWindow keyboard input and feedback. Delegation to other windows and command processing.
+    /// Runs this window keyboard input and feedback.
+    /// Delegation to other windows and command processing.
     ///
     func run() -> Void {
         // clear screen with current theme backgorund color

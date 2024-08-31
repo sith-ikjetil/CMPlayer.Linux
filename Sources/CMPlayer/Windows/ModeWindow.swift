@@ -183,7 +183,7 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         print("")
     }          
     ///
-    /// Runs AboutWindow keyboard input and feedback.
+    /// Runs this window keyboard input and feedback.
     ///
     func run() -> Void {
         Console.clearScreenCurrentTheme()

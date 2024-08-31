@@ -136,7 +136,7 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         print("")
     }  
     ///
-    /// Runs AboutWindow keyboard input and feedback.
+    /// Runs this window keyboard input and feedback.
     ///
     func run() -> Void {
         // clear screen current theme
@@ -147,7 +147,7 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         self.renderWindow()        
         // create a ConsoleKeyboardHandler constant
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
-        // add key handler for key down
+        // add key handler for key down (move down one line)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
             // if genreIndex plus a page size is less than genreText count
             if (self.genreIndex + (g_rows-7)) <= self.genreText.count {
@@ -159,7 +159,7 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             // do not return from keyHandler.run()
             return false
         })
-        // add key handler for key up
+        // add key handler for key up (move up one line)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
             // if genreIndex is larger or equal than 1
             if self.genreIndex >= 1 
@@ -172,7 +172,7 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             // do not return from keyHandler.run()
             return false
         })
-        // add key handler for key left
+        // add key handler for key left (move up one page)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
             // if genreText count is greated than a page size
             if self.genreIndex > 0 && self.genreText.count > (g_rows-7) {
@@ -192,7 +192,7 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             // do not return from keyHandler.run()
             return false
         })
-        // add key handler for key right
+        // add key handler for key right (move down one page)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
             // if genreText count is greated than a page size
             if self.genreIndex >= 0 && self.genreText.count > (g_rows-7) {

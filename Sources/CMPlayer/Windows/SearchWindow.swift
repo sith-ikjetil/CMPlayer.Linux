@@ -395,7 +395,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         print("")
     }        
     ///
-    /// Runs SearchWindow keyboard input and feedback.
+    /// Runs this window keyboard input and feedback.
     ///
     /// parameter parts: command parts from search input command.
     ///

@@ -99,12 +99,12 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         while index_search < max {
             // if index_screen_lines is reaching forbidden area on screen
             if index_screen_lines >= (g_rows-3) {
-                // break loop
+                // discontinue loop
                 break
             }
             // if index_search has reached artistText count
             if index_search >= artistText.count {
-                // break loop
+                // discontinue loop
                 break
             }
             // set se to artistText item
@@ -134,7 +134,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         print("")
     }
     ///
-    /// Runs AboutWindow keyboard input and feedback.
+    /// Runs this window keyboard input and feedback.
     ///
     func run() -> Void {
         // clear screen current theme
@@ -145,7 +145,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         self.renderWindow()
         // create a ConsoleKeyboardHandler constant
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
-        // add key handler for key down
+        // add key handler for key down (move down one line)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in
             // if artistIndex + page size is less than artistText count
             if (self.artistIndex + (g_rows-7)) <= self.artistText.count {
@@ -157,7 +157,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             // do not return from keyHandler.run()
             return false
         })
-        // add key handler for key up
+        // add key handler for key up (move up one line)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
             // if artistIndex is larger than 1
             if self.artistIndex >= 1 {
@@ -169,7 +169,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             // do not return from keyHandler.run()
             return false
         })
-        // add key handler for key left
+        // add key handler for key left (move up one page)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in
             // if artistText count is larger than a page size
             if self.artistIndex > 0 && self.artistText.count > (g_rows-7) {
@@ -189,7 +189,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             // do not return from keyHandler.run()
             return false
         })
-        // add key handler for key right
+        // add key handler for key right (move down one page)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in
             // if artistText count is larget than page size
             if self.artistIndex >= 0 && self.artistText.count > (g_rows-7) {

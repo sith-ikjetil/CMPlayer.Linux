@@ -98,7 +98,7 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         Console.printXY(1,5+self.setupText.count + 1, ":> \(self.path)\(self.cursor)", g_cols, .left, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
     }
     ///
-    /// Runs InitialSetupWindow keyboard input and feedback.
+    /// Runs this window keyboard input and feedback.
     ///
     /// returns: Bool. True if path entered, false otherwise.
     ///
