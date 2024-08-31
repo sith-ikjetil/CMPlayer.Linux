@@ -226,19 +226,9 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
     ///
     /// parameter terms: Array of search terms.
     ///
-    func performSearch(terms: [String], type: SearchType) -> Void {
-        // loop and find if we are in a mode of same type as type
-        for t in g_searchType {
-            // type is the same
-            if t == type {
-                // set modOff flag to true
-                modeOff = true
-                // discontinue loop
-                break;
-            }
-        }
+    func performSearch(terms: [String], type: SearchType) -> Void {        
         // if we have a mode and global serach result has items
-        if !modeOff && g_searchResult.count > 0 {
+        if g_searchResult.count > 0 {
             // perform a narrowing search
             performNarrowSearch(terms: terms, type: type)
             // return
@@ -264,11 +254,11 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             // for each search term in terms
             for name in terms {
                 // lowercase the term
-                let name = name.lowercased()                
+                let name = name.lowercased()                 
                 // try lookup the genre from g_genres
                 if let genre = g_genres[name] {                                        
-                    // we found it, does it have a count of at least 1
-                    if genre.count >= 1 {
+                    // we found it, does it have a count of at least 1                    
+                    if genre.count >= 1 {                    
                         // yes append SongEntries for that genre to searchResult
                         self.searchResult.append(contentsOf: genre)
                         // add to search term the count of genres
