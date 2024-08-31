@@ -1,15 +1,16 @@
 //
 //  InitializeWindow.swift
 //
+//  (i): Finds all available and supported songs and gathers 
+//       metadata.
+//
 //  Created by Kjetil Kr Solberg on 24-09-2024.
 //  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
 //
-
 //
 // import
 //
 import Foundation
-
 ///
 /// Represents CMPlayer HelpWindow.
 ///
@@ -17,13 +18,13 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     //
     // private variables
     //
-    private var filesFoundCompleted: Int = 0
-    private var libraryLoadedCompleted: Int = 0
-    private var isFinished: Bool = false
-    private var currentPath: String = ""    
-    private var musicFormats: [String] = []
-    private var countFindSongs: Int = 0
-    private var countFoundMetadata: Int = 0
+    private var filesFoundCompleted: Int = 0        // percent found files
+    private var libraryLoadedCompleted: Int = 0     // percent library loaded
+    private var isFinished: Bool = false            // are we finished
+    private var currentPath: String = ""            // current path we are looking for files in
+    private var musicFormats: [String] = []         // music formats supported
+    private var countFindSongs: Int = 0             // number of files found
+    private var countFoundMetadata: Int = 0         // number of files metadata has been gathered
     ///
     /// private constants
     /// 
@@ -34,73 +35,98 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     /// parameter song: Instance of SongEntry to render info.
     ///
     func showWindow() -> Void {
-        
+        // add to top this window to terminal size change protocol stack
         g_tscpStack.append(self)
-        
+        // clear screen current theme
         Console.clearScreenCurrentTheme()
+        // render this window
         self.renderWindow()
-        
+        // run async
         concurrentQueue1.async {            
+            // perform work (initialization)
             self.initialize()
+            // set isFinished flag to true (this will end run())
             self.isFinished = true
         }
-        
+        // run(), modal call
         self.run()
-        
+        // remove from top this window from terminal size change protocol stack
         g_tscpStack.removeLast()
     }
     /// 
     /// Finds all songs and appends them to g_songs and initializes g_playlist.
     ///     
     func initialize() -> Void {
+        // remove all songs in g_songs
         g_songs.removeAll()
+        // remove all songs from g_playlist
         g_playlist.removeAll()
-        
+        // get musicFormats supported from PlayerPreferences
         self.musicFormats = PlayerPreferences.musicFormats.components(separatedBy: ";")
-        
+        // for each music root path
         for mrpath in PlayerPreferences.musicRootPath {            
-            self.filesFoundCompleted = 0                
+            // files found completed at 0%
+            self.filesFoundCompleted = 0  
+            // find all songs (files) and return path string array              
             let result = findSongs(path: mrpath)
+            // files found completed at 100%
             self.filesFoundCompleted = 100        
-            
+            // set current path to current music root path
             self.currentPath = mrpath
+            // set library loaded completed to 0%
             self.libraryLoadedCompleted = 0
-            
+            // create variable i that keeps tab on file number
             var i: Int = 1
+            // loop through all songs (file paths)
             for r in result {
+                // set currentPath = current music root path
                 self.currentPath = mrpath
+                // set libraryLoadedCompleted % completion of loading of library
                 self.libraryLoadedCompleted = Int(Double(i) * Double(100.0) / Double(result.count))
-                
+                // create constant u of type URL for current file (song)
                 let u: URL = URL(fileURLWithPath: r)
+                // if we have the song in library
                 if let se = g_library.find(url: u) {                    
+                    // yes, then just append the SongEntry from library
                     g_songs.append(se)
                 }
+                // no this is a new file (song)
                 else {
+                    // create a constant of next available song no.
                     let nasno = g_library.nextAvailableSongNo()
                     do {
                         // Attempt to create a song entry object
+                        // gathers metadata
                         let songEntry = try SongEntry(path: URL(fileURLWithPath: r),songNo: nasno)
+                        // increase countFoundMetadata by 1. number of files metadata gathered
                         self.countFoundMetadata += 1
-                        // If successfull add to g_songs
+                        // add to g_songs
                         g_songs.append(songEntry)
                     }
+                    // a known error occured
                     catch _ as CmpError {
+                        // set next available song no
                         g_library.setNextAvailableSongNo(nasno)
                     }
+                    // an unknown error occurred
                     catch  {
+                        // set next availble song no
                         g_library.setNextAvailableSongNo(nasno)
                     }
                 }
-                
+                // increase file (song) number by 1
                 i += 1
             }
         }
-        
+        // if we have found even a single song
         if g_songs.count > 0 {
+            // create a constant r1 with random SongEntry
             let r1 = g_songs.randomElement()
+            // create a constant r2 with random SongEntry
             let r2 = g_songs.randomElement()
-            
+            // append r1
             g_playlist.append(r1!)
+            // append r2
             g_playlist.append(r2!)
         }
     }    
@@ -113,33 +139,45 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     ///
     func findSongs(path: String) -> [String]
     {
+        // set return variable, array of strings (filepaths)
         var results: [String] = []
-        
+        // if path is not in music root path or is in exclution path
         if !isPathInMusicRootPath(path: path) || isPathInExclusionPath(path: path) {            
+            // return results (empty)
             return results
         }
         
         do
         {
+            // gather all files and directories in path
             let result = try FileManager.default.contentsOfDirectory(atPath: path)
+            // loop through all elements in path
             for r in result {
-                
+                // create a String variable of path and filename
                 var nr = "\(path)/\(r)"
                 if path.hasSuffix("/") {
                     nr = "\(path)\(r)"
                 }                
-                
+                // set currentPath to nr
                 self.currentPath = nr
-                
+                // if nr is a directory
                 if isDirectory(path: nr) {                    
+                    // add to results the return value of findSongs nr as path (recursion)
                     results.append(contentsOf: findSongs(path: nr))
                 }
-                else {                    
+                // nr is a file
+                else {         
+                    // can we read from the file           
                     if FileManager.default.isReadableFile(atPath: nr) {
+                        // loop through all music format supported
                         for f in self.musicFormats {
+                            // is the file a supported music format
                             if r.hasSuffix(f) {
+                                // yes, increase countFindSongs (number of found songs)
                                 self.countFindSongs += 1 // count variable
-                                results.append(nr)                 
+                                // add song (file+path) to results
+                                results.append(nr)                
+                                // discontinue for-loop 
                                 break
                             }
                         }
@@ -148,6 +186,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
             }
         }
         catch {
+            // remove all items from results
             results.removeAll()
         }
         
@@ -161,17 +200,23 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     /// returns: Bool. True if path is directory. False otherwise.
     ///
     func isDirectory(path: String) -> Bool {
+        // set up variable isDirectory
         var isDirectory: ObjCBool = false
+        // if file exists
         if FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) {
+            // return if this is a directory or not
             return isDirectory.boolValue;
         }
+        // if file does not exist, return false
         return false;
     }// isDirectory    
     ///
     /// TerminalSizeChangedProtocol method
     ///
     func terminalSizeHasChanged() -> Void {
+        // clear screen current theme
         Console.clearScreenCurrentTheme()
+        // render this window
         self.renderWindow()
     }        
     ///
