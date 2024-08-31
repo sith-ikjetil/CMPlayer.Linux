@@ -1,7 +1,7 @@
 //
 //  GenreWindow.swift
 //
-//  (i): Showns all genres with the count of songs in each genre.
+//  (i): Shows all genres with the count of songs in each genre.
 //
 //  Created by Kjetil Kr Solberg on 24-09-2024.
 //  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
@@ -92,7 +92,7 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
         Console.printXY(1,4,"mode genre is: \((isSearchTypeInMode(SearchType.Genre)) ? "on" : "off")", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         // line index on screen. start at 5
         var index_screen_lines: Int = 5
-        // index into genreIndex
+        // index into genreText
         var index_search: Int = self.genreIndex
         // max index_search
         let max = self.genreText.count
@@ -113,12 +113,12 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             // if even row
             if index_search % 2 == 0 {
                 // genre name in cyan
-                Console.printXY(1, index_screen_lines, se, 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+                Console.printXY(1, index_screen_lines, se, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
             }
             // else if odd row
             else {
                 // number of songs in genre in white
-                Console.printXY(1, index_screen_lines, se, 80, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(1, index_screen_lines, se, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
             }
             // increase index_screen_lines by 1 for next round of loop
             index_screen_lines += 1
@@ -215,6 +215,7 @@ internal class GenreWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
                 // render window
                 self.renderWindow()
             }
+            // do not return from keyHandler.run()
             return false
         })
         // add key handler for unknown key handler
