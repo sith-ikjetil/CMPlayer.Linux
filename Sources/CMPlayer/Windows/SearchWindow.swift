@@ -18,7 +18,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
     // private variables
     //
     private var searchIndex: Int = 0        // index into searchResult
-    private var partsYear: [String] = []    // search result for year
+    private var partsYear: [String] = []    // years
     private var modeOff: Bool = false       // are we not in a mode
     //
     // variables
@@ -40,70 +40,108 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
     /// Perform narrow search from arguments.
     ///
     func performNarrowSearch(terms: [String], type: SearchType) -> Void {        
-        
+        // clear self.searchResult
         self.searchResult.removeAll(keepingCapacity: false)
+        // clear partsYear
         self.partsYear.removeAll()
-        
+        // clear stats
         self.stats.removeAll()
+        // loop through all terms
         for _ in 0..<terms.count {
+            // append stat, default to 0
             self.stats.append(0)
         }
-
+        // if search type is genre
         if type == SearchType.Genre {
+            // create an index variable set to 0
             var index: Int = 0
+            // for each search term in terms
             for name in terms {
+                // lowercase the term
                 let name = name.lowercased()
+                // loop through all songs in g_searchResult
                 for s in g_searchResult {
+                    // if we find a match for genre
                     if s.genre == name {
+                        // append song to searchResult
                         self.searchResult.append(s)
+                        // update stats
                         self.stats[index] += 1
                     }
                 }
                 index += 1
             }
         }
+        // else if search type is recorded year
         else if type == SearchType.RecordedYear {
+            // get current year as a constant
             let currentYear = Calendar.current.component(.year, from: Date()) + 1
+            // create an index variable
             var index: Int = 0
+            // for each year in terms
             for year in terms {
+                // try to split the term in case year is written as "2010-2020"
                 let yearsSubs = year.split(separator: "-")
-                
+                // keeper of years variable
                 var years: [String] = []
+                // for each year in yearsSubs
                 for ys in yearsSubs {
+                    // append year to years
                     years.append(String(ys))
                 }
-                
+                // if years count is 1
                 if years.count == 1 {
+                    // convert year to Int
                     let resultYear = Int(years[0]) ?? -1
+                    // if resultYear is valid
                     if resultYear >= 0 && resultYear <= currentYear {
+                        // for each SongEntry in g_searchResult
                         for s in g_searchResult {
+                            // if found
                             if s.recordingYear == resultYear {
+                                // add song to self.searchResult
                                 self.searchResult.append(s)
+                                // update stats
                                 self.stats[index] += 1
                             }
                         }
+                        // append year to partsYear
                         self.partsYear.append(String(resultYear))
                     }
+                    // increment index
                     index += 1
                 }
                 else if years.count == 2 {
+                    // create constant year from
                     let from: Int = Int(years[0]) ?? -1
+                    // create constant year to
                     let to: Int = Int(years[1]) ?? -1
-                    
+                    // if to year is less than or equal to current year
                     if to <= currentYear {
+                        // if years (from, to) are valid
                         if from != -1 && to != -1 && from <= to {
+                            // create a constant from year + 1
                             let xfrom: Int = from + 1
+                            // loop through xfrom -> to
                             for _ in xfrom...to {
+                                // append 0 to stats
                                 self.stats.append(0)
                             }
+                            // loop through years from -> to
                             for y in from...to {
+                                // loop through all SongEntry in g_searchResult
                                 for s in g_searchResult {
+                                    // if found
                                     if s.recordingYear == y {
+                                        // add song to self.searchResult
                                         self.searchResult.append(s)
+                                        // update stats
                                         self.stats[index] += 1
                                     }
                                 }
+                                // increment index
                                 index += 1
+                                // append year to partsYear
                                 self.partsYear.append(String(y))
                             }
                         }
@@ -111,49 +149,76 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
                 }
             }
         }
+        // else 
         else {
+            // loop through entire g_searchResult
             for se in g_searchResult {
+                // create constant artist and get artist lowercased
                 let artist = se.artist.lowercased()
+                // create constant title and get title lowercased
                 let title = se.title.lowercased()
+                // create constant album and get album lowercased
                 let album = se.albumName.lowercased()
+                // create an index variable
                 var index: Int = 0
-                
+                // loop through each search term                
                 for t in terms {
+                    // create a constant term which is the term t lowercased
                     let term = t.lowercased()
-                    
+                    // if search type is artist or title                    
                     if type == SearchType.ArtistOrTitle {
+                        // if artist or title contains term
                         if artist.contains(term) || title.contains(term) {
+                            // yes, append song to searchResult
                             self.searchResult.append(se)
+                            // increment stats with 1
                             self.stats[index] += 1
+                            // discontinue loop
                             break
                         }
                     }
+                    // else if search type is artist
                     else if type == SearchType.Artist {
+                        // if artist contains term
                         if artist.contains(term) {
+                           // yes, append song to searchResult
                             self.searchResult.append(se)
+                            // increment stats with 1
                             self.stats[index] += 1
+                            // discontinue loop
                             break
                         }
                     }
+                    // else if search type is title
                     else if type == SearchType.Title {
+                        // if title contains term
                         if title.contains(term) {
+                            // yes, append song to searchResult
                             self.searchResult.append(se)
+                            // increment stats with 1
                             self.stats[index] += 1
+                            // discontinue loop
                             break
                         }
                     }
+                    // else if search type is album
                     else if type == SearchType.Album {
+                        // if album contains term
                         if album.contains(term) {
+                            // yes, append song to searchResult
                             self.searchResult.append(se)
+                            // increment stats with 1
                             self.stats[index] += 1
+                            // discontinue loop
                             break
                         }
                     }
+                    // increment index
                     index += 1
                 }
             }
         }
-    
+        // sort serachResult
         self.searchResult = self.searchResult.sorted {sortSongEntry(se1: $0, se2: $1)} // $0.artist < $1.artist }
     }    
     ///
@@ -235,7 +300,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
                 if years.count == 1 {
                     // convert year to Int
                     let resultYear = Int(years[0]) ?? -1
-                    // if resultYear >= 0 and <= current year
+                    // if resultYear is valid
                     if resultYear >= 0 && resultYear <= currentYear {
                         // try to find item in g_recordingYears
                         if g_recordingYears[resultYear] != nil {
@@ -262,7 +327,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
                     let to: Int = Int(years[1]) ?? -1
                     // if to year is less than or equal to current year
                     if to <= currentYear {
-                        // if from year and to year are not -1 and from < to
+                        // if years (from, to) are valid
                         if from != -1 && to != -1 && from <= to {
                             // create a constant from year + 1
                             let xfrom: Int = from + 1
@@ -506,12 +571,9 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
     /// parameter parts: command parts from search input command.
     ///
     func run() -> Void {
-        var p : [String] = []
-        for px in parts {
-            p.append(px)
-        }
-        _ = p.removeFirst()
+        // set serachIndex to 0
         self.searchIndex = 0
+        // do search
         self.performSearch(terms: self.parts, type: self.type)
         // clear screen current theme
         Console.clearScreenCurrentTheme()
@@ -521,80 +583,125 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()
         // add key handler for key down (move down one line)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_DOWN.rawValue, closure: { () -> Bool in 
+            // if viewtype is default
             if PlayerPreferences.viewType == ViewType.Default {                       
+                // if searchIndex + page size < searchResult count
                 if (self.searchIndex+(g_rows-7)) < self.searchResult.count {
+                    // saftley increment searchIndex (move down one line)
                     self.searchIndex += 1
+                    // render window
                     self.renderWindow()
                 }
             }
+            // else if viewtype is details
             else if PlayerPreferences.viewType == ViewType.Details {
+                // if searchIndex + page size < searchResult count
                 if (self.searchIndex+((g_rows-7)/2)) < self.searchResult.count {
+                    // saftley increment searchIndex (move down one line)
                     self.searchIndex += 1
+                    // render window
                     self.renderWindow()
                 }                
             }
+            // do not return from keyHandler.run()
             return false
         })
         // add key handler for key up (move up one line)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_UP.rawValue, closure: { () -> Bool in
+            // if searchIndex is at least 1
             if self.searchIndex >= 1 {
+                // saftley decrement searchIndex by 1 (move up one line)
                 self.searchIndex -= 1
+                // render window
                 self.renderWindow()
             }
+            // do not return from keyHandler.run()
             return false
         })
         // add key handler for key left (move up one page)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_LEFT.rawValue, closure: { () -> Bool in  
+            // if viewtype is default
             if PlayerPreferences.viewType == ViewType.Default {
+                // if searchIndex is >= page size
                 if self.searchIndex >= (g_rows-7-1) {
+                    // saftley decrement by one page size
                     self.searchIndex -= (g_rows-7) - 1                   
                 }
+                // else we are first page
                 else {
+                    // set searchIndex to start = 0
                     self.searchIndex = 0                    
-                }   
+                }
+                // render window   
                 self.renderWindow()     
             }
+            // else if viewtype is details
             else if PlayerPreferences.viewType == ViewType.Details {          
+                // if searchIndex is >= page size
                 if self.searchIndex >= ((g_rows-7)/2) {
+                    // saftley decrement by one page size
                     self.searchIndex -= ((g_rows-7)/2)                    
                 }
+                // else we are first page
                 else {
+                    // set searchIndex to start = 0
                     self.searchIndex = 0                    
-                }        
+                }
+                // render window
                 self.renderWindow()
             }
+            // do not return from keyHandler.run()
             return false
         })
         // add key handler for key right (move down one page)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_RIGHT.rawValue, closure: { () -> Bool in            
+            // if viewtype is default
             if PlayerPreferences.viewType == ViewType.Default {
+                // if searchResult count is > than page size
                  if self.searchIndex >= 0 && self.searchResult.count > (g_rows-7) {
+                    // if searchIndex + page size < searchResult count - page size (are we not at last page)
                     if self.searchIndex + (g_rows-7) < self.searchResult.count - (g_rows-7) {
+                        // increment searchIndex by a page (move down one page)
                         self.searchIndex += (g_rows-7) - 1
                     }
+                    // else at last page
                     else {
+                        // set searchIndex to last page
                         self.searchIndex = self.searchResult.count - (g_rows-7) + 1
+                        // should searchIndex be negative
                         if (self.searchIndex < 0) {
+                            // set searchIndex to start = 0
                             self.searchIndex = 0
                         }
                     }                    
-                }             
+                }
+                // render window
                 self.renderWindow()                
             }
+            // else if viewtype is details
             else if PlayerPreferences.viewType == ViewType.Details {
-                 if self.searchIndex >= 0 && self.searchResult.count > (g_rows-7) {
+                // if searchResult count > page size
+                if self.searchIndex >= 0 && self.searchResult.count > (g_rows-7) {
+                    // if searchIndex + page size < searchResult count - page size (are we not at last page)
                     if self.searchIndex + ((g_rows-7)/2) < (self.searchResult.count - ((g_rows-7)/2)) {
+                        // increment searchIndex by a page (move down one page)
                         self.searchIndex += ((g_rows-7)/2) 
                     }
+                    // else at last page
                     else {
+                        // set searchIndex to last page
                         self.searchIndex = (self.searchResult.count) - ((g_rows-7)/2)
+                        // should searchIndex be negative
                         if (self.searchIndex < 0) {
+                            // set searchIndex to start = 0
                             self.searchIndex = 0
                         }
                     }                    
-                }             
+                }
+                // render window
                 self.renderWindow()
             }
+            // do not return from keyHandler.run()
             return false
         })
         // add key handler for spacebar (set mode and exit screen back to mainwindow)
