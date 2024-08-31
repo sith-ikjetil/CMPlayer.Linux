@@ -18,8 +18,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
     // private variables
     //
     private var searchIndex: Int = 0        // index into searchResult
-    private var partsYear: [String] = []    // years
-    private var modeOff: Bool = false       // are we not in a mode
+    private var partsYear: [String] = []    // years    
     //
     // variables
     //
@@ -699,7 +698,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             // if we have a search result
             if self.searchResult.count > 0 {
                 // if we are not in a mode
-                if self.modeOff {
+                if g_searchResult.count == 0 {
                     // lock
                     g_lock.lock()
                     // clear g_searchType
