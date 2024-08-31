@@ -100,6 +100,12 @@ internal class M4aAudioPlayer {
         // set filePath to path
         self.filePath = path        
     }
+    //
+    // deinit
+    //
+    deinit {
+        
+    }
     ///
     /// initiates playback of the audio file from init(path)
     /// 

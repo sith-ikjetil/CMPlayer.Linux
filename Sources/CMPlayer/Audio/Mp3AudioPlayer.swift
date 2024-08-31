@@ -79,10 +79,16 @@ internal class Mp3AudioPlayer {
         }
     }
     ///
-    /// Only initializer
+    /// only initializer
     ///
     init(path: URL) {
         self.filePath = path        
+    }
+    //
+    // deinit
+    //
+    deinit {
+        
     }
     ///
     /// initiates playback of the audio file from init(path)
@@ -319,8 +325,9 @@ internal class Mp3AudioPlayer {
             // log debug
             PlayerLog.ApplicationLog?.logDebug(title: "[Mp3AudioPlayer].playAsync()@defer", text: self.filePath.path)      
         }
-        // buffer size for audio output
-        let bufferSize: Int = max(mpg123_outblock(self.mpg123Handle), 1024*2*2)
+        // set minimum buffer size for audio output 
+        // mpg123_outblock = maximum decoded data size in bytes, minimum buffer size
+        let bufferSize: Int = max(mpg123_outblock(self.mpg123Handle), 4096*2*2)//1024
         // buffer of bufferSize
         var buffer: [UInt8] = [UInt8](repeating: 0, count: bufferSize)
         // bytes read from mpg123_read
