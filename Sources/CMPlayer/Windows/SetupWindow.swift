@@ -1,15 +1,15 @@
 //
 //  SetupWindow.swift
 //
+//  (i): Setup screen where you add an initial music root path that must exist.
+//
 //  Created by Kjetil Kr Solberg on 24-09-2024.
 //  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
 //
-
 //
 // import
 //
 import Foundation
-
 ///
 /// Represents CMPlayer InitialSetupWindow.
 ///
@@ -25,43 +25,50 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
     //
     // variables
     //
-    var path: String = ""
-    var cursor: String = ""
-    var finished: Bool = false    
+    var path: String = ""       // current path entered
+    var cursor: String = ""     // cursor character
+    var finished: Bool = false  // are we finished
     ///
     /// Shows this InitialSetupWindow on screen.
     ///
     func showWindow() -> Void {
+        // add to top this window to terminal size change protocol stack
         g_tscpStack.append(self)
 
         let musicDefaultPath: URL = PlayerDirectories.homeDirectory.appendingPathComponent("Music", isDirectory: false)
         self.path = musicDefaultPath.path
 
         concurrentQueue.async {
-
+            // loop while finished is false
             while !self.finished {
+                // if cursor has a character
                 if self.cursor.count > 0 {
+                    // set cursor to empty string
                     self.cursor = ""
                 }
+                // else cursor does not have a character
                 else {
+                    // set cursor to a character
                     self.cursor = "_"
                 }
-
+                // render input
                 self.renderInput()
-
-                let second: Double = 1_000_000
-                usleep(useconds_t(0.075 * second))
+                // sleep for 75 ms
+                usleep(75_000)
             }
         }
-
+        // run(), modal call
         self.run()
+        // remove from top this window from terminal size change protocol stack
         g_tscpStack.removeLast()
     }    
     ///
     /// TerminalSizeChangedProtocol method
     ///
     func terminalSizeHasChanged() -> Void {
+        // clear screen current theme
         Console.clearScreen()
+        // render this window
         self.renderWindow()
     }    
     ///
@@ -70,31 +77,40 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
     /// parameter path: Path to render on screen.
     ///
     func renderWindow() -> Void {
+        // guard window size is valid
         guard isWindowSizeValid() else {
+            // else write terminal too small message
             renderTerminalTooSmallMessage()
+            // return
             return
         }
-        
+        // clear screen current theme
         Console.clearScreenCurrentTheme()
+        // render header
         MainWindow.renderHeader(showTime: false)
-        
+        // render title
         Console.printXY(1,3,":: SETUP ::", g_cols, .center, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        
+        // create a y coordinate variable starting from 5
         var y: Int = 5
+        // loop through all setupText items
         for txt in self.setupText {
+            // render setup text
             Console.printXY(1, y, txt, g_cols, .center, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            // increment y coordinate
             y += 1
         }
-
+        // render input
         self.renderInput()                
-        
+        // goto g_cols,1
         Console.gotoXY(g_cols,1)
+        // print nothing
         print("")
     }   
     ///
     /// renders path input only
     ///  
     func renderInput() {
+        // render input
         Console.printXY(1,5+self.setupText.count + 1, ":> \(self.path)\(self.cursor)", g_cols, .left, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
     }
     ///
@@ -103,35 +119,54 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
     /// returns: Bool. True if path entered, false otherwise.
     ///
     func run() -> Void {
+        // clear screen
         Console.clearScreen()
+        // render this window
         self.renderWindow()
-        
+        // create a ConsoleKeyboardHandler constant
         let keyHandler: ConsoleKeyboardHandler = ConsoleKeyboardHandler()        
+        // add key handler for backspace
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_BACKSPACE.rawValue, closure: { () -> Bool in
+            // if path has value
             if self.path.count > 0 {
+                // remove last character
                 self.path.removeLast()
+                // render this window
                 self.renderWindow()
             }
+            // do not return from keyHandler.run()
             return false
         })
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_ENTER.rawValue, closure: { () -> Bool in
+            // if path has value
             if self.path.count > 0 {
+                // if path does not exist
                 if !FileManager.default.fileExists(atPath: self.path) {
+                    // ignore
+                    // do not return from keyHandler.run()
                     return false
                 }
+                // we have a path, set finished flag to true
                 self.finished = true
+                // append path to PlayerPreference.musicRootPath
                 PlayerPreferences.musicRootPath.append(self.path)
+                // save preferences
                 PlayerPreferences.savePreferences()
+                // return from run()
                 return true
             }
+            // do not return from keyHandler.run()
             return false
         })
         keyHandler.addCharacterKeyHandler(closure: { (ch: Character) -> Bool in
+            // append character to path
             self.path.append(String(ch))
+            // render this window
             self.renderWindow()
-            
+            // do not return from keyHandler.run()
             return false
         })
+        // execute run(), modal call
         keyHandler.run()
     }// run
 }// SetupWindow
