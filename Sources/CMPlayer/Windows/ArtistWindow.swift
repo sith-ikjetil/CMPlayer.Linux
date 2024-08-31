@@ -1,6 +1,8 @@
 //
 //  ArtistWindow.swift
 //
+//  (i): Renders all artists with count of songs in for each artist
+//
 //  Created by Kjetil Kr Solberg on 24-09-2024.
 //  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
 //
@@ -54,7 +56,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         self.artistText.removeAll()
         // sort all artists in g_artists
         let sorted = g_artists.sorted { $0.key < $1.key }
-        // loop through all sorted items
+        // loop through all items in sorted
         for g in sorted {
             // set artist name
             let name = g.key
@@ -100,7 +102,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
                 // break loop
                 break
             }
-            // if index_search has reached artistText.count
+            // if index_search has reached artistText count
             if index_search >= artistText.count {
                 // break loop
                 break
@@ -214,7 +216,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         })
         // add key handler for unknown key handler
         keyHandler.addUnknownKeyHandler(closure: { (key: UInt32) -> Bool in
-        // return from run()
+            // return from run()
             return true
         })
         // execute run(), modal call
