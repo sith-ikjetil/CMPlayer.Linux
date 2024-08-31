@@ -18,6 +18,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     //
     // private variables
     //
+    private var backup: PlayerLibrary? = nil        // backup library
     private var filesFoundCompleted: Int = 0        // percent found files
     private var libraryLoadedCompleted: Int = 0     // percent library loaded
     private var isFinished: Bool = false            // are we finished
@@ -30,6 +31,23 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     /// 
     private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.linux.Initialize", attributes: .concurrent)
     ///
+    /// default initializer
+    ///
+    init() {
+
+    }
+    ///
+    /// overriden initializer
+    /// - for use with reinitialize command
+    /// - ensure same song no for existing song
+    /// - just add new ones
+    /// - faster loading
+    ///
+    init(backup: PlayerLibrary) {
+        // set backup library        
+        self.backup = backup        
+        g_library.setNextAvailableSongNo(self.backup!.nextAvailableSongNo())    
+    }    
     /// Shows this HelpWindow on screen.
     ///
     /// parameter song: Instance of SongEntry to render info.
@@ -88,7 +106,50 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
                 // if we have the song in library
                 if let se = g_library.find(url: u) {                    
                     // yes, then just append the SongEntry from library
-                    g_songs.append(se)
+                    g_songs.append(se)                    
+                    // append to genres
+                    let genre = se.genre.lowercased()
+                    if g_genres[genre] == nil {
+                        g_genres[genre] = []
+                    }                    
+                    g_genres[genre]?.append(se)                    
+                    // append to artists
+                    let artist = se.artist
+                    if g_artists[artist] == nil {
+                        g_artists[artist] = []
+                    }
+                    g_artists[artist]?.append(se)                    
+                    // append to years
+                    if g_recordingYears[se.recordingYear] == nil {
+                        g_recordingYears[se.recordingYear] = []
+                    }                    
+                    g_recordingYears[se.recordingYear]?.append(se)
+                    // update g_library.dictionary
+                    g_library.dictionary[r] = g_songs.count - 1                
+                }
+                // check backup library
+                else if let se = backup?.find(url: u) {
+                    // yes, then just append the SongEntry from backup library
+                    g_songs.append(se)                    
+                    // append to genres
+                    let genre = se.genre.lowercased()
+                    if g_genres[genre] == nil {
+                        g_genres[genre] = []
+                    }                    
+                    g_genres[genre]?.append(se)                    
+                    // append to artists
+                    let artist = se.artist
+                    if g_artists[artist] == nil {
+                        g_artists[artist] = []
+                    }
+                    g_artists[artist]?.append(se)                    
+                    // append to years
+                    if g_recordingYears[se.recordingYear] == nil {
+                        g_recordingYears[se.recordingYear] = []
+                    }                    
+                    g_recordingYears[se.recordingYear]?.append(se)
+                    // update g_library.dictionary
+                    g_library.dictionary[r] = g_songs.count - 1
                 }
                 // no this is a new file (song)
                 else {
@@ -102,6 +163,8 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
                         self.countFoundMetadata += 1
                         // add to g_songs
                         g_songs.append(songEntry)
+                        // update g_library.dictionary
+                        g_library.dictionary[r] = g_songs.count - 1
                     }
                     // a known error occured
                     catch _ as CmpError {

@@ -1292,8 +1292,18 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         g_songs.removeAll()
         // clear g_playlist
         g_playlist.removeAll()
+        // create backup of g_library
+        let backupLibrary: PlayerLibrary = PlayerLibrary()
+        // backup of all the songs
+        backupLibrary.library = g_library.library
+        // backup of dictionary
+        backupLibrary.dictionary = g_library.dictionary
+        // set backup next available song no
+        backupLibrary.setNextAvailableSongNo(g_library.nextAvailableSongNo())        
         // set library to empty array
-        g_library.library = []
+        g_library.library.removeAll()
+        // set library dictionary empty
+        g_library.dictionary.removeAll()        
         // save library
         g_library.save()
         // set next available song to 1, we are starting over
@@ -1304,7 +1314,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         g_player.audio1 = nil
         // set audio player 2 to nil, restart player
         g_player.audio2 = nil
-        // if Playpreferences have 0 items
+        // if music root path have 0 items
         if PlayerPreferences.musicRootPath.count == 0 {
             // set isShowingTopWindow flag to true
             self.isShowingTopWindow = true
@@ -1320,11 +1330,11 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             wndI.showWindow()
         }
         // we have music root path
-        else {
+        else {            
             // set isShowingTopWindow flag to true
             self.isShowingTopWindow = true
             // create InitializeWindow            
-            let wnd = InitializeWindow()
+            let wnd = InitializeWindow(backup: backupLibrary)
             // show initialize window, modal call.
             wnd.showWindow()
         }

@@ -61,7 +61,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
                 // loop through all songs in g_searchResult
                 for s in g_searchResult {
                     // if we find a match for genre
-                    if s.genre == name {
+                    if s.genre.lowercased() == name {
                         // append song to searchResult
                         self.searchResult.append(s)
                         // update stats

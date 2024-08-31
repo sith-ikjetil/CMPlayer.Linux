@@ -20,12 +20,12 @@ internal class PlayerLibrary {
     // Private properties/constants
     //
     static let filename: String = "library.xml"
-    private var nextSongNo: Int = 1
-    private var dictionary: [String: Int] = [:]    
+    private var nextSongNo: Int = 1    
     //
     // variables
     //
     var library: [SongEntry] = []    
+    var dictionary: [String: Int] = [:]    
     ///
     /// Default initializer
     ///
