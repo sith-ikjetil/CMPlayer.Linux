@@ -101,14 +101,14 @@ internal class Player {
             if player == 1 {
                 // if player 1 has not been set
                 if self.audio1 == nil {                      
-                    self.audio1 = CmpAudioPlayer(path:g_playlist[playlistIndex].fileURL!)                    
+                    self.audio1 = try CmpAudioPlayer(path:g_playlist[playlistIndex].fileURL!)                    
                     self.durationAudioPlayer1 = g_playlist[playlistIndex].duration
                     try self.audio1?.play()                    
                 }
                 // if player 1 is active
                 else {
                     self.audio1?.stop()
-                    self.audio1 = CmpAudioPlayer(path: g_playlist[playlistIndex].fileURL!)
+                    self.audio1 = try CmpAudioPlayer(path: g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer1 = g_playlist[playlistIndex].duration
                     try self.audio1?.play()
                 }                
@@ -117,14 +117,14 @@ internal class Player {
             else if player == 2 {              
                 // if player 2 has not been set  
                 if self.audio2 == nil {
-                    self.audio2 = CmpAudioPlayer(path:g_playlist[playlistIndex].fileURL!)
+                    self.audio2 = try CmpAudioPlayer(path:g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer2 = g_playlist[playlistIndex].duration
                     try self.audio2?.play()
                 }
                 // if player 2 is active
                 else {
                     self.audio2?.stop()
-                    self.audio2 = CmpAudioPlayer(path: g_playlist[playlistIndex].fileURL!)
+                    self.audio2 = try CmpAudioPlayer(path: g_playlist[playlistIndex].fileURL!)
                     self.durationAudioPlayer2 = g_playlist[playlistIndex].duration
                     try self.audio2?.play()
                 }            
