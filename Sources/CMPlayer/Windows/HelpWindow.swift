@@ -111,7 +111,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         Console.printXY(1,4," ", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         // line index on screen. start at 5
         var index_screen_lines: Int = 5
-        // index into artistIndex
+        // index into helpText
         var index_search: Int = self.helpIndex
         // max index_search
         let max = self.helpText.count
