@@ -223,34 +223,44 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     /// Renders screen output. Does clear screen first.
     ///
     func renderWindow() -> Void {
+        // guard window size is valid
         guard isWindowSizeValid() else {
+            // else write terminal too small message
             renderTerminalTooSmallMessage()
+            // return
             return
         }
-                
+        // render header
         MainWindow.renderHeader(showTime: false)
-        
+        // get bg color from current theme
         let bgColor = getThemeBgColor()
-        
+        // render title
         Console.printXY(1,3,":: INITIALIZE ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-        
+        // render current path
         Console.printXY(1, 5, "Current Path: " + self.currentPath, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-        
+        // create a string variable for holding files found
         var pstFiles: String = "\(self.filesFoundCompleted)"
+        // if we have found at least one song
         if self.countFindSongs > 0 {
+            // append files found
             pstFiles += " (\(self.countFindSongs) files found)"
         } 
+        // render song files found
         Console.printXY(1, 6, "Finding Song Files: " + pstFiles, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-        
+        // create a string variable for hold metadata gathered from files
         var pstLib: String = "\(self.libraryLoadedCompleted)%"
+        // if we have found at least 1 metadata file
         if self.countFoundMetadata > 0 {
+            // append metadata from countFoundMetadata files
             pstLib += " (gathered metadata from \(self.countFoundMetadata) files)"
         } 
+        // render song library update
         Console.printXY(1, 7, "Updating Song Library: " + pstLib, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-        
+        // render status line
         Console.printXY(1,g_rows-1,"PLEASE BE PATIENT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-        
+        // goto g_cols,1
         Console.gotoXY(g_cols,1)
+        // print nothing
         print("")
     }    
     ///
