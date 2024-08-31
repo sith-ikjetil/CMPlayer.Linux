@@ -1,6 +1,11 @@
 //
 //  MainWindow.swift
 //
+//  (i): Main window. Shows playlist and currently playing items
+//       with time remaining. Can enter commands into command line
+//       at bottom of screen ">:" Type "help" for information on what 
+//       commands can be entered.
+//
 //  Created by Kjetil Kr Solberg on 24-09-2024.
 //  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
 //
@@ -22,8 +27,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     private var currentCommand: String = ""       // current command typing in
     private var commands: [PlayerCommand] = []    // array of PlayerCommandObjects set in run()
     private var isShowingTopWindow = false  // true == window on top of this window, false == this is top window
-    private var addendumText: String = ""         // text added to screen over command line if info needs to be outputted
-    //private var updateFileName: String = ""
+    private var addendumText: String = ""         // text added to screen over command line if info needs to be outputted    
     private var isTooSmall: Bool = false          // true == screen size is invalid too small, false == supported and valid size
     private var showCursor: Bool = false          // true == should cursor be visible, false == should not be visible
     private var cursorTimeout: UInt64 = 0         // cursor time in ms counted from 0 to target. used to set showCursor

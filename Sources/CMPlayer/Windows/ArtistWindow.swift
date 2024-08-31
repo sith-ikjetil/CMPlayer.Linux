@@ -31,6 +31,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         g_tscpStack.append(self)
         // clear screen current theme
         Console.clearScreenCurrentTheme()
+        // render this window
         self.renderWindow()
         // run(), modal call
         self.run()
@@ -91,7 +92,7 @@ internal class ArtistWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         Console.printXY(1,4,"mode artist is: \((isSearchTypeInMode(SearchType.Artist)) ? "on" : "off")", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
         // line index on screen. start at 5
         var index_screen_lines: Int = 5
-        // index into artistIndex
+        // index into artistText
         var index_search: Int = self.artistIndex
         // max index_search
         let max = self.artistText.count
