@@ -66,7 +66,7 @@ internal class Player {
         }
         // try load library
         try g_library.load()
-        // initialize CMPlayer
+        // initialize CMPlayer, builds a brand new g_songs
         let wnd = InitializeWindow()
         wnd.showWindow()        
         // rebuild g_library and all other structures
