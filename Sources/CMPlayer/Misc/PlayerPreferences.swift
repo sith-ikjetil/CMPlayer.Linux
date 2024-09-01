@@ -1,17 +1,16 @@
 //
 //  PlayerPreferences.swift
 //
+//  (i): Code that deals with the applications preferences.
+//
 //  Created by Kjetil Kr Solberg on 24-09-2024.
 //  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
 //
-
 //
 // import.
 //
 import Foundation
-//import FoundationNetworking
 import FoundationXML
-
 ///
 /// What to do when log max size is reached.
 ///
@@ -19,7 +18,6 @@ internal enum LogMaxSizeReached: String {
     case StopLogging = "StopLogging"
     case EmptyLog = "EmptyLog"
 }
-
 ///
 /// What to do with log when application starts
 ///
@@ -27,7 +25,6 @@ internal enum LogApplicationStartLoadType: String {
     case DoNotLoadOldLog = "DoNotLoadOldLog"
     case LoadOldLog = "LoadOldLog"
 }
-
 ///
 /// MainWindow View Type
 ///
@@ -35,7 +32,6 @@ internal enum ViewType: String {
     case Default = "default"
     case Details = "details"
 }
-
 //
 // Application Color Theme
 //
@@ -44,7 +40,6 @@ internal enum ColorTheme: String {
     case Blue = "blue"
     case Black = "black"
 }
-
 //
 // Sound output library to use
 //
@@ -52,7 +47,6 @@ internal enum OutputSoundLibrary: String {
     case ao = "ao"
     case alsa = "alsa"
 }
-
 ///
 /// Represents CMPlayer PlayerPreferences.
 ///
