@@ -1,7 +1,17 @@
+//
+//  CommandLineHandler.swift
+//
+//  (i): Handles command line parameters execution.
+//
+//  Created by Kjetil Kr Solberg on 24-09-2024.
+//  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
+//
+///
+/// import
+/// 
 import Foundation
 import Cao
 import Casound
-
 ///
 /// State class for CommandLineArguments handling
 /// of command line arguments. Can be used through

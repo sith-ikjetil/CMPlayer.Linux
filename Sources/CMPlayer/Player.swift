@@ -71,7 +71,7 @@ internal class Player {
         wnd.showWindow()        
         // rebuild g_library and all other structures
         // - from g_songs which is populated after InitializeWindow
-        g_library.rebuildDataStructuresFromLoaded()
+        g_library.rebuild()
         // save library      
         g_library.save()
         // if autoplay on startup, start playing

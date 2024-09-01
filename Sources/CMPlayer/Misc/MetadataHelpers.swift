@@ -1,5 +1,15 @@
+//
+//  MetadataHelpers.swift
+//
+//  (i): Code dealing with song metadata.
+//
+//  Created by Kjetil Kr Solberg on 24-09-2024.
+//  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
+//
+//
+// import
+//
 import Foundation
-
 ///
 /// CmpMetadata
 /// Container for metadata.
@@ -14,7 +24,6 @@ internal class CmpMetadata {
     var recordingYear: Int = 0
     var trackNo: Int = 0        
 }
-
 /// 
 /// Extracts track number from aac metadata track field.
 /// 

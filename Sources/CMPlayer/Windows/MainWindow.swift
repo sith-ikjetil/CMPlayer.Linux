@@ -1341,7 +1341,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         // set isShowingTopWindow flag to false
         self.isShowingTopWindow = false
         // rebuild all data structures from newly loaded g_songs
-        g_library.rebuildDataStructuresFromLoaded()
+        g_library.rebuild()
         // save library
         g_library.save()
         // render this window

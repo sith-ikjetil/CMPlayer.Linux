@@ -1,5 +1,7 @@
 //
-//  PlayerLibrary.swift
+// PlayerLibrary.swift
+//
+// (i): Code dealing with player library. load/save/rebuild.
 //
 //  Created by Kjetil Kr Solberg on 24-09-2024.
 //  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
@@ -217,7 +219,7 @@ internal class PlayerLibrary {
     ///
     /// rebuilds all data structures from newly made g_songs    
     /// 
-    func rebuildDataStructuresFromLoaded() {
+    func rebuild() {
         // clear self.library        
         self.library.removeAll()
         // clear self.dictionary

@@ -1,4 +1,15 @@
-import Foundation
+//
+//  Extensions.swift
+//
+//  (i): Implements extensions methods to different types.
+//
+//  Created by Kjetil Kr Solberg on 24-09-2024.
+//  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
+//
+//
+// import
+//
+import Foundation 
 ///
 /// Int extension methods.
 ///
