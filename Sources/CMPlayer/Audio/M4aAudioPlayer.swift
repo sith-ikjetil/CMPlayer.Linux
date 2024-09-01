@@ -595,8 +595,12 @@ internal class M4aAudioPlayer {
                         let samples = swr_convert(self.m_audioState.swrCtx, &outputBuffer, self.m_audioState.frame!.pointee.nb_samples, UnsafeMutablePointer(mutating: bufferPointer.baseAddress), self.m_audioState.frame!.pointee.nb_samples)                                                    
                         // Ensure resampling was successful
                         guard samples >= 0 else {
+                            // else error occured
+                            // create error message
                             let msg = "swr_convert returned with value: \(samples) = '\(renderFfmpegError(error: samples))'."
+                            // log message
                             PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
+                            // return
                             return
                         }
                         // total bytes of samples: samples * channels * 2 (16 bit)
@@ -613,8 +617,8 @@ internal class M4aAudioPlayer {
                         if timeLeft > 0 && timeLeft <= self.m_targetFadeDuration {
                             // set timeToStartCrossfade flag to true
                             timeToStartCrossfade = true
-                            // calculate volume 100%-0% volume over m_targetFadeDuration
-                            currentVolume = Float(Float(timeLeft)/Float(self.m_targetFadeDuration))                    
+                            // calculate volume 100%-0% volume over m_targetFadeDuration                            
+                            currentVolume = max(0.0, min(1.0, Float(timeLeft) / Float(self.m_targetFadeDuration)))                 
                         }
                         // adjust crossfade volume
                         if self.m_enableCrossfade && timeToStartCrossfade {

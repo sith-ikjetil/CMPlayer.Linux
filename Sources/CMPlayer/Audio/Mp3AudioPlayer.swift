@@ -421,7 +421,7 @@ internal class Mp3AudioPlayer {
                 // set timeToStartCrossfade flag to true
                 timeToStartCrossfade = true
                 // calculate current volume
-                currentVolume = Float(Float(timeLeft)/Float(self.m_targetFadeDuration))                    
+                currentVolume = max(0.0, min(1.0, Float(timeLeft) / Float(self.m_targetFadeDuration)))
             }            
             // guard buffer is not empty
             guard !buffer.isEmpty else {
