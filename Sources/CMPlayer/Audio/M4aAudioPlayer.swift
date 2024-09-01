@@ -530,10 +530,19 @@ internal class M4aAudioPlayer {
             }
             // return next frame of stream
             var retVal: Int32 = av_read_frame(self.m_audioState.formatCtx, &self.m_audioState.packet)
-            // if error or EOF
-            if retVal < 0 {
-                // return 
+            // guard for success
+            guard retVal >= 0 else {
+                // else we have an error
+                // create log messsge
+                let msg = "av_read_frame failed with value: \(retVal) = '\(renderFfmpegError(error: retVal))'."
+                // log message
+                PlayerLog.ApplicationLog?.logError(title: "[M4aPlayer].playAsync()", text: msg)
+                // return
                 return
+            }
+            // ensure cleanup by defer
+            defer {
+                av_packet_unref(&self.m_audioState.packet)
             }
             // if codecCtx and frame are invalid pointers
             guard let _ = self.m_audioState.codecCtx, let _ = self.m_audioState.frame else {
@@ -556,11 +565,7 @@ internal class M4aAudioPlayer {
                     PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
                     // return
                     return
-                }
-                // ensure cleanup by defer
-                defer {
-                    av_packet_unref(&self.m_audioState.packet)
-                }
+                }                
                 // while we are not quitting, stopping or 
                 while !g_quit && !m_stopFlag && (avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame) == 0) {
                     // create a read/write pointer to outputBuffer
@@ -569,7 +574,7 @@ internal class M4aAudioPlayer {
                     retVal = av_samples_alloc(&outputBuffer, nil, 2, self.m_audioState.frame!.pointee.nb_samples, AV_SAMPLE_FMT_S16, 0)                    
                     // Ensure the buffer is allocated properly
                     guard retVal >= 0 else {
-                        let msg = "Error allocating buffer for resampled audio."
+                        let msg = "av_samples_alloc failed with value: \(retVal) = '\(renderFfmpegError(error: retVal))'."
                         PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
                         return
                     }
@@ -842,4 +847,4 @@ internal class M4aAudioPlayer {
         // throw error
         throw CmpError(message: msg)
     }
-}// AudioPlayer
+}// M4aAudioPlayer
