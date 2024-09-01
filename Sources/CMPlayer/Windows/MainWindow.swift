@@ -1340,8 +1340,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }
         // set isShowingTopWindow flag to false
         self.isShowingTopWindow = false
-        // set library to g_songs found
-        g_library.library = g_songs
+        // rebuild all data structures from newly loaded g_songs
+        g_library.rebuildDataStructuresFromLoaded()
         // save library
         g_library.save()
         // render this window

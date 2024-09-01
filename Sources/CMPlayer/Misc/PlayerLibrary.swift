@@ -106,7 +106,7 @@ internal class PlayerLibrary {
                         url = aUrl.stringValue ?? ""
                     }
                     if let aGenre = s.attribute(forName: "genre") {
-                        genre = aGenre.stringValue ?? ""
+                        genre = aGenre.stringValue?.lowercased() ?? g_metadataNotFoundName
                     }
                     if let aRecordingYear = s.attribute(forName: "recordingYear") {
                         recordingYear = Int(aRecordingYear.stringValue ?? "0") ?? 0
@@ -186,7 +186,7 @@ internal class PlayerLibrary {
             
             let xnGenre: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
             xnGenre.name = "genre"
-            xnGenre.setStringValue(s.fullGenre, resolvingEntities: false)
+            xnGenre.setStringValue(s.fullGenre.lowercased(), resolvingEntities: false)
             xeSong.addAttribute(xnGenre)
             
             let xnRecordingYear: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
@@ -214,4 +214,46 @@ internal class PlayerLibrary {
             
         }
     }// save
+    ///
+    /// rebuilds all data structures from newly made g_songs    
+    /// 
+    func rebuildDataStructuresFromLoaded() {
+        // clear self.library        
+        self.library.removeAll()
+        // clear self.dictionary
+        self.dictionary.removeAll()
+        // clear g_genres
+        g_genres.removeAll()
+        // clear g_artists
+        g_artists.removeAll()
+        // clear g_recordingYears
+        g_recordingYears.removeAll()
+        // set self.library to g_songs (all songs)
+        self.library = g_songs
+        // loop through all songs in g_songs(self.library(se above)) and rebuild
+        var index: Int = 0
+        for se: SongEntry in self.library {
+            // append genre
+            let genre = se.genre.lowercased()
+            if g_genres[genre] == nil {
+                g_genres[genre] = []
+            }                    
+            g_genres[genre]?.append(se)                    
+            // append to artists
+            let artist = se.artist
+            if g_artists[artist] == nil {
+                g_artists[artist] = []
+            }
+            g_artists[artist]?.append(se)                    
+            // append to years
+            if g_recordingYears[se.recordingYear] == nil {
+                g_recordingYears[se.recordingYear] = []
+            }                    
+            g_recordingYears[se.recordingYear]?.append(se)
+            // update g_library.dictionary
+            g_library.dictionary[se.fileURL!.path] = index
+            // increment index by 1
+            index += 1
+        }            
+    }
 }// PlayerLibrary

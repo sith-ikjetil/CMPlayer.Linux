@@ -87,38 +87,11 @@ internal class SongEntry {
         self.fullAlbumName = trimAndSetStringDefaultValue(str: self.albumName)
         self.albumName = trimAndSetStringDefaultValueMaxLength(str: self.albumName)
         
-        //
-        // Add to g_genres
-        //
         self.fullGenre = trimAndSetStringDefaultValue(str: self.genre)
-        self.genre = trimAndSetStringDefaultValueMaxLength(str: self.genre)
+        self.genre = trimAndSetStringDefaultValueMaxLength(str: self.genre)        
 
-        if g_genres[self.genre] == nil {
-            g_genres[self.genre] = []
-        }
-        
-        g_genres[self.genre]?.append(self)
-        
-        //
-        // Add to g_artists
-        //
         self.fullArtist = trimAndSetStringDefaultValue(str: self.artist)
         self.artist = trimAndSetStringDefaultValueMaxLength(str: self.artist)
-        
-        if g_artists[self.artist] == nil {
-            g_artists[self.artist] = []
-        }
-
-        g_artists[self.artist]?.append(self)
-        
-        //
-        // Add to g_releaseYears
-        //
-        if g_recordingYears[self.recordingYear] == nil {
-            g_recordingYears[self.recordingYear] = []
-        }
-        
-        g_recordingYears[self.recordingYear]?.append(self)
     }    
     ///
     /// Overloaded initializer.
@@ -179,37 +152,12 @@ internal class SongEntry {
             throw error
         }
         
-        //
-        // Add to genre
-        //        
         self.fullGenre = trimAndSetStringDefaultValue(str: self.genre)
         self.genre = trimAndSetStringDefaultValueMaxLength(str: self.genre)
-        if g_genres[self.genre] == nil {
-            g_genres[self.genre] = []
-        }
-        
-        g_genres[self.genre]?.append(self)
-        
-        //
-        // Add to g_artists
-        //
+
         self.fullArtist = trimAndSetStringDefaultValue(str: self.artist)
         self.artist = trimAndSetStringDefaultValueMaxLength(str: self.artist)
-        if g_artists[self.artist] == nil {
-            g_artists[self.artist] = []
-        }
-    
-        g_artists[self.artist]?.append(self)
-            
-        //
-        // Add to g_releaseYears
-        //
-        if g_recordingYears[self.recordingYear] == nil {
-            g_recordingYears[self.recordingYear] = []
-        }
-       
-        g_recordingYears[self.recordingYear]?.append(self)
-        
+      
         self.fullTitle = trimAndSetStringDefaultValue(str: self.title)
         self.title = trimAndSetStringDefaultValueMaxLength(str: self.title)
         

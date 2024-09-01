@@ -69,8 +69,9 @@ internal class Player {
         // initialize CMPlayer
         let wnd = InitializeWindow()
         wnd.showWindow()        
-        // set library to songs found
-        g_library.library = g_songs  
+        // rebuild g_library and all other structures
+        // - from g_songs which is populated after InitializeWindow
+        g_library.rebuildDataStructuresFromLoaded()
         // save library      
         g_library.save()
         // if autoplay on startup, start playing
