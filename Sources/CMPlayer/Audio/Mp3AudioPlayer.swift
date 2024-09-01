@@ -1,10 +1,11 @@
 //
-//  AudioPlayer.swift
+//  Mp3AudioPlayer.swift
+//
+//  (i): Audio player for mp3 files.
 //
 //  Created by Kjetil Kr Solberg on 24-09-2024.
 //  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
 //
-
 //
 // import.
 //
@@ -12,76 +13,78 @@ import Foundation
 import Cmpg123
 import Cao
 import Casound
-
 ///
 /// Mp3 Audio state.
 ///
 internal struct Mp3AudioState {    
-    var aoDevice: OpaquePointer? = nil
-    var aoFormat = ao_sample_format()
-    var alsaState: AlsaState = AlsaState()
+    var aoDevice: OpaquePointer? = nil                    // device handle
+    var aoFormat = ao_sample_format()   // ao format structure
+    var alsaState: AlsaState = AlsaState()                // alsa state
 }
-
 //
-// Represents CMPlayer AudioPlayer.
+// Represents CMPlayer Mp3AudioPlayer.
+// using libmpg123
 //
 internal class Mp3AudioPlayer {
     ///
     /// private constants
     /// 
-    private let filePath: URL    
+    private let filePath: URL   // URL path to file to play
     ///
     /// private variables
     /// 
-    private var mpg123Handle: OpaquePointer?
-    private var m_length: off_t = 0
-    private var m_rate: CLong = 0
+    private var mpg123Handle: OpaquePointer?    // libmpg123 handle
+    private var m_length: off_t = 0             // mp3 length
+    private var m_rate: CLong = 0               // mp3 sample rate
     private let audioQueue = DispatchQueue(label: "dqueue.cmp.linux.mp3-audio-player", qos: .background)
-    private var m_stopFlag: Bool = false
-    private var m_isPlaying: Bool = false    
-    private var m_isPaused: Bool = false
-    private var m_hasPlayed: Bool = false
-    private var m_timeElapsed: UInt64 = 0
-    private var m_duration: UInt64 = 0
-    private var m_channels: Int32 = 2
-    private var m_targetFadeVolume: Float = 1
-    private var m_targetFadeDuration: UInt64 = 0
-    private var m_enableCrossfade: Bool = false
-    private var m_seekPos: UInt64 = 0
-    private var m_doSeekToPos: Bool = false
-    private var m_audioState: Mp3AudioState = Mp3AudioState()
-    ///
-    /// get properties
-    ///
+    private var m_stopFlag: Bool = false        // should we stop playing
+    private var m_isPlaying: Bool = false       // are we currently playing
+    private var m_isPaused: Bool = false        // are we currently paused
+    private var m_hasPlayed: Bool = false       // have we played our song
+    private var m_timeElapsed: UInt64 = 0       // duration of song played
+    private var m_duration: UInt64 = 0          // duration of song 
+    private var m_channels: Int32 = 2           // output audio channels count (2 = stereo)
+    private var m_targetFadeVolume: Float = 1   // what should fade volume be at end of crossfade
+    private var m_targetFadeDuration: UInt64 = 0    // how long should we fade
+    private var m_enableCrossfade: Bool = false     // should we perform crossfade
+    private var m_seekPos: UInt64 = 0               // position to seek to
+    private var m_doSeekToPos: Bool = false         // should we do a seek to
+    private var m_audioState: Mp3AudioState = Mp3AudioState()    // mp3 audio state
+    // return if we are currently playing
     var isPlaying: Bool {
         get {
             return self.m_isPlaying
         }
     }
+    // return if we are paused
     var isPaused: Bool {
         get {
             return self.m_isPaused
         }
     }    
+    // return if we have played
     var hasPlayed: Bool {
         get {
             return self.m_hasPlayed
         }
     }
+    // return elapsed playing time of file
     var timeElapsed: UInt64 {
         get {
             return self.m_timeElapsed
         }
     }
+    // return duration of file
     var duration: UInt64 {
         get {
             return self.m_duration
         }
     }
     ///
-    /// only initializer
+    /// initializer
     ///
     init(path: URL) {
+        // set filePath to path
         self.filePath = path        
     }
     //
@@ -241,39 +244,63 @@ internal class Mp3AudioPlayer {
         self.m_audioState.alsaState.bufferSize = 1024 
         // if output sound library is .ao
         if PlayerPreferences.outputSoundLibrary == .ao {
+            // open ao for playback
             self.m_audioState.aoDevice = ao_open_live(defaultDriver, &self.m_audioState.aoFormat, nil)
-            if self.m_audioState.aoDevice == nil {
+            // if we have a valid device
+            guard self.m_audioState.aoDevice != nil else {
+                // else error, not valid device
+                // create error message
                 let msg = "[Mp3AudioPlayer].play(). ao_open_live failed. Couldn't open audio device"            
-
+                // close handle
                 mpg123_close(self.mpg123Handle)
+                // delete handle
                 mpg123_delete(self.mpg123Handle)
+                // set handle variable to nil
                 self.mpg123Handle = nil
+                // set m_isPlaying flag to false
                 self.m_isPlaying = false                
-
+                // throw error
                 throw CmpError(message:msg)
             }
         }
         // else if output sound library is .alsa
         else if PlayerPreferences.outputSoundLibrary == .alsa {
+            // open alsa for playback
             var err = snd_pcm_open(&self.m_audioState.alsaState.pcmHandle, self.m_audioState.alsaState.pcmDeviceName, SND_PCM_STREAM_PLAYBACK, 0)
+            // check snd_pcm_open for success
             guard err >= 0 else {
+                // else we have an error
+                // create error message
                 let msg = "[Mp3AudioPlayer].play(). alsa. snd_pcm_open failed with value: \(err) = '\(renderAlsaError(error: err))'. Failed to open ALSA PCM device."
+                // close handle
                 mpg123_close(self.mpg123Handle)
+                // delete handle
                 mpg123_delete(self.mpg123Handle)
+                // set handle variable to nil
                 self.mpg123Handle = nil
+                // set m_isPlaying flag to false
                 self.m_isPlaying = false                
-                
-                throw CmpError(message: msg)
+                // throw error
+                throw CmpError(message:msg)
             }  
+            // set alsa output audio parameters
             err = snd_pcm_set_params(self.m_audioState.alsaState.pcmHandle, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, self.m_audioState.alsaState.channels, self.m_audioState.alsaState.sampleRate, 1, 500000)
+            // check snd_pcm_set_params for success
             guard err >= 0 else {
+                // else we have an error
+                // create error message
                 let msg = "[Mp3AudioPlayer].play(). alsa. snd_pcm_set_params failed with value: \(err) = '\(renderAlsaError(error: err))'"
+                // close alsa handle
                 snd_pcm_close(self.m_audioState.alsaState.pcmHandle)
+                // close handle
                 mpg123_close(self.mpg123Handle)
+                // delete handle
                 mpg123_delete(self.mpg123Handle)                
+                // set handle variable to nil
                 self.mpg123Handle = nil
+                // set m_isPlaying flag to false
                 self.m_isPlaying = false                
-                
+                // throw error
                 throw CmpError(message: msg)
             }
         }
@@ -440,23 +467,30 @@ internal class Mp3AudioPlayer {
     /// - Parameter position: ms from start
     func seekToPos(position: UInt64)
     {
+        // guard valid position
         guard position <= self.duration else {
+            // else error
+            // ignore and return
             return
         }
-
+        // set seek position
         self.m_seekPos = position
+        // set m_doSeekToPos flag to true
         self.m_doSeekToPos = true
     }
     /// 
     /// Adjusts volume in the sample buffer to a factor 0.0-1.0
     ///     
     func adjustVolume(buffer: UnsafeMutablePointer<Int8>, size: Int, volume: Float) {
+        // get sample count for 16 bit samples
         let sampleCount = size / MemoryLayout<Int16>.size
+        // reinterpret buffer pointer to samples Int16 pointer from Int8 pointer
         let samples = buffer.withMemoryRebound(to: Int16.self, capacity: sampleCount) { $0 }
-
+        // for each sample in buffer
         for i in 0..<sampleCount {
+            // adjust sample
             let adjustedSample = Float(samples[i]) * volume
-            // Ensure the value is within the Int16 range
+            // ensure the value is within the Int16 range
             samples[i] = Int16(max(min(adjustedSample, Float(Int16.max)), Float(Int16.min)))
         }
     }
@@ -466,34 +500,44 @@ internal class Mp3AudioPlayer {
     ///   - volume: target volume. usually 0.
     ///   - duration: time from end of song, fading should be done.
     func setCrossfadeVolume(volume: Float, fadeDuration: UInt64) {
+        // guard valid volume
         guard volume >= 0 && volume <= 1 else {
+            // else error
+            // ignore and return
             return
         }
-        
+        // guard valid crossfade time
         guard isCrossfadeTimeValid(seconds: Int(fadeDuration / 1000)) else {
+            // else error
+            // ignore and return
             return
         }
-        
+        // set crossfade volume target
         self.m_targetFadeVolume = volume
+        // set crossfade duration
         self.m_targetFadeDuration = fadeDuration
+        // set m_enableCrossfade flag to true
         self.m_enableCrossfade = true
     }
     ///
     /// stops playback if we are playing.
     /// 
     func stop() {
+        // set m_stopFlag flag to true
         self.m_stopFlag = true        
     }
     ///
     /// pauses playback if we are playing
     /// 
     func pause() {
+        // set m_isPaused flag to true
         self.m_isPaused = true
     }
     ///
     /// resumes playback if we are playing.
     ///
     func resume() {
+        // set m_isPaused flag to false
         self.m_isPaused = false
     }
     ///
