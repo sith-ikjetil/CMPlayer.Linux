@@ -557,17 +557,35 @@ internal class M4aAudioPlayer {
             if self.m_audioState.packet.stream_index == self.m_audioState.audioStreamIndex {
                 // supply raw packet data as input to a decoder.
                 retVal = avcodec_send_packet(self.m_audioState.codecCtx, &self.m_audioState.packet)
-                // if error
-                if retVal < 0 {
-                    // create log message
+                // if success
+                guard retVal >= 0 else {
+                    // else we have an error
+                    // create error message
                     let msg = "avcodec_send_packet failed with value: \(retVal) = '\(renderFfmpegError(error: retVal))'."
                     // log error
                     PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
                     // return
                     return
-                }                
+                }                                
                 // while we are not quitting, stopping or 
-                while !g_quit && !m_stopFlag && (avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame) == 0) {
+                while !g_quit && !m_stopFlag {
+                    // return decoded output
+                    retVal = avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame)
+                    // guard retVal success
+                    guard retVal == 0 else {
+                        // else we have an error
+                        // create error message
+                        let msg = "avcodec_receive_frame failed with value: \(retVal) = '\(renderFfmpegError(error: retVal))'."
+                        // log error
+                        PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
+                        // return
+                        return
+                    }
+                    // ensure cleanup by defer                    
+                    defer {
+                        // release all resources associated with this AVFrame.
+                        av_frame_unref(self.m_audioState.frame)
+                    }
                     // create a read/write pointer to outputBuffer
                     var outputBuffer: UnsafeMutablePointer<UInt8>? = nil
                     // allocate a samples buffer for nb_samples samples
