@@ -411,9 +411,9 @@ internal class Mp3AudioPlayer {
             // calculate total current number of bytes per channel
             let totalCurrentBytesPerChannel = bytesRead / Int(self.m_channels)
             // calculate current duration of read samples
-            let currentDuration = Double(totalCurrentBytesPerChannel) / Double(self.m_rate)
+            let currentDuration = Double(totalCurrentBytesPerChannel) / Double(MemoryLayout<Int16>.size * self.m_rate)
             // update time elapsed
-            self.m_timeElapsed += UInt64(currentDuration * Double(1000/self.m_channels))
+            self.m_timeElapsed += UInt64(currentDuration * 1000.0)
             // calculate time left
             let timeLeft: UInt64 = (self.duration >= self.m_timeElapsed) ? self.duration - self.m_timeElapsed : self.duration
             // if time left is inside fade duration
@@ -422,7 +422,12 @@ internal class Mp3AudioPlayer {
                 timeToStartCrossfade = true
                 // calculate current volume
                 currentVolume = max(0.0, min(1.0, Float(timeLeft) / Float(self.m_targetFadeDuration)))
-            }            
+            }
+            // time left not inside fade duration
+            else {
+                // set timeToStartCrossfade flag to false
+                timeToStartCrossfade = false
+            }
             // guard buffer is not empty
             guard !buffer.isEmpty else {
                 // else create an error message

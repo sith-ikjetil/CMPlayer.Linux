@@ -608,17 +608,22 @@ internal class M4aAudioPlayer {
                         // total samples per channel
                         let totalBytesPerChannel: UInt64 = UInt64(totalBytes) / UInt64(self.m_audioState.aoFormat.channels)
                         // duration of samples
-                        let currentDuration: Double = Double(totalBytesPerChannel) / Double(self.m_audioState.aoFormat.rate)
+                        let currentDuration: Double = Double(totalBytesPerChannel) / Double(MemoryLayout<Int16>.size * Int(self.m_audioState.aoFormat.rate))
                         // time elapsed when these bytes are played
-                        self.m_timeElapsed += UInt64(currentDuration * Double(1000/self.m_audioState.aoFormat.channels))                        
+                        self.m_timeElapsed += UInt64(currentDuration * 1000.0)                        
                         // set crossfade volume
                         let timeLeft: UInt64 = (self.duration >= self.m_timeElapsed) ? self.duration - self.m_timeElapsed : self.duration
-                        // if we should crossfade
+                        // if time is inside fade duration
                         if timeLeft > 0 && timeLeft <= self.m_targetFadeDuration {
                             // set timeToStartCrossfade flag to true
                             timeToStartCrossfade = true
                             // calculate volume 100%-0% volume over m_targetFadeDuration                            
                             currentVolume = max(0.0, min(1.0, Float(timeLeft) / Float(self.m_targetFadeDuration)))                 
+                        }
+                        // else time is not inside fade duration
+                        else {
+                            // set timeToStartCrossfade flag to false
+                            timeToStartCrossfade = false
                         }
                         // adjust crossfade volume
                         if self.m_enableCrossfade && timeToStartCrossfade {
