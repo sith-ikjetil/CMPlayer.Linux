@@ -503,211 +503,285 @@ internal class Mp3AudioPlayer {
     /// - Returns: CmpMetadata
     /// 
     static func gatherMetadata(path: URL) throws -> CmpMetadata {
-        if path.path.lowercased().hasSuffix(".mp3") {
-            let metadata = CmpMetadata()
-           
-            //print("URL: \(self.fileURL!.path)")
-            guard let handle = mpg123_new(nil, nil) else {
-                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_new failed. File: \(path.lastPathComponent)"
-                throw CmpError(message: msg)
-            }
-
-            defer {
-                // deleted the handle
-                mpg123_delete(handle)                
-            }
-
-            var err = mpg123_open(handle, path.path)
-            guard err == 0 else {                
-                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_open failed with value: \(err) = '\(renderMpg123Error(error: err))'. File: \(path.lastPathComponent)"
-                throw CmpError(message: msg)
-            }      
-
-            defer {
-                // closed the source after open
-                mpg123_close(handle)
-            }
-
-            //
-            // find duration
-            //       
-            err = mpg123_scan(handle)
-            if  err != 0 {                                                
-                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_scan failed with value: \(err) = '\(renderMpg123Error(error: err))'. File: \(path.lastPathComponent)"
-                throw CmpError(message: msg)                
-            }
-
-            let length  = mpg123_length(handle)
-            if length  <= 0 {                
-                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_length failed with length: \(length). File: \(path.lastPathComponent)"                
-                throw CmpError(message: msg)
-            }
-            
-            // Get the rate and channels to calculate duration
-            var rate: CLong = 0
-            var channels: Int32 = 0
-            var encoding: Int32 = 0
-            err = mpg123_getformat(handle, &rate, &channels, &encoding)            
-            if err != 0 {
-                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_getformat failed with value: \(err) = '\(renderMpg123Error(error: err))'. File: \(path.lastPathComponent)"
-                throw CmpError(message: msg)
-            }
-
-            // Calculate duration
-            // Scan the file to build an accurate index of frames
-            
-            let duration = Double(length) / Double(rate)
-            metadata.duration = UInt64(duration * 1000)            
-
-            // Ensure positive duration
-            guard duration > 0 else {            
-                let msg = "[Mp3AudioPlayer].gatherMetadata(path:). Duration was 0. File: \(path.lastPathComponent)"
-                throw CmpError(message: msg)
-            }
-            
-            let metaCheck = mpg123_meta_check(handle)
-            if metaCheck & MPG123_ID3 != 0 {
-                let id3v1Pointer: UnsafeMutablePointer<UnsafeMutablePointer<mpg123_id3v1>?>? = UnsafeMutablePointer.allocate(capacity: 1)
-                id3v1Pointer?.initialize(to: nil)
-                
-                let id3v2Pointer: UnsafeMutablePointer<UnsafeMutablePointer<mpg123_id3v2>?>? = UnsafeMutablePointer.allocate(capacity: 1)
-                id3v2Pointer?.initialize(to: nil)
-                
-                defer {
-                    id3v1Pointer?.deallocate()
-                    id3v2Pointer?.deallocate()
-                }
-
-                // Call the mpg123_id3 function to fill in the pointers
-                let err = mpg123_id3(handle, id3v1Pointer, id3v2Pointer)
-                if err == 0 {
-                    var bFoundTitle: Bool = false
-                    var bFoundArtist: Bool = false
-                    var bFoundAlbumName: Bool = false
-                    var bFoundYear: Bool = false
-                    var bFoundGenre: Bool = false
-                    if let id3v2 = id3v2Pointer?.pointee?.pointee {
-                        // Access ID3v2 metadata fields safely
-                        if id3v2.title?.pointee.p != nil {
-                            let title = String(cString: id3v2.title.pointee.p)
-                            if title.count > 0 {
-                                metadata.title = title
-                                bFoundTitle = true
-                            }
-                        }                        
-                        
-                        if id3v2.artist?.pointee.p != nil {
-                            let artist = String(cString: id3v2.artist.pointee.p)                            
-                            if artist.count > 0 {
-                                metadata.artist = artist
-                                bFoundArtist = true
-                            }
-                        }
-                                                
-                        if id3v2.album?.pointee.p != nil {
-                            let album = String(cString: id3v2.album.pointee.p)
-                            if album.count > 0 {
-                                metadata.albumName = album
-                                bFoundAlbumName = true
-                            }
-                        }                        
-
-                        if id3v2.year?.pointee.p != nil {
-                            let year = String(cString: id3v2.year.pointee.p)
-                            if year.count > 0 {
-                                metadata.recordingYear = Int(year) ?? 0
-                                if metadata.recordingYear != 0 {
-                                    bFoundYear = true
-                                }
-                            }
-                        }                        
-
-                        if id3v2.genre?.pointee.p != nil {
-                            let genre = String(cString: id3v2.genre.pointee.p)
-                            if genre.count > 0 {
-                                metadata.genre = extractMetadataGenre(text: genre)                                
-                                bFoundGenre = true
-                            }
-                        }                                                                   
-
-                        // Loop through the text fields to find the track number
-                        for i in 0..<id3v2.texts {                            
-                            let textItem = id3v2.text[i]
-                            let text = String(cString: textItem.text.p)
-                            let id = "\(Character(UnicodeScalar(UInt32(textItem.id.0))!))\(Character(UnicodeScalar(UInt32(textItem.id.1))!))\(Character(UnicodeScalar(UInt32(textItem.id.2))!))\(Character(UnicodeScalar(UInt32(textItem.id.3))!))"
-                            if id == "TRCK" {
-                                metadata.trackNo = Int(text) ?? 0
-                            }  
-                            if !bFoundYear {                                                                             
-                                if id == "TYER" || id == "TORY" {                                    
-                                    metadata.recordingYear = extractMetadataYear(text: text)
-                                    if metadata.recordingYear != 0 {                                   
-                                        bFoundYear = true               
-                                    }                     
-                                }
-                            }
-                        }                                                
-                    } 
-
-                    if let id3v1 = id3v1Pointer?.pointee?.pointee {
-                        // ID3v1 fallback                        
-                        if !bFoundArtist {
-                            let artist = withUnsafePointer(to: id3v1.artist) { ptr in
-                                return String(cString: UnsafeRawPointer(ptr).assumingMemoryBound(to: CChar.self), encoding: .isoLatin1)         
-                            }
-                            metadata.artist = artist ?? g_metadataNotFoundName
-                        }                         
-                        if !bFoundTitle {
-                            let title = withUnsafePointer(to: id3v1.title) { ptr in
-                                return String(cString: UnsafeRawPointer(ptr).assumingMemoryBound(to: CChar.self), encoding: .isoLatin1)         
-                            }
-                            metadata.title = title ?? g_metadataNotFoundName                            
-                        }
-                        if !bFoundAlbumName {
-                            let album = withUnsafePointer(to: id3v1.album) { ptr in
-                                return String(cString: UnsafeRawPointer(ptr).assumingMemoryBound(to: CChar.self), encoding: .isoLatin1)         
-                            }
-                            metadata.albumName = album ?? g_metadataNotFoundName                            
-                        }
-                        if !bFoundYear {
-                            let year = withUnsafePointer(to: id3v1.year) { ptr in
-                                return String(cString: UnsafeRawPointer(ptr).assumingMemoryBound(to: CChar.self), encoding: .isoLatin1)         
-                            }                                                
-                            if year != nil {    
-                                metadata.recordingYear = extractMetadataYear(text: year!)
-                            }
-                        }                        
-                        if !bFoundGenre {
-                            metadata.genre = convertId3V1GenreIndexToName(index: id3v1.genre)
-                        }
-                    }
-
-                    //
-                    // ensure valid values
-                    //
-                    if metadata.trackNo < 0 {
-                        metadata.trackNo = 0
-                    }
-
-                    // Log we found metadatda
-                    // this is a preformance issue
-                    //PlayerLog.ApplicationLog?.logInformation(title: "[Mp3AudioPlayer].gatherMetadata()", text: "Found metadata for: \(path.path)")
-                    
-                    //
-                    // return metadata
-                    //
-                    return metadata
-                } 
-                else {
-                    let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_id3 failed with value \(err). File: \(path.lastPathComponent)"
-                    throw CmpError(message: msg)
-                }                
-            }// mpg123_meta_check            
-            let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_meta_check failed with value: \(metaCheck). File: \(path.lastPathComponent)"
+        // guard file type is expected .mp3
+        guard path.path.lowercased().hasSuffix(".mp3") else {
+            // else we have an error
+            // create error message
+            let msg = "[Mp3AudioPlayer].gatherMetadata(path:). Unknown file type. File: \(path.lastPathComponent)"
+            // throw error
             throw CmpError(message: msg)
-        }// is .mp3
-        
-        let msg = "[Mp3AudioPlayer].gatherMetadata(path:). Unknown file type. File: \(path.lastPathComponent)"
-        throw CmpError(message: msg)
-    }    
+        }
+        // create metadata, default values
+        let metadata = CmpMetadata()
+        // if create a handle with mpg123_new returnes valid handle
+        guard let handle: OpaquePointer = mpg123_new(nil, nil) else {
+            // else we have an invalid handle
+            // create error message
+            let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_new failed. File: \(path.lastPathComponent)"
+            // throw error
+            throw CmpError(message: msg)
+        }
+        // defer newly created handle
+        // - by deleting it
+        defer {
+            // deleted the handle
+            mpg123_delete(handle)                
+        }
+        // open and prepare to decode path file
+        var err = mpg123_open(handle, path.path)
+        // guard for no error
+        guard err == 0 else {             
+            // else we have an error
+            // create error message
+            let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_open failed with value: \(err) = '\(renderMpg123Error(error: err))'. File: \(path.lastPathComponent)"
+            // throw error
+            throw CmpError(message: msg)
+        }      
+        // defer newly opened file
+        // - by closing handle
+        defer {
+            // closed the source after open
+            mpg123_close(handle)
+        }
+        // scan through file so we can get proper length (duration)           
+        err = mpg123_scan(handle)
+        // guard for no error
+        guard err == 0 else {                                                
+            // else we have an error
+            // create error message
+            let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_scan failed with value: \(err) = '\(renderMpg123Error(error: err))'. File: \(path.lastPathComponent)"
+            // throw error
+            throw CmpError(message: msg)                
+        }
+        // get full length of file in frames
+        let length  = mpg123_length(handle)
+        // guard for positive length
+        guard length > 0 else {
+            // else we have an error
+            // create error message
+            let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_length failed with length: \(length). File: \(path.lastPathComponent)"                
+            // throw error
+            throw CmpError(message: msg)
+        }
+        // create rate variable
+        var rate: CLong = 0
+        // create channels variable
+        var channels: Int32 = 0
+        // create encoding variable
+        var encoding: Int32 = 0
+        // get current output format
+        err = mpg123_getformat(handle, &rate, &channels, &encoding)            
+        // guard for no error
+        guard err == 0 else {
+            // else we have an error
+            // create error message
+            let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_getformat failed with value: \(err) = '\(renderMpg123Error(error: err))'. File: \(path.lastPathComponent)"
+            // throw error
+            throw CmpError(message: msg)
+        }
+        // calculate duration in seconds
+        let duration = Double(length) / Double(rate)
+        // calculate and set duration (ms)
+        metadata.duration = UInt64(duration * 1000)            
+        // guard duration > 0
+        guard duration > 0 else {            
+            // else we have an error
+            // create error message
+            let msg = "[Mp3AudioPlayer].gatherMetadata(path:). Duration was 0. File: \(path.lastPathComponent)"
+            // throw error
+            throw CmpError(message: msg)
+        }
+        // query if there is metadata info
+        let metaCheck = mpg123_meta_check(handle)
+        guard metaCheck & MPG123_ID3 != 0 else {
+            // else we have an error
+            // create error message
+            let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_meta_check failed with value: \(metaCheck). File: \(path.lastPathComponent)"
+            // throw error
+            throw CmpError(message: msg)
+        }
+        // create pointer to id3v1 metadata
+        let id3v1Pointer: UnsafeMutablePointer<UnsafeMutablePointer<mpg123_id3v1>?>? = UnsafeMutablePointer.allocate(capacity: 1)
+        // initialize pointer
+        id3v1Pointer?.initialize(to: nil)
+        // create pointer to id3v2 metadata
+        let id3v2Pointer: UnsafeMutablePointer<UnsafeMutablePointer<mpg123_id3v2>?>? = UnsafeMutablePointer.allocate(capacity: 1)
+        // initialize pointer
+        id3v2Pointer?.initialize(to: nil)
+        // defer id3v1 and id3v2 pointers
+        defer {
+            // deallocate pointer
+            id3v1Pointer?.deallocate()
+            // deallocate pointer
+            id3v2Pointer?.deallocate()
+        }
+        // call the mpg123_id3 function to fill in the pointers
+        err = mpg123_id3(handle, id3v1Pointer, id3v2Pointer)
+        // guard mpg123_id3 return value success
+        guard err == 0 else {                
+            // else we have an error
+            // create error message
+            let msg = "[Mp3AudioPlayer].gatherMetadata(path:). mpg123_id3 failed with value \(err). File: \(path.lastPathComponent)"
+            // throw error
+            throw CmpError(message: msg)
+        }     
+        // set bFoundTitle flag to false
+        var bFoundTitle: Bool = false
+        // set bFoundArtist flag to false
+        var bFoundArtist: Bool = false
+        // set bFoundAlbumName flag to false
+        var bFoundAlbumName: Bool = false
+        // set bFoundYear flag to false
+        var bFoundYear: Bool = false
+        // set bFoundGenre flag to false
+        var bFoundGenre: Bool = false
+        // if idrv2 pointer is valid
+        if let id3v2 = id3v2Pointer?.pointee?.pointee {
+            // access ID3v2 metadata fields safely
+            // is id3v2 title pointer ok
+            if id3v2.title?.pointee.p != nil {
+                // yes get title
+                let title = String(cString: id3v2.title.pointee.p)
+                // if title has characters
+                if title.count > 0 {
+                    // set metadata title
+                    metadata.title = title
+                    // set bFoundTitle flag to true
+                    bFoundTitle = true
+                }
+            }                        
+            // is id3v2 artist pointer ok
+            if id3v2.artist?.pointee.p != nil {
+                // yes get artist
+                let artist = String(cString: id3v2.artist.pointee.p)                            
+                // if artist has characters
+                if artist.count > 0 {
+                    // set metadata artist
+                    metadata.artist = artist
+                    // set bFoundArtist flag to true
+                    bFoundArtist = true
+                }
+            }
+            // is id3v2 album pointer ok
+            if id3v2.album?.pointee.p != nil {
+                // yes get album
+                let album = String(cString: id3v2.album.pointee.p)
+                // if album has characters
+                if album.count > 0 {
+                    // set metadata albumName
+                    metadata.albumName = album
+                    // set bFoundAlbumName flag to true
+                    bFoundAlbumName = true
+                }
+            }                        
+            // is id3v2 year pointer ok
+            if id3v2.year?.pointee.p != nil {
+                // yes get year
+                let year = String(cString: id3v2.year.pointee.p)
+                // if year has characters
+                if year.count > 0 {
+                    // set metadata recordingYear
+                    metadata.recordingYear = Int(year) ?? 0
+                    // check year is valid
+                    if metadata.recordingYear > 0 {
+                        // set bFoundYear flag to true
+                        bFoundYear = true
+                    }
+                }
+            }                        
+            // is id3v2 genre pointer ok
+            if id3v2.genre?.pointee.p != nil {
+                // yes get genre
+                let genre = String(cString: id3v2.genre.pointee.p)
+                // if genre has characters
+                if genre.count > 0 {
+                    // set metadata genre
+                    metadata.genre = extractMetadataGenre(text: genre)                                
+                    // set bFoundGenre flag to true
+                    bFoundGenre = true
+                }
+            }                                                                   
+            // Loop through the text fields to find the track number
+            for i in 0..<id3v2.texts {
+                // get current text item
+                let textItem = id3v2.text[i]
+                // get item value
+                let text = String(cString: textItem.text.p)
+                // get item id
+                let id = "\(Character(UnicodeScalar(UInt32(textItem.id.0))!))\(Character(UnicodeScalar(UInt32(textItem.id.1))!))\(Character(UnicodeScalar(UInt32(textItem.id.2))!))\(Character(UnicodeScalar(UInt32(textItem.id.3))!))"
+                // check id = track no
+                if id == "TRCK" {
+                    // set metadata track no
+                    let trackNo = Int(text) ?? 0
+                    // check for valid track no
+                    if trackNo > 0 {
+                        metadata.trackNo = trackNo
+                    }
+                }  
+                // if we have not found year
+                if !bFoundYear {            
+                    // check for year                                                                 
+                    if id == "TYER" || id == "TORY" {                        
+                        // get year
+                        let recordingYear = extractMetadataYear(text: text)
+                        // is year valid
+                        if recordingYear > 0 {
+                            metadata.recordingYear = recordingYear
+                            bFoundYear = true               
+                        }                     
+                    }
+                }
+            }                                                
+        } 
+        // if id3v1 pointer is valid
+        if let id3v1 = id3v1Pointer?.pointee?.pointee {
+            // ID3v1 fallback
+            // if we have not found artist                 
+            if !bFoundArtist {
+                // get artist
+                let artist = withUnsafePointer(to: id3v1.artist) { ptr in
+                    return String(cString: UnsafeRawPointer(ptr).assumingMemoryBound(to: CChar.self), encoding: .isoLatin1)         
+                }
+                // set artist to metadata
+                metadata.artist = artist ?? g_metadataNotFoundName
+            }                         
+            // if we have not found title
+            if !bFoundTitle {
+                // get title
+                let title = withUnsafePointer(to: id3v1.title) { ptr in
+                    return String(cString: UnsafeRawPointer(ptr).assumingMemoryBound(to: CChar.self), encoding: .isoLatin1)         
+                }
+                // set title to metadata
+                metadata.title = title ?? g_metadataNotFoundName                            
+            }
+            // if we have not found album name
+            if !bFoundAlbumName {
+                // get album
+                let album = withUnsafePointer(to: id3v1.album) { ptr in
+                    return String(cString: UnsafeRawPointer(ptr).assumingMemoryBound(to: CChar.self), encoding: .isoLatin1)         
+                }
+                // set albumName to metadata
+                metadata.albumName = album ?? g_metadataNotFoundName                            
+            }
+            // if we have not found year
+            if !bFoundYear {
+                // get year
+                let year = withUnsafePointer(to: id3v1.year) { ptr in
+                    return String(cString: UnsafeRawPointer(ptr).assumingMemoryBound(to: CChar.self), encoding: .isoLatin1)         
+                }
+                // if year is valid
+                if year != nil {    
+                    // set recordingYear to metadata
+                    metadata.recordingYear = extractMetadataYear(text: year!)
+                }
+            }                        
+            // if we have not found genre
+            if !bFoundGenre {
+                // set genre to metadata
+                metadata.genre = convertId3V1GenreIndexToName(index: id3v1.genre)
+            }                        
+        }                    
+        // return metadata
+        return metadata                                               
+    }
 }// AudioPlayer
