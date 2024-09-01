@@ -1,7 +1,7 @@
 //
 //  AudioHelpers.swift
 //
-//  (i): Helper functions and etc. that is used in audio decoding or playback.
+//  (i): Helper functions/etc. that is used in audio decoding or playback.
 //
 //  Created by Kjetil Kr Solberg on 27-09-2024.
 //  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.

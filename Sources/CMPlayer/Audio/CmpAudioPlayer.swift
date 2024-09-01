@@ -112,16 +112,31 @@ internal class CmpAudioPlayer {
         }
     }
     ///
-    /// Only initializer
+    /// initializer
     ///
     init(path: URL) throws {
+        // check if file exists
+        if !FileManager.default.fileExists(atPath: path.path) {
+            // no, create error message
+            let msg: String = "[CmpAudioPlayer].init. File not found: \(path.path)"
+            // throw error
+            throw CmpError(message: msg)
+        }
+
+        // save path
         self.filePath = path       
+        // is path an mp3?
         if path.path.lowercased().hasSuffix(".mp3") {
+            // yes, set self.mp3Player to a new instance of Mp3AudioPlayer
             self.mp3Player = Mp3AudioPlayer(path: path);            
+            // return
             return
         }
+        // else if path an m4a?
         else if path.path.lowercased().hasSuffix(".m4a") {
+            // yes, set self.mp3Player to a new instance of M4aAudioPlayer
             self.m4aPlayer = M4aAudioPlayer(path: path);            
+            // return
             return
         }
 
@@ -229,13 +244,18 @@ internal class CmpAudioPlayer {
     /// - Returns: CmpMetadata
     /// 
     static func gatherMetadata(path: URL) throws -> CmpMetadata {
+        // is file an mp3?
         if path.path.lowercased().hasSuffix(".mp3") {
+            // yes, try and gather metadata
             return try Mp3AudioPlayer.gatherMetadata(path: path);
         }
+        // else is file an m4a?
         else if path.path.lowercased().hasSuffix(".m4a") {            
+            // yes, try and gather metadata
             return try M4aAudioPlayer.gatherMetadata(path: path);            
         }
-
+        // unsupported or unknown file type
+        // throw error
         throw CmpError(message: "Error trying to gather metadata on unknown file format. File: \(path.path)")
     }
 }// AudioPlayer
