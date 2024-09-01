@@ -117,7 +117,7 @@ internal class Mp3AudioPlayer {
         guard mpg123Handle == nil else {
             // else error
             // create error message            
-            let msg = "[Mp3AudioPlayer].play(). Already playing a file."            
+            let msg = "[Mp3AudioPlayer].play(). mpg123Handle != nil. Already playing a file."            
             // throw error
             throw CmpError(message: msg)
         }        

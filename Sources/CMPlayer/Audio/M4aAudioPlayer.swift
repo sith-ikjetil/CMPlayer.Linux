@@ -560,7 +560,7 @@ internal class M4aAudioPlayer {
                 // if error
                 if retVal < 0 {
                     // create log message
-                    let msg = "[M4aAudioPlayer].playAsync(). avcodec_send_packet failed with value: \(retVal) = '\(renderFfmpegError(error: retVal))'."
+                    let msg = "avcodec_send_packet failed with value: \(retVal) = '\(renderFfmpegError(error: retVal))'."
                     // log error
                     PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
                     // return
