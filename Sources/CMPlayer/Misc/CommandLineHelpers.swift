@@ -161,7 +161,9 @@ func PrintAndExecutePlayerLibrary() {
         let fileUrl: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLibrary.filename, isDirectory: false)
         if FileManager.default.fileExists(atPath: fileUrl.path) {
             let lib: PlayerLibrary = PlayerLibrary()
-            try lib.load()        
+            try lib.load()  
+            g_songs = lib.library      
+            lib.rebuild()
             print(" > Number of valid entries              \(lib.library.count)")    
             print(" > Number of distinct artists           \(g_artists.count)") 
             print(" > Number of distinct genres            \(g_genres.count)")    
