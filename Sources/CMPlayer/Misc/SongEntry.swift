@@ -129,7 +129,7 @@ internal class SongEntry {
                 self.artist = metadata.artist
                 self.albumName = metadata.albumName
                 self.recordingYear = metadata.recordingYear
-                self.genre = metadata.genre
+                self.genre = metadata.genre.lowercased()
                 self.duration = metadata.duration    
                 self.trackNo = metadata.trackNo    
 

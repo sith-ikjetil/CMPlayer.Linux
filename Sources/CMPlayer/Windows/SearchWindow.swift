@@ -670,7 +670,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             // else if viewtype is details
             else if PlayerPreferences.viewType == ViewType.Details {
                 // if searchResult count > page size
-                if self.searchIndex >= 0 && self.searchResult.count > (g_rows-7) {
+                if self.searchIndex >= 0 && self.searchResult.count > ((g_rows-7)/2) {
                     // if searchIndex + page size < searchResult count - page size (are we not at last page)
                     if self.searchIndex + ((g_rows-7)/2) < (self.searchResult.count - ((g_rows-7)/2)) {
                         // increment searchIndex by a page (move down one page)
