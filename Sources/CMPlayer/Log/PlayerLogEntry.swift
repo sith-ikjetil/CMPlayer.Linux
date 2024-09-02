@@ -1,31 +1,27 @@
 //
 //  PlayerLogEntry.swift
 //
+//  (i): Code that represent a log item.
+//
 //  Created by Kjetil Kr Solberg on 24-09-2024.
 //  Copyright © 2024 Kjetil Kr Solberg. All rights reserved.
 //
-
 //
 // import.
 //
 import Foundation
 import FoundationXML
-
 ///
 /// Log entry class.
 ///
 internal class PlayerLogEntry {
     ///
-    /// static constants
-    ///
-    static let XML_ELEMENT_NAME: String = "LogEntry"
-    ///
     /// variables
     /// 
-    var type: PlayerLogEntryType
-    var title: String
-    var text: String
-    var timeStamp: Date
+    var type: PlayerLogEntryType    // log type (information, debug, warning, other or error)
+    var title: String               // title of log item
+    var text: String                // text of log item
+    var timeStamp: Date             // timestamp of log item
     ///
     /// Overloaded initializer
     ///
@@ -36,64 +32,29 @@ internal class PlayerLogEntry {
     ///
     init( type: PlayerLogEntryType, title: String, text: String, timeStamp: Date)
     {
+        // set self.type to type
         self.type = type
+        // set self.title to title
         self.title = title
+        // set self.text to text
         self.text = text
+        // set self.timeStamp to timeStamp
         self.timeStamp = timeStamp
-    }
-    ///
-    /// Overloaded initializer
-    ///
-    /// parameter e: XML element representing a log entry
-    ///
-    init( e: XMLElement )
-    {
-        self.title = e.attribute(forName: "Title")?.stringValue ?? ""
-        self.text = e.stringValue ?? ""
-        self.type = PlayerLogEntryType(rawValue: e.attribute(forName: "Type")?.stringValue ?? "Other") ?? PlayerLogEntryType.Other
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
-        
-        self.timeStamp = dateFormatter.date(from: e.attribute(forName: "TimeStamp")?.stringValue ?? "") ?? Date()
-    }  
-    ///
-    /// Creates an xml element representing this log entry.
-    ///
-    /// returnes: XML element.
-    ///
-    func toXMLElement() -> XMLElement {        
-        let xe = XMLElement(name: PlayerLogEntry.XML_ELEMENT_NAME)
-    
-        // Set the text content of the element
-        xe.stringValue = self.text
-        
-        // Add the "Title" attribute
-        let xnTitle = XMLNode.attribute(withName: "Title", stringValue: self.title) as! XMLNode
-        xe.addAttribute(xnTitle)
-        
-        // Add the "Type" attribute
-        let xnType = XMLNode.attribute(withName: "Type", stringValue: self.type.rawValue) as! XMLNode
-        xe.addAttribute(xnType)
-        
-        // Format the date and add the "TimeStamp" attribute
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
-        
-        let xnTimeStamp = XMLNode.attribute(withName: "TimeStamp", stringValue: dateFormatter.string(from: self.timeStamp)) as! XMLNode
-        xe.addAttribute(xnTimeStamp)
-        
-        return xe
-    }//toXMLElement
+    }    
     /// 
     /// Converts entry into plain text for loggin purposes.
     /// 
     /// - Returns: 
     func toPlainText() -> String {
+        // create a variable named text of type string
         var text: String = ""    
+        // append self.type, self.timeStamp and self.title
         text += "[\(self.type)] [\(self.timeStamp.itsToString())] Title: \(self.title)"
+        // append a new line
         text += "\n"
+        // append self.text
         text += "Text: \(self.text)"
+        // append two new lines, entries separated by a line
         text += "\n\n"
 
         return text
