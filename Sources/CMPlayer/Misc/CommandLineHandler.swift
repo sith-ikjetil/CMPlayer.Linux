@@ -70,10 +70,32 @@ internal class CommandLineHandler {
         // load preferences
         PlayerPreferences.ensureLoadPreferences()                    
         // initialize ao
-        ao_initialize()  // initialize libao
-        // print and execute integrity check (CommandLineHelpers.swift)
-        PrintAndExecuteIntegrityCheck()       
-        // shutdown ao     
+        ao_initialize()  // initialize libao 
+        // print header
+        print("CMPlayer Integrity Check")
+        // print separator
+        print("========================")
+        // print output devices ao and alsa
+        PrintAndExecuteOutputDevices()
+        // print new line>
+        print("")
+        // print about library files needed to run
+        // PrintAndExecuteLibraryFiles()
+        // print new line
+        // print("")
+        // print info about home directory
+        PrintAndExecutePlayerHomeDirectory()
+        // print new line>
+        print("")
+        // print info about library
+        PrintAndExecutePlayerLibrary()
+        // print new line>
+        print("")
+        // print info about player preferences
+        PrintAndExecutePlayerPreferences()
+        // print new line>
+        print("")
+        // shutdown ao
         ao_shutdown()
         // exit application
         exit(ExitCodes.SUCCESS.rawValue)   
