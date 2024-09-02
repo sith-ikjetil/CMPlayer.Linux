@@ -219,9 +219,35 @@ internal class Mp3AudioPlayer {
             throw CmpError(message: msg)
         }
         // configure to set no format
-        mpg123_format_none(mpg123Handle)
+        err = mpg123_format_none(mpg123Handle)
+        guard err == 0 else {
+            // else error
+            // create error message
+            let msg = "[Mp3AudioPlayer].play(). mpg123_format_none failed value: \(err) = '\(renderMpg123Error(error: err))'."                        
+            // close handle
+            mpg123_close(self.mpg123Handle)
+            // delete handle
+            mpg123_delete(self.mpg123Handle)
+            // set handle variable to nil
+            self.mpg123Handle = nil
+            // throw error
+            throw CmpError(message: msg)
+        }        
         // set audio format 
-        mpg123_format(mpg123Handle, 44100, 2, encoding);//rate, channels, encoding)
+        err = mpg123_format(mpg123Handle, 44100, 2, encoding);
+        guard err == 0 else {
+            // else error
+            // create error message
+            let msg = "[Mp3AudioPlayer].play(). mpg123_format failed value: \(err) = '\(renderMpg123Error(error: err))'."                        
+            // close handle
+            mpg123_close(self.mpg123Handle)
+            // delete handle
+            mpg123_delete(self.mpg123Handle)
+            // set handle variable to nil
+            self.mpg123Handle = nil
+            // throw error
+            throw CmpError(message: msg)
+        }
         // get default libao playback driver id
         let defaultDriver = ao_default_driver_id()
         // Set up libao format        

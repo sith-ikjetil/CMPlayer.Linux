@@ -302,7 +302,21 @@ internal class M4aAudioPlayer {
             throw CmpError(message: msg)
         }
         // set default values to chLayoutOut
-        av_channel_layout_default(&self.m_audioState.chLayoutOut, 2);
+        err = av_channel_layout_default(&self.m_audioState.chLayoutOut, 2)
+        if err < 0 {
+            // create error message
+            let msg = "[M4aAudioPlayer].play(). av_channel_layout_default failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            // free swrCtx
+            swr_free(&self.m_audioState.swrCtx)
+            // free frame
+            av_frame_free(&self.m_audioState.frame)
+            // free codec context
+            avcodec_free_context(&self.m_audioState.codecCtx)
+            // close opened input
+            avformat_close_input(&self.m_audioState.formatCtx)  
+            // throw error
+            throw CmpError(message: msg)
+        }        
         // set channel layout to SwrCtx
         err = av_opt_set_chlayout(rawSwrCtxPtr, "out_chlayout", &self.m_audioState.chLayoutOut, 0)
         if err < 0 {
@@ -321,18 +335,108 @@ internal class M4aAudioPlayer {
         }        
 #elseif CMP_FFMPEG_V4
         // set in channel layout to swrCtx
-        av_opt_set_int(rawSwrCtxPtr, "in_channel_layout", Int64(self.m_audioState.codecCtx!.pointee.channel_layout), 0)
+        err = av_opt_set_int(rawSwrCtxPtr, "in_channel_layout", Int64(self.m_audioState.codecCtx!.pointee.channel_layout), 0)
+        // if error
+        if err < 0 {
+            // create error message
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_int for 'in_channel_layout' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            // free swrCtx
+            swr_free(&self.m_audioState.swrCtx)
+            // free frame
+            av_frame_free(&self.m_audioState.frame)
+            // free codec context
+            avcodec_free_context(&self.m_audioState.codecCtx)
+            // close opened input
+            avformat_close_input(&self.m_audioState.formatCtx)  
+            // throw error
+            throw CmpError(message: msg)
+        }
         // set out channel layout to swrCtx
-        av_opt_set_int(rawSwrCtxPtr, "out_channel_layout", Int64(av_ch_layout_stereo), 0)
+        err = av_opt_set_int(rawSwrCtxPtr, "out_channel_layout", Int64(av_ch_layout_stereo), 0)
+        // if error
+        if err < 0 {
+            // create error message
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_int for 'out_channel_layout' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            // free swrCtx
+            swr_free(&self.m_audioState.swrCtx)
+            // free frame
+            av_frame_free(&self.m_audioState.frame)
+            // free codec context
+            avcodec_free_context(&self.m_audioState.codecCtx)
+            // close opened input
+            avformat_close_input(&self.m_audioState.formatCtx)  
+            // throw error
+            throw CmpError(message: msg)
+        }
 #endif        
         // set input sample rate to swrCtx
-        av_opt_set_int(rawSwrCtxPtr, "in_sample_rate", Int64(self.m_audioState.codecCtx!.pointee.sample_rate), 0)
+        err = av_opt_set_int(rawSwrCtxPtr, "in_sample_rate", Int64(self.m_audioState.codecCtx!.pointee.sample_rate), 0)
+        // if error
+        if err < 0 {
+            // create error message
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_int for 'in_sample_rate' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            // free swrCtx
+            swr_free(&self.m_audioState.swrCtx)
+            // free frame
+            av_frame_free(&self.m_audioState.frame)
+            // free codec context
+            avcodec_free_context(&self.m_audioState.codecCtx)
+            // close opened input
+            avformat_close_input(&self.m_audioState.formatCtx)  
+            // throw error
+            throw CmpError(message: msg)
+        }
         // set out sample rate to swrCtx
-        av_opt_set_int(rawSwrCtxPtr, "out_sample_rate", 44100, 0)
+        err = av_opt_set_int(rawSwrCtxPtr, "out_sample_rate", 44100, 0)
+        // if error
+        if err < 0 {
+            // create error message
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_int for 'out_sample_rate' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            // free swrCtx
+            swr_free(&self.m_audioState.swrCtx)
+            // free frame
+            av_frame_free(&self.m_audioState.frame)
+            // free codec context
+            avcodec_free_context(&self.m_audioState.codecCtx)
+            // close opened input
+            avformat_close_input(&self.m_audioState.formatCtx)  
+            // throw error
+            throw CmpError(message: msg)
+        }
         // set in sample format to swrCtx
-        av_opt_set_sample_fmt(rawSwrCtxPtr, "in_sample_fmt", self.m_audioState.codecCtx!.pointee.sample_fmt, 0)
+        err = av_opt_set_sample_fmt(rawSwrCtxPtr, "in_sample_fmt", self.m_audioState.codecCtx!.pointee.sample_fmt, 0)
+        // if error
+        if err < 0 {
+            // create error message
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_int for 'in_sample_fmt' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            // free swrCtx
+            swr_free(&self.m_audioState.swrCtx)
+            // free frame
+            av_frame_free(&self.m_audioState.frame)
+            // free codec context
+            avcodec_free_context(&self.m_audioState.codecCtx)
+            // close opened input
+            avformat_close_input(&self.m_audioState.formatCtx)  
+            // throw error
+            throw CmpError(message: msg)
+        }
         // set out sample format to swrCtx
-        av_opt_set_sample_fmt(rawSwrCtxPtr, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0)
+        err = av_opt_set_sample_fmt(rawSwrCtxPtr, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0)
+        // if error
+        if err < 0 {
+            // create error message
+            let msg = "[M4aAudioPlayer].play(). av_opt_set_int for 'out_sample_fmt' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            // free swrCtx
+            swr_free(&self.m_audioState.swrCtx)
+            // free frame
+            av_frame_free(&self.m_audioState.frame)
+            // free codec context
+            avcodec_free_context(&self.m_audioState.codecCtx)
+            // close opened input
+            avformat_close_input(&self.m_audioState.formatCtx)  
+            // throw error
+            throw CmpError(message: msg)
+        }
         // initialize context
         err = swr_init(self.m_audioState.swrCtx)
         // if error
