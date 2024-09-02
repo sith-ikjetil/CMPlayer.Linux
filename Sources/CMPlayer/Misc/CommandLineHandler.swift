@@ -29,14 +29,23 @@ internal class CommandLineHandlerState {
 /// data needed from command line parsing, such as arguments for runtime effects.
 /// 
 internal class CommandLineHandler {
+    ///
+    /// static variables
+    ///
     static var state: CommandLineHandlerState? = nil
+    ///
+    /// static functions
+    ///
     static func processCommandLine()
-    {        
+    {   
+        // guard command line count have minimum of arguments     
         guard CommandLine.argc >= 2 else {            
+            // else nothing to do, just return
             return
         }
-
+        // create constant arg1 to CommandLine arguments 1
         let arg1: String = CommandLine.arguments[1].lowercased()
+        // switch arg1
         switch arg1 {
             case "--integrity-check": return CommandLineHandler.execute__integrity_check()
             case "--version": return CommandLineHandler.execute__version()
@@ -56,11 +65,17 @@ internal class CommandLineHandler {
     /// 
     private static func execute__integrity_check()
     {
+        // ensure directories exists
         PlayerDirectories.ensureDirectoriesExistence()
+        // load preferences
         PlayerPreferences.ensureLoadPreferences()                    
+        // initialize ao
         ao_initialize()  // initialize libao
-        PrintAndExecuteIntegrityCheck()            
-        ao_shutdown()    // shutdown ao
+        // print and execute integrity check (CommandLineHelpers.swift)
+        PrintAndExecuteIntegrityCheck()       
+        // shutdown ao     
+        ao_shutdown()
+        // exit application
         exit(ExitCodes.SUCCESS.rawValue)   
     }
     ///
@@ -68,6 +83,7 @@ internal class CommandLineHandler {
     /// 
     private static func execute__version()
     {        
+        // create a closure that gathers distribution name
         let readLinuxReleaseInfo: () -> String? = {
             if let text = try? String(contentsOfFile: "/etc/os-release") {
                 let pattern = "PRETTY_NAME=\"(.*)\""
@@ -83,12 +99,16 @@ internal class CommandLineHandler {
             }
             return nil
         }
-
+        // print out version
         print("CMPlayer version \(g_versionString)")
+        // if our closure found a distro name
         if let distro = readLinuxReleaseInfo() {
+            // print distro name
             print("Distribution: \(distro)")
         }
+        // print new line
         print("")
+        // exist application
         exit(ExitCodes.SUCCESS.rawValue)
     }
     ///
@@ -96,15 +116,24 @@ internal class CommandLineHandler {
     /// 
     private static func execute__purge()
     {
+        // print header
         print("CMPlayer: --purge")
+        // print separator
         print("=========================")
+        // do purge
         if PlayerDirectories.purge() {
+            // purge successfull
+            // print message
             print("(i): Purge success")
         }
         else {
+            // purge not successfull
+            // print message
             print("(e): Purge error")
         }
+        // print new line
         print("")
+        // exit application
         exit(ExitCodes.SUCCESS.rawValue)
     }  
     ///
@@ -112,14 +141,23 @@ internal class CommandLineHandler {
     /// 
     private static func execute__set_output_api_ao() 
     {
+        // print header
         print("CMPlayer: --set-output-api-ao")
+        // print separator
         print("=============================")
+        // ensure directories exists
         PlayerDirectories.ensureDirectoriesExistence()
+        // ensure load preferences
         PlayerPreferences.ensureLoadPreferences()
+        // set preferences outputSoundLibrary to ao
         PlayerPreferences.outputSoundLibrary = OutputSoundLibrary.ao
+        // save preferences
         PlayerPreferences.savePreferences()
+        // print result
         print("(i): Output sound set to ao")
+        // print new line
         print("")
+        // exist application
         exit(ExitCodes.SUCCESS.rawValue)
     }
     ///
@@ -127,32 +165,51 @@ internal class CommandLineHandler {
     /// 
     private static func execute__set_output_api_alsa() 
     {
+        // print header
         print("CMPlayer: --set-output-api-alsa")
+        // print separator
         print("===============================")
+        // ensure directories exists
         PlayerDirectories.ensureDirectoriesExistence()
+        // ensure load preferences
         PlayerPreferences.ensureLoadPreferences()
+        // set preferences outputSoundLibrary to alsa
         PlayerPreferences.outputSoundLibrary = OutputSoundLibrary.alsa
+        // save preferences
         PlayerPreferences.savePreferences()
+        // print result
         print("(i): Output sound set to alsa")
+        // print new line
         print("")
+        // exit application
         exit(ExitCodes.SUCCESS.rawValue)
     }
     ///
     /// execute --get-output-api
     /// 
     private static func execute__get_output_api()
-    {
-        PlayerDirectories.ensureDirectoriesExistence()
-        PlayerPreferences.ensureLoadPreferences()
+    {        
+        // print header
         print("CMPlayer: --get-output-api")
+        // print separator
         print("==========================")
+        // ensure directory exists
+        PlayerDirectories.ensureDirectoriesExistence()
+        // ensure log preferences
+        PlayerPreferences.ensureLoadPreferences()
+        // if preferences outputSoundLibrary is ao
         if PlayerPreferences.outputSoundLibrary == OutputSoundLibrary.ao {
+            // print result ao
             print("(i): Output api is: ao")
         }
+        // else if preferences outputSoundLibrary is alsa
         else if PlayerPreferences.outputSoundLibrary == OutputSoundLibrary.alsa {
+            // print result alsa
             print("(i): Output api is: alsa")
         }                   
+        // print new line
         print("")
+        // exit application
         exit(ExitCodes.SUCCESS.rawValue)
     }
     ///
@@ -160,44 +217,69 @@ internal class CommandLineHandler {
     /// 
     private static func execute__set_max_log_n()
     {
+        // if command line arguments count is less than 3
         if CommandLine.argc < 3 {
+            // error then execute__help handler
             CommandLineHandler.execute__help()
+            // return
             return
         }        
-
-        PlayerDirectories.ensureDirectoriesExistence()
-        PlayerPreferences.ensureLoadPreferences()
+        // print header        
         print("CMPlayer: --set-max-log-n")
+        // print separator
         print("=========================")
+        // ensure directories exist
+        PlayerDirectories.ensureDirectoriesExistence()
+        // ensure load preferences
+        PlayerPreferences.ensureLoadPreferences()
+        // if command line arguments 2 is a number
         if let n = Int(CommandLine.arguments[2]) {
+            // if number is valid
             if n >= 25 && n <= 1000 {
+                // set preferences logMaxEntries to n
                 PlayerPreferences.logMaxEntries = n
+                // save preferences
                 PlayerPreferences.savePreferences()
+                // print result
                 print("(i): Max log entries set to: \(n)")
             }
             else {
+                // print error
                 print("(e): Invalid max log entries: \(n).")
+                // print explanation
                 print("(i): Must be a number between 25 and 1000.")
             }
         }
+        // else invalid command line argument 2
         else {
+            // print error
             print("(e): Invalid max log entries.")
+            // print explanation
             print("(i): Must be a number between 25 and 1000.")
         }
+        // print new line
         print("")
+        // exit application
         exit(ExitCodes.SUCCESS.rawValue)
     }
     ///
     /// execute --set-max-log-size
     /// 
     private static func execute__get_max_log_n()
-    {
-        PlayerDirectories.ensureDirectoriesExistence()
-        PlayerPreferences.ensureLoadPreferences()
+    {   
+        // print header     
         print("CMPlayer: --get-max-log-n")
+        // print separator
         print("=========================")
+        // ensure direcetories exists
+        PlayerDirectories.ensureDirectoriesExistence()
+        // ensure load preferences
+        PlayerPreferences.ensureLoadPreferences()
+        // print result
         print("(i): Max log entries is: \(PlayerPreferences.logMaxEntries)")
+        // print new line
         print("")
+        // exit application
         exit(ExitCodes.SUCCESS.rawValue)
     }
     ///
@@ -205,44 +287,70 @@ internal class CommandLineHandler {
     /// 
     private static func execute__set_max_history_n()
     {
+        // if command line arguments count is less than 3
         if CommandLine.argc < 3 {
+            // error then call execute__help handler
             CommandLineHandler.execute__help()
+            // return
             return
-        }        
-
-        PlayerDirectories.ensureDirectoriesExistence()
-        PlayerPreferences.ensureLoadPreferences()
+        }                
+        // print header
         print("CMPlayer: --set-max-history-n")
+        // print separator
         print("=============================")
+        // ensure directories exists
+        PlayerDirectories.ensureDirectoriesExistence()
+        // ensure load preferences
+        PlayerPreferences.ensureLoadPreferences()
+        // if command line argument 2 is a number
         if let n = Int(CommandLine.arguments[2]) {
+            // if n is a valid number
             if n >= 25 && n <= 1000 {
+                // set preferences historyMaxEntries
                 PlayerPreferences.historyMaxEntries = n
+                // save preferences
                 PlayerPreferences.savePreferences()
+                // print result
                 print("(i): Max history entries set to: \(n)")
             }
+            // else if n is invalid
             else {
+                // print error
                 print("(e): Invalid max history entries: \(n).")
+                // print explanation
                 print("(i): Must be a number between 25 and 1000.")
             }
         }
+        // else command line argument 2 is not a number
         else {
+            // print error
             print("(e): Invalid max history entries.")
+            // print explanation
             print("(i): Must be a number between 25 and 1000.")
         }
+        // print new line
         print("")
+        // exit application
         exit(ExitCodes.SUCCESS.rawValue)
     }
     ///
     /// execute --set-max-log-size
     /// 
     private static func execute__get_max_history_n()
-    {
-        PlayerDirectories.ensureDirectoriesExistence()
-        PlayerPreferences.ensureLoadPreferences()
+    {        
+        // print header
         print("CMPlayer: --get-max-history-n")
+        // print separator
         print("=============================")
+        // ensure directories exists
+        PlayerDirectories.ensureDirectoriesExistence()
+        // ensure load preferences
+        PlayerPreferences.ensureLoadPreferences()
+        // print result
         print("(i): Max history entries is: \(PlayerPreferences.historyMaxEntries)")
+        // print new line
         print("")
+        // exit application
         exit(ExitCodes.SUCCESS.rawValue)
     }
     ///
