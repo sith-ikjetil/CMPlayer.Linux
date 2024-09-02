@@ -74,3 +74,21 @@ func renderMpg123Error(error: Int32) -> String {
     // return empty string
     return ""
 }
+///
+/// audio player protocol
+/// 
+protocol CmpAudioPlayerProtocol {
+    var isPlaying: Bool { get }
+    var isPaused: Bool { get }
+    var hasPlayed: Bool { get }
+    var timeElapsed: UInt64 { get }
+    var duration: UInt64 { get }
+    init(path: URL)
+    func play() throws
+    func stop()
+    func pause()
+    func resume()
+    func seekToPos(position: UInt64)
+    func setCrossfadeVolume(volume: Float, fadeDuration: UInt64)
+    static func gatherMetadata(path: URL) throws -> CmpMetadata
+}

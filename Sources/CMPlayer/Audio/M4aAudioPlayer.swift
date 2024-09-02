@@ -39,7 +39,7 @@ let av_ch_layout_stereo: Int32 = 1|2    // constant stereo layout
 //
 // Represents CMPlayer AudioPlayer.
 //
-internal class M4aAudioPlayer {
+internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
     ///
     /// constants
     ///

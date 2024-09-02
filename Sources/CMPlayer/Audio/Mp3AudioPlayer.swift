@@ -25,7 +25,7 @@ internal struct Mp3AudioState {
 // Represents CMPlayer Mp3AudioPlayer.
 // using libmpg123
 //
-internal class Mp3AudioPlayer {
+internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
     ///
     /// private constants
     /// 

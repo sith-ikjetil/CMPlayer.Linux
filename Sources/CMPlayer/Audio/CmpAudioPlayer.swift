@@ -25,90 +25,35 @@ internal class CmpAudioPlayer {
     ///
     /// private variables
     /// 
-    private var mp3Player: Mp3AudioPlayer? = nil // libmpg123 mp3 audio player
-    private var m4aPlayer: M4aAudioPlayer? = nil // ffmpeg m4a audio player
+    //private var mp3Player: Mp3AudioPlayer? = nil // libmpg123 mp3 audio player
+    //private var m4aPlayer: M4aAudioPlayer? = nil // ffmpeg m4a audio player
+    private var audioPlayer: CmpAudioPlayerProtocol? = nil
     ///
     /// get properties
     ///
     var isPlaying: Bool {
         get {
-            // if we are holding an mp3 player
-            if self.mp3Player != nil {
-                // forward to mp3 player
-                return self.mp3Player!.isPlaying
-            }
-            // else if we are holding an m4a player
-            else if self.m4aPlayer != nil {
-                // forward to m4a player
-                return self.m4aPlayer!.isPlaying
-            }
-            // should not get here
-            // return false
-            return false
+            return self.audioPlayer?.isPlaying ?? false            
         }
     }
     var isPaused: Bool {
-        // if we are holding an mp3 player
-        if self.mp3Player != nil {
-            // forward to mp3 player
-            return self.mp3Player!.isPaused
+        get {
+            return self.audioPlayer?.isPaused ?? false            
         }
-        // else if we are holding an m4a player
-        else if self.m4aPlayer != nil {
-            // forward to m4a player
-            return self.m4aPlayer!.isPaused
-        }
-        // should not get here
-        // return false
-        return false
     }    
     var hasPlayed: Bool {
-        // if we are holding an mp3 player
-        if self.mp3Player != nil {
-            // forward to mp3 player
-            return self.mp3Player!.hasPlayed            
+        get {
+            return self.audioPlayer?.hasPlayed ?? false
         }
-        // else if we are holding an m4a player
-        else if self.m4aPlayer != nil {
-            // forward to m4a player
-            return self.m4aPlayer!.hasPlayed
-        }
-        // should not get here
-        // return false
-        return false
     }    
     var timeElapsed: UInt64 {
         get {
-            // if we are holding an mp3 player
-            if mp3Player != nil {
-                // forward to mp3 player
-                return mp3Player!.timeElapsed
-            }
-            // else if we are holding an m4a player
-            else if self.m4aPlayer != nil {
-                // forward to m4a player
-                return self.m4aPlayer!.timeElapsed
-            }
-            // should not get here
-            // return 0
-            return 0
+            return self.audioPlayer?.timeElapsed ?? 0
         }
     }
     var duration: UInt64 {
         get {
-            // if we are holding an mp3 player
-            if self.mp3Player != nil {
-                // forward to mp3 player
-                return self.mp3Player!.duration
-            }
-            // else if we are holding an m4a player
-            else if self.m4aPlayer != nil {
-                // forward to m4a player
-                return self.m4aPlayer!.duration
-            }
-            // should not get here
-            // return 0
-            return 0
+            return self.audioPlayer?.duration ?? 0
         }
     }
     ///
@@ -128,14 +73,14 @@ internal class CmpAudioPlayer {
         // is path an mp3?
         if path.path.lowercased().hasSuffix(".mp3") {
             // yes, set self.mp3Player to a new instance of Mp3AudioPlayer
-            self.mp3Player = Mp3AudioPlayer(path: path);            
+            self.audioPlayer = Mp3AudioPlayer(path: path);            
             // return
             return
         }
         // else if path an m4a?
         else if path.path.lowercased().hasSuffix(".m4a") {
             // yes, set self.mp3Player to a new instance of M4aAudioPlayer
-            self.m4aPlayer = M4aAudioPlayer(path: path);            
+            self.audioPlayer = M4aAudioPlayer(path: path);            
             // return
             return
         }
@@ -147,61 +92,25 @@ internal class CmpAudioPlayer {
     /// initiates playback of the audio file from init(path)
     /// 
     func play() throws {
-        // if we are holding an mp3 player
-        if self.mp3Player != nil {
-            // forward to mp3 player
-            try self.mp3Player!.play()
-        }
-        // else if we are holding an m4a player
-        else if self.m4aPlayer != nil {
-            // forward to m4a player
-            try self.m4aPlayer!.play()
-        }        
+        try self.audioPlayer?.play()
     }
     ///
     /// stops playback if we are playing.
     /// 
     func stop() {
-        // if we are holding an mp3 player
-        if self.mp3Player != nil {
-            // forward to mp3 player
-            self.mp3Player!.stop()
-        }
-        // else if we are holding an m4a player
-        else if self.m4aPlayer != nil {
-            // forward to m4a player
-            self.m4aPlayer!.stop()
-        }
+        self.audioPlayer?.stop()
     }
     ///
     /// pauses playback if we are playing
     /// 
     func pause() {
-        // if we are holding an mp3 player
-        if self.mp3Player != nil {
-            // forward to mp3 player
-            self.mp3Player!.pause()
-        }
-        // else if we are holding an m4a player
-        else if self.m4aPlayer != nil {
-            // forward to m4a player
-            self.m4aPlayer!.pause()
-        }
+        self.audioPlayer?.pause()
     }
     ///
     /// resumes playback if we are playing.
     ///
     func resume() {
-        // if we are holding an mp3 player
-        if self.mp3Player != nil {
-            // forward to mp3 player
-            self.mp3Player!.resume()
-        }
-        // else if we are holding an m4a player
-        else if self.m4aPlayer != nil {
-            // forward to m4a player
-            self.m4aPlayer!.resume()
-        }
+        self.audioPlayer?.resume()
     }
     /// 
     /// seeks playback from start to position (ms)
@@ -209,16 +118,7 @@ internal class CmpAudioPlayer {
     /// - Parameter position: ms from start
     func seekToPos(position: UInt64)
     {
-        // if we are holding an mp3 player
-        if self.mp3Player != nil {
-            // forward to mp3 player
-            self.mp3Player!.seekToPos(position: position)
-        }
-        // else if we are holding an m4a player
-        else if self.m4aPlayer != nil {
-            // forward to m4a player
-            self.m4aPlayer!.seekToPos(position: position)
-        }
+        self.audioPlayer?.seekToPos(position: position)        
     }
     /// 
     /// Sets how the volume is done with crossfading enabled.
@@ -226,16 +126,7 @@ internal class CmpAudioPlayer {
     ///   - volume: target volume. usually 0.
     ///   - duration: time from end of song, fading should be done.
     func setCrossfadeVolume(volume: Float, fadeDuration: UInt64) {
-        // if we are holding an mp3 player
-        if self.mp3Player != nil {
-            // forward to mp3 player
-            self.mp3Player!.setCrossfadeVolume(volume: volume, fadeDuration: fadeDuration)
-        }
-        // else if we are holding an m4a player
-        else if self.m4aPlayer != nil {
-            // forward to m4a player
-            self.m4aPlayer!.setCrossfadeVolume(volume: volume, fadeDuration: fadeDuration)
-        }
+        self.audioPlayer?.setCrossfadeVolume(volume: volume, fadeDuration: fadeDuration)        
     }
     ///
     /// Gathers metadata.
@@ -243,7 +134,7 @@ internal class CmpAudioPlayer {
     /// - Throws: CmpError
     /// - Returns: CmpMetadata
     /// 
-    static func gatherMetadata(path: URL) throws -> CmpMetadata {
+    static func gatherMetadata(path: URL) throws -> CmpMetadata {        
         // is file an mp3?
         if path.path.lowercased().hasSuffix(".mp3") {
             // yes, try and gather metadata
