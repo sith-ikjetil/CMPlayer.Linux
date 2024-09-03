@@ -302,21 +302,7 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
             throw CmpError(message: msg)
         }
         // set default values to chLayoutOut
-        err = av_channel_layout_default(&self.m_audioState.chLayoutOut, 2)
-        if err < 0 {
-            // create error message
-            let msg = "[M4aAudioPlayer].play(). av_channel_layout_default failed with value: \(err) = '\(renderFfmpegError(error: err))'."
-            // free swrCtx
-            swr_free(&self.m_audioState.swrCtx)
-            // free frame
-            av_frame_free(&self.m_audioState.frame)
-            // free codec context
-            avcodec_free_context(&self.m_audioState.codecCtx)
-            // close opened input
-            avformat_close_input(&self.m_audioState.formatCtx)  
-            // throw error
-            throw CmpError(message: msg)
-        }        
+        av_channel_layout_default(&self.m_audioState.chLayoutOut, 2)                
         // set channel layout to SwrCtx
         err = av_opt_set_chlayout(rawSwrCtxPtr, "out_chlayout", &self.m_audioState.chLayoutOut, 0)
         if err < 0 {
