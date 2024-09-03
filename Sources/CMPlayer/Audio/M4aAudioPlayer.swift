@@ -620,6 +620,12 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
             }
             // return next frame of stream
             var retVal: Int32 = av_read_frame(self.m_audioState.formatCtx, &self.m_audioState.packet)
+            // check for EOF
+            guard retVal != 0xEDE2 else { // AVERROR_EOF
+                // else we have end of file
+                // return
+                return
+            }
             // guard for success
             guard retVal >= 0 else {
                 // else we have an error
