@@ -494,9 +494,32 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
                 // else if .alsa
                 else if PlayerPreferences.outputSoundLibrary == .alsa {
                     // calculate frames
-                    let frames = Int(bytesRead) / 2 / Int(self.m_audioState.alsaState.channels)
-                    // play audio through alsa
-                    snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, pointer, snd_pcm_uframes_t(frames))
+                    let frames: snd_pcm_uframes_t = UInt(bytesRead) / 2 / UInt(self.m_audioState.alsaState.channels)                    
+                    var writtenFrames: snd_pcm_sframes_t = 0
+                    var totalFrames = frames
+                    // while we still have frames to play
+                    while totalFrames > 0 {
+                        // play audio through alsa
+                        writtenFrames = snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, pointer, totalFrames)
+                        // err return value error
+                        if writtenFrames == -EPIPE {// EPIPE means an underrun occurred
+                            // prepare pcm device for use
+                            snd_pcm_prepare(self.m_audioState.alsaState.pcmHandle)
+                        } 
+                        // else error code instead of number of frames written
+                        else if writtenFrames < 0 {
+                            // create error message
+                            let msg = "snd_pcm_writei failed with value: \(writtenFrames) = '\(renderAlsaError(error: Int32(writtenFrames)))'."
+                            // log error
+                            PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: msg)                        
+                            // return
+                            return                            
+                        } 
+                        else {
+                            // decrease total frames to play with frames just written
+                            totalFrames -= snd_pcm_uframes_t(writtenFrames)
+                        }
+                    }
                 }
             }            
             // if we are !paused! and not stopping and not quitting

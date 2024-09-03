@@ -715,7 +715,7 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
                         UnsafePointer(self.m_audioState.frame!.pointee.data.7)
                     ]                    
                     // Use withUnsafeBufferPointer to pass the array as a pointer
-                    inputData.withUnsafeBufferPointer { bufferPointer in
+                    inputData.withUnsafeBufferPointer { bufferPointer in                        
                         // convert audio, return number of samples per channel
                         let samples = swr_convert(self.m_audioState.swrCtx, &outputBuffer, self.m_audioState.frame!.pointee.nb_samples, UnsafeMutablePointer(mutating: bufferPointer.baseAddress), self.m_audioState.frame!.pointee.nb_samples)                                                    
                         // Ensure resampling was successful
@@ -774,9 +774,34 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
                             }
                         }
                         // if alsa
-                        else {                            
-                            // send samples to alsa for playback
-                            snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), snd_pcm_uframes_t(samples))
+                        else {                                                        
+                            // calculate frames
+                            let frames: snd_pcm_uframes_t = UInt(totalBytes) / 2 / UInt(self.m_audioState.alsaState.channels)                    
+                            var writtenFrames: snd_pcm_sframes_t = 0
+                            var totalFrames = frames
+                            // while we still have frames to play
+                            while totalFrames > 0 {
+                                // play audio through alsa
+                                writtenFrames = snd_pcm_writei(self.m_audioState.alsaState.pcmHandle, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), totalFrames)
+                                // err return value error
+                                if writtenFrames == -EPIPE {// EPIPE means an underrun occurred
+                                    // prepare pcm device for use
+                                    snd_pcm_prepare(self.m_audioState.alsaState.pcmHandle)
+                                } 
+                                // else error code instead of number of frames written
+                                else if writtenFrames < 0 {
+                                    // create error message
+                                    let msg = "snd_pcm_writei failed with value: \(writtenFrames) = '\(renderAlsaError(error: Int32(writtenFrames)))'."
+                                    // log error
+                                    PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: msg)                        
+                                    // return
+                                    return                            
+                                } 
+                                else {
+                                    // decrease total frames to play with frames just written
+                                    totalFrames -= snd_pcm_uframes_t(writtenFrames)
+                                }
+                            }
                         }
                     }                                                                                      
                     // if we are !paused! and not stopping and not quitting
