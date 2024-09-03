@@ -94,7 +94,7 @@ internal class Player {
             return
         }
         // log playing
-        PlayerLog.ApplicationLog?.logInformation(title: "[Player].play(player,playlistIndex)", text: "Playing player: \(player), index \(playlistIndex), file \(g_playlist[playlistIndex].fileURL?.path ?? "--unknown--")")
+        PlayerLog.ApplicationLog?.logDebug(title: "[Player].play(player,playlistIndex)", text: "Playing player: \(player), index \(playlistIndex), file \(g_playlist[playlistIndex].fileURL?.path ?? "--unknown--")")
         // set which player is active
         self.audioPlayerActive = player
         do {

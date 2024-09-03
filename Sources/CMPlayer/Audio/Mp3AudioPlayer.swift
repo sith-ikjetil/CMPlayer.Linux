@@ -417,7 +417,7 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
             let err: Int32 = mpg123_read(self.mpg123Handle, &buffer, bufferSize, &bytesRead)
             // if we are done
             if err == -12 { // MPG123_DONE
-                // return, we are finished
+                // return, we are finished                
                 return
             }
             // check for error
