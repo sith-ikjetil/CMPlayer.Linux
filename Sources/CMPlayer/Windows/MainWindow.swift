@@ -78,14 +78,20 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     static func renderHeader(showTime: Bool) -> Void {
         // set header background color
         let bgColor = ConsoleColor.blue
-        // if we show time render this
+        // create message
+        var msg: String = "CMPlayer | v\(g_versionString)"
+        // if showTime flag is true
         if showTime {
-            Console.printXY(1,1,"CMPlayer | v\(g_versionString) | \(itsRenderMsToFullString(MainWindow.timeElapsedMs, false))", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            // append time to message
+            msg += " | \(itsRenderMsToFullString(MainWindow.timeElapsedMs, false))"
         }
-        // else we render this without time
-        else {
-            Console.printXY(1,1,"CMPlayer | v\(g_versionString)", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        // if player is paused
+        if g_player.isPaused {
+            // append paused to message
+            msg += " | [paused]"
         }
+        // render header with message
+        Console.printXY(1, 1, msg, g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)        
     }    
     ///
     /// Renders main window frame on screen

@@ -475,7 +475,17 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
                 // if .ao
                 if PlayerPreferences.outputSoundLibrary == .ao {
                     // play audio through ao
-                    ao_play(self.m_audioState.aoDevice, pointer, UInt32(bytesRead))
+                    let err: Int32 = ao_play(self.m_audioState.aoDevice, pointer, UInt32(bytesRead))
+                    // guard for success
+                    guard err != 0 else {
+                        // else we have an error
+                        // create an error message
+                        let msg = "ao_player failed with value: \(err)."
+                        // log error
+                        PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: msg)                        
+                        // return
+                        return
+                    }
                 }
                 // else if .alsa
                 else if PlayerPreferences.outputSoundLibrary == .alsa {
