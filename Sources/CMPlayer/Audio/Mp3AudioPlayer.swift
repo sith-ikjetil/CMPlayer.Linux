@@ -234,7 +234,7 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
             throw CmpError(message: msg)
         }        
         // set audio format 
-        err = mpg123_format(mpg123Handle, 44100, 2, encoding);
+        err = mpg123_format(mpg123Handle, 44100, channels, encoding);
         guard err == 0 else {
             // else error
             // create error message
@@ -494,21 +494,38 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
                 }
                 // if .ao
                 if PlayerPreferences.outputSoundLibrary == .ao {
-                    // play audio through ao
-                    let err: Int32 = ao_play(self.m_audioState.aoDevice, pointer, UInt32(bytesRead))
-                    // guard for success                    
-                    guard err != 0 else {                                
-                        // else we have an error
-                        // get errno from system
-                        let errorNumber: Int32 = errno
-                        // convert errorNumber to string
-                        let errorDescription: String? = String(validatingUTF8: strerror(errorNumber))                                
-                        // create an error message                                
-                        let msg = "ao_player failed with value: \(err). System errno had value: \(errno) = '\(errorDescription ?? "?")'."
-                        // log error
-                        PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: msg)                        
-                        // return
-                        return
+                    if self.m_channels == 1 {
+                        // Allocate a stereo buffer if necessary
+                        let stereoBuffer = UnsafeMutablePointer<Int16>.allocate(capacity: Int(bytesRead) * 2)
+                        let monoBuffer = bufferPointer.baseAddress!.assumingMemoryBound(to: Int16.self)
+                        
+                        defer {
+                            stereoBuffer.deallocate()
+                        }
+
+                        for i in 0..<(bytesRead / 2) {
+                            stereoBuffer[i * 2] = monoBuffer[i]
+                            stereoBuffer[i * 2 + 1] = monoBuffer[i]
+                        }                        
+                        ao_play(self.m_audioState.aoDevice, stereoBuffer, UInt32(bytesRead * 2))                        
+                    }
+                    else {
+                        // play audio through ao
+                        let err: Int32 = ao_play(self.m_audioState.aoDevice, pointer, UInt32(bytesRead))
+                        // guard for success                    
+                        guard err != 0 else {                                
+                            // else we have an error
+                            // get errno from system
+                            let errorNumber: Int32 = errno
+                            // convert errorNumber to string
+                            let errorDescription: String? = String(validatingUTF8: strerror(errorNumber))                                
+                            // create an error message                                
+                            let msg = "ao_player failed with value: \(err). System errno had value: \(errno) = '\(errorDescription ?? "?")'."
+                            // log error
+                            PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: msg)                        
+                            // return
+                            return
+                        }
                     }
                 }
                 // else if .alsa

@@ -687,13 +687,13 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
                     // return
                     return
                 }                                
-                // while we are not quitting, stopping or 
+                // while we are not quitting, stopping
                 while !g_quit && !m_stopFlag {
                     // return decoded output
                     retVal = avcodec_receive_frame(self.m_audioState.codecCtx, self.m_audioState.frame)
                     // if retval indicates we needs to try again
                     if retVal == -EAGAIN { 
-                        // AVERROR(EAGAIN) = -11
+                        // AVERROR(EAGAIN) = -11                        
                         // break current loop
                         break
                     }
