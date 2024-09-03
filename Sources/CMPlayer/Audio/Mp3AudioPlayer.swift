@@ -476,11 +476,15 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
                 if PlayerPreferences.outputSoundLibrary == .ao {
                     // play audio through ao
                     let err: Int32 = ao_play(self.m_audioState.aoDevice, pointer, UInt32(bytesRead))
-                    // guard for success
-                    guard err != 0 else {
+                    // guard for success                    
+                    guard err != 0 else {                                
                         // else we have an error
-                        // create an error message
-                        let msg = "ao_player failed with value: \(err)."
+                        // get errno from system
+                        let errorNumber: Int32 = errno
+                        // convert errorNumber to string
+                        let errorDescription: String? = String(validatingUTF8: strerror(errorNumber))                                
+                        // create an error message                                
+                        let msg = "ao_player failed with value: \(err). System errno had value: \(errno) = '\(errorDescription ?? "?")'."
                         // log error
                         PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: msg)                        
                         // return

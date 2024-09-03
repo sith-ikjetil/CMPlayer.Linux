@@ -765,7 +765,21 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
                         // if ao
                         if PlayerPreferences.outputSoundLibrary == .ao {
                             // send samples to ao for playback
-                            ao_play(self.m_audioState.device, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), totalBytes)                            
+                            let err: Int32 = ao_play(self.m_audioState.device, UnsafeMutableRawPointer(outputBuffer!).assumingMemoryBound(to: CChar.self), totalBytes)                            
+                            // guard for success
+                            guard err != 0 else {                                
+                                // else we have an error
+                                // get errno from system
+                                let errorNumber: Int32 = errno
+                                // convert errorNumber to string
+                                let errorDescription: String? = String(validatingUTF8: strerror(errorNumber))                                
+                                // create an error message                                
+                                let msg = "ao_player failed with value: \(err). System errno had value: \(errno) = '\(errorDescription ?? "?")'."
+                                // log error
+                                PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)                        
+                                // return
+                                return
+                            }
                         }
                         // if alsa
                         else {                            
