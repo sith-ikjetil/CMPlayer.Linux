@@ -311,11 +311,31 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
             }  
             // set alsa output audio parameters
             err = snd_pcm_set_params(self.m_audioState.alsaState.pcmHandle, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, self.m_audioState.alsaState.channels, self.m_audioState.alsaState.sampleRate, 1, 500000)
-            // check snd_pcm_set_params for success
+            // guard snd_pcm_set_params for success
             guard err >= 0 else {
                 // else we have an error
                 // create error message
                 let msg = "[Mp3AudioPlayer].play(). alsa. snd_pcm_set_params failed with value: \(err) = '\(renderAlsaError(error: err))'"
+                // close alsa handle
+                snd_pcm_close(self.m_audioState.alsaState.pcmHandle)
+                // close handle
+                mpg123_close(self.mpg123Handle)
+                // delete handle
+                mpg123_delete(self.mpg123Handle)                
+                // set handle variable to nil
+                self.mpg123Handle = nil
+                // set m_isPlaying flag to false
+                self.m_isPlaying = false                
+                // throw error
+                throw CmpError(message: msg)
+            }
+            // prepare for audio playback
+            err = snd_pcm_prepare(self.m_audioState.alsaState.pcmHandle)
+            // guard snd_pcm_prepare for success
+            guard err == 0 else {
+                // else we have an error
+                // create error message
+                let msg = "[Mp3AudioPlayer].play(). alsa. snd_pcm_prepare failed with value: \(err) = '\(renderAlsaError(error: err))'"
                 // close alsa handle
                 snd_pcm_close(self.m_audioState.alsaState.pcmHandle)
                 // close handle
@@ -380,7 +400,7 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
         }
         // set minimum buffer size for audio output 
         // mpg123_outblock = maximum decoded data size in bytes, minimum buffer size
-        let bufferSize: Int = max(mpg123_outblock(self.mpg123Handle), 1024*2*2)
+        let bufferSize: Int = max(mpg123_outblock(self.mpg123Handle), 2048*2*2)
         // buffer of bufferSize
         var buffer: [UInt8] = [UInt8](repeating: 0, count: bufferSize)
         // bytes read from mpg123_read

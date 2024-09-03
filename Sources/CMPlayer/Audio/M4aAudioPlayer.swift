@@ -532,6 +532,30 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
                 // throw error                     
                 throw CmpError(message: msg)
             }
+            // prepare for audio playback
+            err = snd_pcm_prepare(self.m_audioState.alsaState.pcmHandle)
+            // guard snd_pcm_prepare for success
+            guard err == 0 else {
+                // else we have an error
+                // create error message
+                let msg = "[M4aAudioPlayer].play(). alsa. snd_pcm_prepare failed with value: \(err) = '\(renderAlsaError(error: err))'"
+    #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+                // uninitialize ch layout in
+                av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
+                // uninitialize ch layout out
+                av_channel_layout_uninit(&self.m_audioState.chLayoutOut)
+    #endif
+                // free swrCtx
+                swr_free(&self.m_audioState.swrCtx)
+                // free frame
+                av_frame_free(&self.m_audioState.frame)
+                // free codec context
+                avcodec_free_context(&self.m_audioState.codecCtx)
+                // close opened input
+                avformat_close_input(&self.m_audioState.formatCtx)
+                // throw error                     
+                throw CmpError(message: msg)
+            }
         }
         // run code async
         self.audioQueue.async { [weak self] in            
