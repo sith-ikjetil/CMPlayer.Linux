@@ -656,7 +656,7 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
                 // create log messsge
                 let msg = "av_read_frame failed with value: \(retVal) = '\(renderFfmpegError(error: retVal))'."
                 // log message
-                PlayerLog.ApplicationLog?.logError(title: "[M4aPlayer].playAsync()", text: msg)
+                PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
                 // return
                 return
             }
@@ -669,7 +669,7 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
                 // create log messsge
                 let msg = "Codec context or frame is nil."
                 // log message
-                PlayerLog.ApplicationLog?.logError(title: "[M4aPlayer].playAsync()", text: msg)
+                PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
                 // return
                 return
             }
@@ -817,7 +817,7 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
                                     // create error message
                                     let msg = "snd_pcm_writei failed with value: \(writtenFrames) = '\(renderAlsaError(error: Int32(writtenFrames)))'."
                                     // log error
-                                    PlayerLog.ApplicationLog?.logError(title: "[Mp3AudioPlayer].playAsync()", text: msg)                        
+                                    PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)                        
                                     // return
                                     return                            
                                 } 
