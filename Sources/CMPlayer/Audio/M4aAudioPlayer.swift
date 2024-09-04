@@ -697,6 +697,16 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
                         // break current loop
                         break
                     }
+                    // check for EOF
+                    guard retVal != 0xEDE2 else { // AVERROR_EOF
+                        // else we have end of file
+                        // create error message
+                        let msg = "avcodec_receive_frame EOF with value: \(retVal) = '\(renderFfmpegError(error: retVal))'."
+                        // log error
+                        PlayerLog.ApplicationLog?.logDebug(title: "[M4aAudioPlayer].playAsync()", text: msg)
+                        // return
+                        return
+                    }
                     // guard retVal success
                     guard retVal == 0 else {
                         // else we have an error
