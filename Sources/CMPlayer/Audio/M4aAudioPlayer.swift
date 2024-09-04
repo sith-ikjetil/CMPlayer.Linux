@@ -43,8 +43,7 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
     ///
     /// constants
     ///
-    private let filePath: URL    // file path to song we are playing
-    private let audioQueue = DispatchQueue(label: "dqueue.cmp.linux.m4a-audio-player", qos: .background)
+    private let filePath: URL    // file path to song we are playing    
     ///
     /// variables
     ///
@@ -558,9 +557,9 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
             }
         }
         // run code async
-        self.audioQueue.async { [weak self] in            
+        DispatchQueue.global(qos: . userInitiated).async {
             // play audio
-            self?.playAsync()
+            self.playAsync()
         }
     }
     ///

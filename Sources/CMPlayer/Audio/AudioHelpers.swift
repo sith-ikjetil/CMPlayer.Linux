@@ -8,8 +8,16 @@
 //
 import Foundation
 import Cmpg123
+import Cao
 import Casound
 import Cffmpeg
+//
+// ao output state struct
+//
+internal struct AoState {
+    var aoDevice: OpaquePointer? = nil                      // device handle
+    var aoFormat = ao_sample_format()     // ao format structure    
+}
 ///
 /// Alsa output state struct.
 ///

@@ -17,9 +17,11 @@ import Casound
 /// Mp3 Audio state.
 ///
 internal struct Mp3AudioState {    
-    var aoDevice: OpaquePointer? = nil                    // device handle
-    var aoFormat = ao_sample_format()   // ao format structure
-    var alsaState: AlsaState = AlsaState()                // alsa state
+    var aoState: AoState = AoState()          // ao state
+    var alsaState: AlsaState = AlsaState()    // alsa state
+    var length: off_t = 0                     // mp3 length
+    var rate: CLong = 0                       // mp3 sample rate    
+    var channels: Int32 = 2                   // output audio channels count (2 = stereo)
 }
 //
 // Represents CMPlayer Mp3AudioPlayer.
@@ -33,17 +35,13 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
     ///
     /// private variables
     /// 
-    private var mpg123Handle: OpaquePointer?    // libmpg123 handle
-    private var m_length: off_t = 0             // mp3 length
-    private var m_rate: CLong = 0               // mp3 sample rate
-    private let audioQueue = DispatchQueue(label: "dqueue.cmp.linux.mp3-audio-player", qos: .background)
+    private var mpg123Handle: OpaquePointer?    // libmpg123 handle    
     private var m_stopFlag: Bool = false        // should we stop playing
     private var m_isPlaying: Bool = false       // are we currently playing
     private var m_isPaused: Bool = false        // are we currently paused
     private var m_hasPlayed: Bool = false       // have we played our song
     private var m_timeElapsed: UInt64 = 0       // duration of song played
-    private var m_duration: UInt64 = 0          // duration of song 
-    private var m_channels: Int32 = 2           // output audio channels count (2 = stereo)
+    private var m_duration: UInt64 = 0          // duration of song     
     private var m_targetFadeVolume: Float = 1   // what should fade volume be at end of crossfade
     private var m_targetFadeDuration: UInt64 = 0    // how long should we fade
     private var m_enableCrossfade: Bool = false     // should we perform crossfade
@@ -162,11 +160,11 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
             throw CmpError(message: msg)                
         }
         // get full length of file in frames
-        self.m_length = mpg123_length(self.mpg123Handle)
+        self.m_audioState.length = mpg123_length(self.mpg123Handle)
         // guard length is > 0
-        guard self.m_length > 0 else {
+        guard self.m_audioState.length > 0 else {
             // else error
-            let msg = "[Mp3AudioPlayer].play(). mpg123_length failed with value: \(self.m_length)"
+            let msg = "[Mp3AudioPlayer].play(). mpg123_length failed with value: \(self.m_audioState.length)"
             // close handle
             mpg123_close(self.mpg123Handle)
             // delete handle
@@ -197,11 +195,11 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
             throw CmpError(message: msg)
         }        
         // set self.m_rate to rate
-        self.m_rate = rate
+        self.m_audioState.rate = rate
         // set self.m_channels to channels
-        self.m_channels = channels
+        self.m_audioState.channels = channels
         // calculate duration in seconds
-        let duration = Double(self.m_length) / Double(self.m_rate)
+        let duration = Double(self.m_audioState.length) / Double(self.m_audioState.rate)
         // calculate and set m_duration (ms)
         self.m_duration = UInt64(duration * 1000)
         // guard duration > 0
@@ -252,15 +250,15 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
         let defaultDriver = ao_default_driver_id()
         // Set up libao format        
         // set bits per sample
-        self.m_audioState.aoFormat.bits = 16
+        self.m_audioState.aoState.aoFormat.bits = 16
         // set channels, 2 = stereo
-        self.m_audioState.aoFormat.channels = 2
+        self.m_audioState.aoState.aoFormat.channels = 2
         // set sample rate
-        self.m_audioState.aoFormat.rate = 44100
+        self.m_audioState.aoState.aoFormat.rate = 44100
         // set byte format
-        self.m_audioState.aoFormat.byte_format = AO_FMT_NATIVE
+        self.m_audioState.aoState.aoFormat.byte_format = AO_FMT_NATIVE
         // set matrix
-        self.m_audioState.aoFormat.matrix = nil
+        self.m_audioState.aoState.aoFormat.matrix = nil
         // Set up libasound format        
         // set channels, 2 = stereo
         self.m_audioState.alsaState.channels = 2
@@ -271,9 +269,9 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
         // if output sound library is .ao
         if PlayerPreferences.outputSoundLibrary == .ao {
             // open ao for playback
-            self.m_audioState.aoDevice = ao_open_live(defaultDriver, &self.m_audioState.aoFormat, nil)
+            self.m_audioState.aoState.aoDevice = ao_open_live(defaultDriver, &self.m_audioState.aoState.aoFormat, nil)
             // if we have a valid device
-            guard self.m_audioState.aoDevice != nil else {
+            guard self.m_audioState.aoState.aoDevice != nil else {
                 // else error, not valid device
                 // create error message
                 let msg = "[Mp3AudioPlayer].play(). ao_open_live failed. Couldn't open audio device"            
@@ -351,9 +349,9 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
             }
         }
         // run code async
-        self.audioQueue.async { [weak self] in
+        DispatchQueue.global(qos: . userInitiated).async {
             // play audio
-            self?.playAsync()
+            self.playAsync()
         }
     }
     ///
@@ -374,7 +372,7 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
             // if we use ao
             if PlayerPreferences.outputSoundLibrary == .ao {                 
                 // close ao
-                ao_close(self.m_audioState.aoDevice)            
+                ao_close(self.m_audioState.aoState.aoDevice)            
             }
             // else if we use alsa
             else if PlayerPreferences.outputSoundLibrary == .alsa {
@@ -420,13 +418,13 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
                 // calculate sekk pos seconds
                 let seconds: UInt64 = (self.duration - self.m_seekPos) / 1000
                 // calculate new position
-                let newPos: off_t = off_t(seconds) * self.m_rate
+                let newPos: off_t = off_t(seconds) * self.m_audioState.rate
                 // seek to desired sample offset
                 let offset: off_t = mpg123_seek(self.mpg123Handle, newPos, SEEK_SET)
                 // check for success
                 if offset >= 0 {
                     // success, calculate seconds
-                    let offsetSeconds: Double = Double(offset) / Double(self.m_rate)
+                    let offsetSeconds: Double = Double(offset) / Double(self.m_audioState.rate)
                     // calculate ms
                     let offsetMs: UInt64 = UInt64(offsetSeconds) * 1000
                     // set m_timeElapsed
@@ -455,9 +453,9 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
                 return;
             }
             // calculate total current number of bytes per channel
-            let totalCurrentBytesPerChannel = bytesRead / Int(self.m_channels)
+            let totalCurrentBytesPerChannel = bytesRead / Int(self.m_audioState.channels)
             // calculate current duration of read samples
-            let currentDuration = Double(totalCurrentBytesPerChannel) / Double(MemoryLayout<Int16>.size * self.m_rate)
+            let currentDuration = Double(totalCurrentBytesPerChannel) / Double(MemoryLayout<Int16>.size * self.m_audioState.rate)
             // update time elapsed
             self.m_timeElapsed += UInt64(currentDuration * 1000.0)
             // calculate time left
@@ -494,7 +492,7 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
                 }
                 // if .ao
                 if PlayerPreferences.outputSoundLibrary == .ao {
-                    if self.m_channels == 1 {
+                    if self.m_audioState.channels == 1 {
                         // Allocate a stereo buffer if necessary
                         let stereoBuffer = UnsafeMutablePointer<Int16>.allocate(capacity: Int(bytesRead) * 2)
                         let monoBuffer = bufferPointer.baseAddress!.assumingMemoryBound(to: Int16.self)
@@ -507,11 +505,11 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
                             stereoBuffer[i * 2] = monoBuffer[i]
                             stereoBuffer[i * 2 + 1] = monoBuffer[i]
                         }                        
-                        ao_play(self.m_audioState.aoDevice, stereoBuffer, UInt32(bytesRead * 2))                        
+                        ao_play(self.m_audioState.aoState.aoDevice, stereoBuffer, UInt32(bytesRead * 2))                        
                     }
                     else {
                         // play audio through ao
-                        let err: Int32 = ao_play(self.m_audioState.aoDevice, pointer, UInt32(bytesRead))
+                        let err: Int32 = ao_play(self.m_audioState.aoState.aoDevice, pointer, UInt32(bytesRead))
                         // guard for success                    
                         guard err != 0 else {                                
                             // else we have an error
