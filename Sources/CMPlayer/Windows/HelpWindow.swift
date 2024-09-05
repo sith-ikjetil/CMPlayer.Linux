@@ -25,7 +25,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                                       " exit, quit, q", " :: exits application",
                                       " next, skip, n, s, 'TAB'-key", " :: plays next song",
                                       " play, p", " :: plays music",
-                                      " pause", " :: pauses music",
+                                      " pause, p", " :: pauses music",
                                       " resume", " :: resumes music playback",
                                       " search [<words>]", " :: searches artist and title for a match. case insensitive",
                                       " search artist [<words>]", " :: searches artist for a match. case insensitive",
