@@ -175,7 +175,24 @@ internal class Player {
             // exit with exit code
             exit(ExitCodes.ERROR_PLAYING_FILE.rawValue)
         }
-    }    
+    }   
+    ///
+    /// stop playback
+    /// 
+    func stop() {
+        self.audio1?.stop()
+        self.audio2?.stop()
+    } 
+    ///
+    /// hasPlayed property
+    /// 
+    var hasPlayed: Bool {
+        get {
+            let b1: Bool = self.audio1?.hasPlayed ?? true
+            let b2: Bool = self.audio2?.hasPlayed ?? true
+            return b1 && b2
+        }
+    }
     ///
     /// Pauses audio playback.
     ///

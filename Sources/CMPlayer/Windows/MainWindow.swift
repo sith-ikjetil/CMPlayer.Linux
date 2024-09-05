@@ -13,6 +13,7 @@
 // import
 //
 import Foundation
+import Cao
 ///
 /// Represents CMPlayer MainWindow.
 ///
@@ -404,6 +405,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                          PlayerCommand(commands: [["p"]], closure: self.onCommandPlayOrPause),
                          PlayerCommand(commands: [["prev"]], closure: self.onCommandPrev),
                          PlayerCommand(commands: [["#"]], closure: self.onCommandAddSongToPlaylist),
+                         PlayerCommand(commands: [["reset", "audio"]], closure: self.onCommandResetAudio),
                          PlayerCommand(commands: [["clear", "history"]], closure: self.onCommandClearHistory),]                
         // Count down and render songs        
         concurrentQueue1.async {
@@ -1605,6 +1607,31 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }
         catch {
 
+        }
+    }    
+    ///
+    /// Reset Audio
+    ///
+    /// parameter parts: command array.
+    ///
+    func onCommandResetAudio(parts: [String]) -> Void {    
+        if PlayerPreferences.outputSoundLibrary == .ao {
+            // stop audio players
+            g_lock.lock()
+            g_player.stop()
+            // allow for async audio playingg threads to complete
+            while !g_player.hasPlayed {
+                usleep(50_000)
+            }               
+            // uninitialize ao
+            ao_shutdown()
+            // give the shutdown some small time
+            usleep(200_000)
+            // initialize ao
+            ao_initialize()
+            // play next song
+            g_player.skip()
+            g_lock.unlock()
         }
     }    
 }// MainWindow
