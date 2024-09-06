@@ -11,13 +11,12 @@ import PackageDescription
             .library(name: "Casound", type: .dynamic, targets: ["Casound"]),
         ],    
         dependencies: [
-            .package(url: "https://github.com/ponyboy47/Termios.git", from: "0.1.1"),
+            
         ],
         targets: [            
             .executableTarget(
                 name: "CMPlayer",
-                dependencies: [    
-                    "Termios",                
+                dependencies: [                        
                     "Cmpg123",
                     "Cao",
                     "Cffmpeg",

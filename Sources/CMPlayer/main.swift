@@ -11,7 +11,6 @@ import Foundation
 import Cmpg123
 import Cao
 import Casound
-import Termios
 import Glibc
 //
 // Global constants.

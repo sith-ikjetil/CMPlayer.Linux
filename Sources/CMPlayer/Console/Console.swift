@@ -10,7 +10,6 @@
 // import
 //
 import Foundation
-import Termios
 ///
 /// Represents console color.
 ///
@@ -38,7 +37,9 @@ enum ConsoleColorModifier : Int {
 internal class Console {
     //
     // static private constants.
-    //
+    //    
+    static private var originalTerm = termios() // Structure representing the terminal settings
+    static private var currentTerm = termios()  // Structure representing the terminal settings
     static private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.linux.console.1", attributes: .concurrent)
     //static private let concurrentQueue2 = DispatchQueue(label: "cqueue.console.music.player.macos.2.console", attributes: .concurrent)
     static private let sigintSrcSIGINT = DispatchSource.makeSignalSource(signal: Int32(SIGINT), queue: Console.concurrentQueue1) // Ctrl+C
@@ -124,70 +125,28 @@ internal class Console {
     ///
     /// Turns console echo off.
     ///
-    static func echoOff() -> Void {
-        do {
-            // create Termios structure form STDIN
-            let oldt = try Termios.fetch(fd: STDIN_FILENO)
-            // set new Termios structure as copy of old
-            var newt = oldt;
-            // set echo off
-            newt.localFlags.subtract([.echo, .canonical])
-            // try to update STDIN with echo off
-            try newt.update(fd: STDIN_FILENO)
-        }
-        // Unknown error
-        catch {
-            // create error message
-            let msg = "CMPlayer ABEND.\n[Console].echoOff().\nUnknown error.\nMessage: \(error)"               
-            // clear screen
-            Console.clearScreen()
-            // goto 1,1
-            Console.gotoXY(1, 1)
-            // reset console color
-            Console.resetConsoleColors()
-            // clear terminal
-            system("clear")
-            // print message
-            print(msg)
-            // log message
-            PlayerLog.ApplicationLog?.logError(title: "[Console].echoOff()", text: msg.trimmingCharacters(in: .newlines))
-            // exit application
-            exit(ExitCodes.ERROR_CONSOLE.rawValue)
-        }
+    static func echoOff() -> Void {        
+        // create variable to hold termios structure
+        var term = termios()    
+        // Get current terminal attributes
+        tcgetattr(STDIN_FILENO, &term)        
+        // Modify the terminal flags to disable echo
+        term.c_lflag &= ~UInt32(ICANON | ECHO)        
+        // Set the modified attributes immediately (TCSANOW)
+        tcsetattr(STDIN_FILENO, TCSANOW, &term)
     }    
     ///
     /// Turns console echo on.
     ///
     static func echoOn() -> Void {
-        do {
-            // create Termios structure form STDIN
-            let oldt = try Termios.fetch(fd: STDIN_FILENO)
-            // set new Termios structure as copy of old
-            var newt = oldt;
-            // set echo on
-            newt.localFlags.formSymmetricDifference([.echo, .canonical])
-            // try to update STDIN with echo on
-            try newt.update(fd: STDIN_FILENO)
-        }
-        // Unknown error
-        catch {
-            // create error message
-            let msg = "CMPlayer ABEND.\n[Console].echoOn().\nUnknown error.\nMessage: \(error)"            
-            // clear screen
-            Console.clearScreen()
-            // goto 1, 1
-            Console.gotoXY(1, 1)
-            // reset console colors
-            Console.resetConsoleColors()
-            // clear terminal
-            system("clear")
-            // print message
-            print(msg)
-            // log message
-            PlayerLog.ApplicationLog?.logError(title: "[Console].echoOn()", text: msg.trimmingCharacters(in: .newlines))
-            // exit application
-            exit(ExitCodes.ERROR_CONSOLE.rawValue)
-        }
+        // create variable to hold termios structure
+        var term = termios()    
+        // Get current terminal attributes
+        tcgetattr(STDIN_FILENO, &term)        
+        // Restore the terminal flags to enable echo
+        term.c_lflag |= UInt32(ICANON | ECHO)        
+        // Set the modified attributes immediately (TCSANOW)
+        tcsetattr(STDIN_FILENO, TCSANOW, &term)
     }
     ///
     /// Applies color to text string.
