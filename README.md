@@ -30,6 +30,7 @@ The player uses the following tools and libraries:
  - libmpg123 (libmpg123.so)
  - ffmpeg
  - libao (libao.so)
+ - libasound (libasound.so)
  - libavcodec (libavcodec.so)
  - libavformat (libavformat.so)
  - libavutil (libavutil.so)
@@ -88,6 +89,7 @@ There are the following preprocessor flags defined in Package.swift:
 ### cSettings and swiftSettings
  - CMP_FFMPEG_V7            (ffmpeg v7)
  - CMP_FFMPEG_V6            (ffmpeg v6)
+ - CMP_FFMPEG_V5            (ffmpeg v5)
  - CMP_FFMPEG_V4            (ffmpeg v4)
  - CMP_TARGET_UBUNTU_V22_04 (Ubuntu 22.04)
  - CMP_TARGET_UBUNTU_V24_04 (Ubuntu 24.04)
@@ -108,14 +110,14 @@ Are located at:
 ### Cao (swift C wrapper library for libao (ao))
 Are located at:
  - /usr/include/ao/ (Ubuntu 22.04, 24.04)
- - /usr/include/ao/ (Fedora)
- - /usr/include/ao/ (Manjaro)
+ - /usr/include/ao/ (Fedora 40)
+ - /usr/include/ao/ (Manjaro 24)
   
 ### Casound (swift C wrapper library for libasound (alsa))
 Are located at:
  - /usr/include/alsa/ (Ubuntu 22.04, 24.04)
- - /usr/include/alsa/ (Fedora)
- - /usr/include/alsa/ (Manjaro)
+ - /usr/include/alsa/ (Fedora 40)
+ - /usr/include/alsa/ (Manjaro 24)
   
 ### Cmpg123 (swift C wrapper library for libmpg123)
 Are located at:
@@ -138,20 +140,26 @@ You must uncomment the .define statements that apply, and comment out
 those that do not apply. Like this:  
 ```swift
 cSettings: [
+    .define("CMP_PLATFORM_AMD64"),
+    //.define("CMP_PLATFORM_ARM64"),
     .define("CMP_TARGET_UBUNTU_V22_04"),
     //.define("CMP_TARGET_UBUNTU_V24_04"),
     //.define("CMP_TARGET_FEDORA_V40"),
     //.define("CMP_TARGET_MANJARO_V24"),
     .define("CMP_FFMPEG_V4"),
+    //.define("CMP_FFMPEG_V5"),
     //.define("CMP_FFMPEG_V6"),
     //.define("CMP_FFMPEG_V7"),
 ],
 swiftSettings: [
+    .define("CMP_PLATFORM_AMD64"),
+    //.define("CMP_PLATFORM_ARM64"),
     .define("CMP_TARGET_UBUNTU_V22_04"),
     //.define("CMP_TARGET_UBUNTU_V24_04"),
     //.define("CMP_TARGET_FEDORA_V40"),
     //.define("CMP_TARGET_MANJARO_V24"),
     .define("CMP_FFMPEG_V4"),
+    //.define("CMP_FFMPEG_V5"),
     //.define("CMP_FFMPEG_V6"),
     //.define("CMP_FFMPEG_V7"),
 ]
