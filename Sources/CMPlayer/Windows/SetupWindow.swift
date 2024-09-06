@@ -54,8 +54,11 @@ internal class SetupWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
                     // set cursor to a character
                     self.cursor = "_"
                 }
-                // render input
-                self.renderInput()            
+                // if we can paint (render window/input)
+                if !g_doNotPaint {
+                    // render input
+                    self.renderInput()
+                }            
                 // sleep for 75 ms
                 usleep(75_000)
             }
