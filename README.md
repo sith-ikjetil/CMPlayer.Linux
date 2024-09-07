@@ -40,9 +40,8 @@ In order to get these libraries onto your Ubuntu distro, you can execute the fol
  - sudo apt install ffmpeg
  - sudo apt install libavcodec-dev
  - sudo apt install libavformat-dev
- - sudo apt install libmpg123
  - sudo apt install libmpg123-dev
- - sudo apt install libao-common 
+ - sudo apt isntall libasound-dev
  - sudo apt install libao-dev
  - On WSL: sudo apt install pulseaudio (can be helpful, but doesn't always work)
    
@@ -53,14 +52,15 @@ In order to get these libraries onto you Fedora distro, you can execute the foll
  - sudo dnf install --allowerasing libavformat-free-devel
  - sudo dnf install --allowerasing libswresample-free-devel
  - sudo dnf install libmpg123-devel
- - sudo dnf install libao
+ - sudo dnf install alsa-lib-devel
  - sudo dnf install libao-devel
 
 ## Manjaro
 In order to get these libraries onto you Manjaro distro, you can execute the following commands:  
  - sudo pacman -Syu libao
+ - sudo pacman -Syu alsa-lib
  - sudo pacman -Syu mpg123
-  
+   
 ## C_INCLUDE_PATH
 ### Fedora
 Remember to set the C_INCLUDE_PATH for ffmpeg headers:  
