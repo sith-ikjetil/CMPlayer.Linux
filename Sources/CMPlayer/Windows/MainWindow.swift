@@ -128,7 +128,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             Console.printXY(1,4," ", layout.songNoCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)                        
             // render artist and album name header
             Console.printXY(layout.artistX,3,"Artist", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(layout.artistX,4,"Album Name", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.artistX,4,"Album", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
             // render title and genre header
             Console.printXY(layout.titleX,3,"Title", layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
             Console.printXY(layout.titleX,4,"Genre", layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
