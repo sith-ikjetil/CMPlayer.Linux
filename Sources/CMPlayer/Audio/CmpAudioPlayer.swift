@@ -24,9 +24,7 @@ internal class CmpAudioPlayer {
     private let filePath: URL    // path to audio file
     ///
     /// private variables
-    /// 
-    //private var mp3Player: Mp3AudioPlayer? = nil // libmpg123 mp3 audio player
-    //private var m4aPlayer: M4aAudioPlayer? = nil // ffmpeg m4a audio player
+    ///     
     private var audioPlayer: CmpAudioPlayerProtocol? = nil
     ///
     /// get properties
@@ -70,23 +68,8 @@ internal class CmpAudioPlayer {
 
         // save path
         self.filePath = path       
-        // is path an mp3?
-        if path.path.lowercased().hasSuffix(".mp3") {
-            // yes, set self.mp3Player to a new instance of Mp3AudioPlayer
-            self.audioPlayer = Mp3AudioPlayer(path: path);            
-            // return
-            return
-        }
-        // else if path an m4a?
-        else if path.path.lowercased().hasSuffix(".m4a") {
-            // yes, set self.mp3Player to a new instance of M4aAudioPlayer
-            self.audioPlayer = M4aAudioPlayer(path: path);            
-            // return
-            return
-        }
-
-        let msg: String = "[CmpAudioPlayer].init. Invalid media type. Not supported. File: \(path.path)"
-        throw CmpError(message: msg)
+        // set audioPlayer to AnyAudioPlayer
+        self.audioPlayer = AnyAudioPlayer(path: path);
     }
     ///
     /// initiates playback of the audio file from init(path)
@@ -135,18 +118,6 @@ internal class CmpAudioPlayer {
     /// - Returns: CmpMetadata
     /// 
     static func gatherMetadata(path: URL) throws -> CmpMetadata {        
-        // is file an mp3?
-        if path.path.lowercased().hasSuffix(".mp3") {
-            // yes, try and gather metadata
-            return try Mp3AudioPlayer.gatherMetadata(path: path);
-        }
-        // else is file an m4a?
-        else if path.path.lowercased().hasSuffix(".m4a") {            
-            // yes, try and gather metadata
-            return try M4aAudioPlayer.gatherMetadata(path: path);            
-        }
-        // unsupported or unknown file type
-        // throw error
-        throw CmpError(message: "Error trying to gather metadata on unknown file format. File: \(path.path)")
+        return try AnyAudioPlayer.gatherMetadata(path: path)
     }
 }// AudioPlayer

@@ -50,7 +50,7 @@ internal class PlayerPreferences {
     static let filename: String = "preferences.xml"
     static var musicRootPath: [String] = []
     static var exclusionPaths: [String] = []
-    static var musicFormats: String = "mp3;m4a"
+    static var musicFormats: String = ".mp3;.m4a"
     static var autoplayOnStartup: Bool = true
     static var crossfadeSongs: Bool = true
     static var crossfadeTimeInSeconds: Int = 4

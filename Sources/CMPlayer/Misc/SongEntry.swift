@@ -120,30 +120,22 @@ internal class SongEntry {
                 
         self.songNo = songNo
         self.fileURL = path!
+        
+        // gather metadata        
+        do {            
+            let metadata = try CmpAudioPlayer.gatherMetadata(path: path!)                
+            self.title = metadata.title
+            self.artist = metadata.artist
+            self.albumName = metadata.albumName
+            self.recordingYear = metadata.recordingYear
+            self.genre = metadata.genre.lowercased()
+            self.duration = metadata.duration    
+            self.trackNo = metadata.trackNo    
 
-        //
-        // Only support .mp3 for now.
-        //        
-        do {
-            if path!.path.lowercased().hasSuffix(".mp3") || path!.path.lowercased().hasSuffix(".m4a") {            
-                let metadata = try CmpAudioPlayer.gatherMetadata(path: path!)                
-                self.title = metadata.title
-                self.artist = metadata.artist
-                self.albumName = metadata.albumName
-                self.recordingYear = metadata.recordingYear
-                self.genre = metadata.genre.lowercased()
-                self.duration = metadata.duration    
-                self.trackNo = metadata.trackNo    
-
-                if self.duration == 0 {
-                    let msg = "[SongEntry].init(path,songNo). Duration from CmpAudioPlayer.gatherMetadata was 0."
-                    throw CmpError(message: msg)
-                }
-            }// is .mp3
-            else {
-                let msg = "[SongEntry].init(path,songNo). Unsupported extension from file: \(path!.lastPathComponent)"
+            if self.duration == 0 {
+                let msg = "[SongEntry].init(path,songNo). Duration from CmpAudioPlayer.gatherMetadata was 0."
                 throw CmpError(message: msg)
-            }   
+            }            
         } catch let error as CmpError {
             let msg = "Error gathering metadata from file: \(path!.path).\nMessage: \(error.message)"
             PlayerLog.ApplicationLog?.logError(title: "[SongEntry].init(path,songNo)", text: msg)

@@ -78,15 +78,15 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
         // remove all songs in g_songs
         g_songs.removeAll()       
         // remove all songs from g_playlist
-        g_playlist.removeAll()
-        // get musicFormats supported from PlayerPreferences
+        g_playlist.removeAll()       
+        // get music formats supported
         self.musicFormats = PlayerPreferences.musicFormats.components(separatedBy: ";")
         // for each music root path
         for mrpath in PlayerPreferences.musicRootPath {            
             // files found completed at 0%
-            self.filesFoundCompleted = 0  
+            self.filesFoundCompleted = 0              
             // find all songs (files) and return path string array              
-            let result = findSongs(path: mrpath)
+            let result = findSongs(path: mrpath)            
             // files found completed at 100%
             self.filesFoundCompleted = 100        
             // set current path to current music root path
@@ -193,16 +193,16 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
                     // can we read from the file           
                     if FileManager.default.isReadableFile(atPath: nr) {
                         // loop through all music format supported
-                        for f in self.musicFormats {
+                        for f in self.musicFormats {                            
                             // is the file a supported music format
-                            if r.hasSuffix(f) {
+                            if r.hasSuffix(f) {                             
                                 // yes, increase countFindSongs (number of found songs)
                                 self.countFindSongs += 1 // count variable
                                 // add song (file+path) to results
                                 results.append(nr)                
                                 // discontinue for-loop 
                                 break
-                            }
+                            }                            
                         }
                     }            
                 }

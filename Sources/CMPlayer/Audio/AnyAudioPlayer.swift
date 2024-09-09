@@ -14,7 +14,7 @@ import Casound
 ///
 /// Audio state variables.
 ///
-internal struct M4aAudioState {
+internal struct AnyAudioState {
     var formatCtx: UnsafeMutablePointer<AVFormatContext>?
     var codecCtx: UnsafeMutablePointer<AVCodecContext>?   
 #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
@@ -39,7 +39,7 @@ let av_ch_layout_stereo: Int32 = 1|2    // constant stereo layout
 //
 // Represents CMPlayer AudioPlayer.
 //
-internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
+internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
     ///
     /// constants
     ///
@@ -53,7 +53,7 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
     private var m_hasPlayed: Bool = false       // true == we have played
     private var m_timeElapsed: UInt64 = 0       // amount (milliseconds) of time we have played
     private var m_duration: UInt64 = 0          // amount (milliseconds) of time in song we are playing
-    private var m_audioState: M4aAudioState = M4aAudioState()   // ao/alsa/ffmpeg audio state
+    private var m_audioState: AnyAudioState = AnyAudioState()   // ao/alsa/ffmpeg audio state
     private var m_targetFadeVolume: Float = 1       // target fade volume. 1 = 100%, 0 = 0% (muted) 
     private var m_targetFadeDuration: UInt64 = 0    // duration (milliseconds) the crossfade should take
     private var m_enableCrossfade: Bool = false     // true == we are doing a crossfade
@@ -934,109 +934,102 @@ internal final class M4aAudioPlayer : CmpAudioPlayerProtocol {
     /// 
     static func gatherMetadata(path: URL) throws -> CmpMetadata {
         // create a metadata instance
-        let metadata = CmpMetadata()              
-        // if path points to a m4a file
-        if path.path.lowercased().hasSuffix(".m4a") {
-            // set filename
-            let filename = path.path
-            // create a pointer read/write variable
-            var formatContext: UnsafeMutablePointer<AVFormatContext>? = nil                        
-            // open input stream
-            var err = avformat_open_input(&formatContext, filename, nil, nil)
-            // if error
-            if err != 0 {
-                // create error message
-                let msg = "[M4aAudioPlayer].gatherMetadata(). avformat_open_input failed with value: \(err) = '\(renderFfmpegError(error: err))'."
-                // throw error
-                throw CmpError(message: msg)
-            }
-            // ensure cleanup by defer
-            defer {
-                // close opened input
-                avformat_close_input(&formatContext)
-            }
-            // Retrieve stream information
-            err = avformat_find_stream_info(formatContext, nil)
-            // if error
-            if err < 0 {
-                // create error message
-                let msg = "[M4aAudioPlayer].gatherMetadata(). avformat_find_stream_info failed with value: \(err) = '\(renderFfmpegError(error: err))'."
-                // close opened input
-                avformat_close_input(&formatContext)
-                // throw error                
-                throw CmpError(message: msg)
-            }
-            // if formatCtx is valid and it has a duration
-            if let formatCtx = formatContext, formatCtx.pointee.duration != 0x00 { // AV_NOPTS_VALUE {
-                // set duration in seconds
-                let durationInSeconds = Double(formatCtx.pointee.duration) / Double(AV_TIME_BASE)                
-                // if duration in seconds is negative or 0
-                if durationInSeconds <= 0 {               
-                    // create error message     
-                    let msg = "[M4aAudioPlayer].gatherMetadata(). duration <= 0. \(durationInSeconds) seconds"
-                    // close opened input
-                    avformat_close_input(&formatContext)
-                    // throw error
-                    throw CmpError(message: msg)
-                }
-                metadata.duration = UInt64(durationInSeconds * 1000)
-            }
-            // else formatCtx is invalid or duration is 0
-            else {
-                // create error message
-                let msg = "[M4aAudioPlayer].gatherMetadata(). Cannot find duration."
-                // close opened input
-                avformat_close_input(&formatContext)
-                // throw error
-                throw CmpError(message: msg)
-            }      
-            // if formatContext is invalid or formatContext metadata is invalid
-            if formatContext == nil || formatContext?.pointee.metadata == nil {
-                // create error message
-                let msg = "[M4aAudioPlayer].gatherMetadata(). formatContext/metadata is nil."
-                // close opened input
-                avformat_close_input(&formatContext)
-                // throw error
-                throw CmpError(message: msg)
-            }
-            // create a read/write pointer
-            var tag: UnsafeMutablePointer<AVDictionaryEntry>? = nil
-            // loop so long as av_dict_get returns a valid nextTag pointer
-            while let nextTag = av_dict_get(formatContext?.pointee.metadata, "", tag, AV_DICT_IGNORE_SUFFIX) {
-                // if key and value are valid pointers
-                if let key = nextTag.pointee.key, let value = nextTag.pointee.value {
-                    // set checkKey to key
-                    let checkKey = String(cString: key).lowercased()
-                    // switch checkKey
-                    switch checkKey {
-                        case "artist":
-                            metadata.artist = String(cString: value)
-                        case "title":
-                            metadata.title = String(cString: value)
-                        case "album":
-                            metadata.albumName = String(cString: value)
-                        case "genre":
-                            metadata.genre = extractMetadataGenre(text: String(cString: value))
-                        case "track":
-                            metadata.trackNo =  extractMetadataTrackNo(text: String(cString: value))
-                        case "year", "date", "time":
-                            if metadata.recordingYear == 0 {
-                                metadata.recordingYear = extractMetadataYear(text: String(cString: value))
-                            }                
-                        default:
-                            // set tag to next tag
-                            tag = nextTag                            
-                    }                    
-                }
-                // set tag to next tag
-                tag = nextTag
-            }         
-            // return metadata                                       
-            return metadata         
+        let metadata = CmpMetadata()
+        // set filename
+        let filename = path.path
+        // create a pointer read/write variable
+        var formatContext: UnsafeMutablePointer<AVFormatContext>? = nil                        
+        // open input stream
+        var err = avformat_open_input(&formatContext, filename, nil, nil)
+        // if error
+        if err != 0 {
+            // create error message
+            let msg = "[M4aAudioPlayer].gatherMetadata(). avformat_open_input failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            // throw error
+            throw CmpError(message: msg)
         }
-        // create error message
-        let msg = "[M4aAudioPlayer].gatherMetadata(). Unknown file type from file: \(path.path)"
-        // throw error
-        throw CmpError(message: msg)
+        // ensure cleanup by defer
+        defer {
+            // close opened input
+            avformat_close_input(&formatContext)
+        }
+        // Retrieve stream information
+        err = avformat_find_stream_info(formatContext, nil)
+        // if error
+        if err < 0 {
+            // create error message
+            let msg = "[M4aAudioPlayer].gatherMetadata(). avformat_find_stream_info failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            // close opened input
+            avformat_close_input(&formatContext)
+            // throw error                
+            throw CmpError(message: msg)
+        }
+        // if formatCtx is valid and it has a duration
+        if let formatCtx = formatContext, formatCtx.pointee.duration != 0x00 { // AV_NOPTS_VALUE {
+            // set duration in seconds
+            let durationInSeconds = Double(formatCtx.pointee.duration) / Double(AV_TIME_BASE)                
+            // if duration in seconds is negative or 0
+            if durationInSeconds <= 0 {               
+                // create error message     
+                let msg = "[M4aAudioPlayer].gatherMetadata(). duration <= 0. \(durationInSeconds) seconds"
+                // close opened input
+                avformat_close_input(&formatContext)
+                // throw error
+                throw CmpError(message: msg)
+            }
+            metadata.duration = UInt64(durationInSeconds * 1000)
+        }
+        // else formatCtx is invalid or duration is 0
+        else {
+            // create error message
+            let msg = "[M4aAudioPlayer].gatherMetadata(). Cannot find duration."
+            // close opened input
+            avformat_close_input(&formatContext)
+            // throw error
+            throw CmpError(message: msg)
+        }      
+        // if formatContext is invalid or formatContext metadata is invalid
+        if formatContext == nil || formatContext?.pointee.metadata == nil {
+            // create error message
+            let msg = "[M4aAudioPlayer].gatherMetadata(). formatContext/metadata is nil."
+            // close opened input
+            avformat_close_input(&formatContext)
+            // throw error
+            throw CmpError(message: msg)
+        }
+        // create a read/write pointer
+        var tag: UnsafeMutablePointer<AVDictionaryEntry>? = nil
+        // loop so long as av_dict_get returns a valid nextTag pointer
+        while let nextTag = av_dict_get(formatContext?.pointee.metadata, "", tag, AV_DICT_IGNORE_SUFFIX) {
+            // if key and value are valid pointers
+            if let key = nextTag.pointee.key, let value = nextTag.pointee.value {
+                // set checkKey to key
+                let checkKey = String(cString: key).lowercased()
+                // switch checkKey
+                switch checkKey {
+                    case "artist":
+                        metadata.artist = String(cString: value)
+                    case "title":
+                        metadata.title = String(cString: value)
+                    case "album":
+                        metadata.albumName = String(cString: value)
+                    case "genre":
+                        metadata.genre = extractMetadataGenre(text: String(cString: value))
+                    case "track":
+                        metadata.trackNo =  extractMetadataTrackNo(text: String(cString: value))
+                    case "year", "date", "time":
+                        if metadata.recordingYear == 0 {
+                            metadata.recordingYear = extractMetadataYear(text: String(cString: value))
+                        }                
+                    default:
+                        // set tag to next tag
+                        tag = nextTag                            
+                }                    
+            }
+            // set tag to next tag
+            tag = nextTag
+        }         
+        // return metadata                                       
+        return metadata        
     }
 }// M4aAudioPlayer
