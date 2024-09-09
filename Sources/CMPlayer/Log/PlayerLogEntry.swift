@@ -45,18 +45,18 @@ internal class PlayerLogEntry {
     /// Converts entry into plain text for loggin purposes.
     /// 
     /// - Returns: 
-    func toPlainText() -> String {
-        // create a variable named text of type string
-        var text: String = ""    
-        // append self.type, self.timeStamp and self.title
-        text += "[\(self.type)] [\(self.timeStamp.itsToString())] Title: \(self.title)"
-        // append a new line
-        text += "\n"
+    func toPlainText() -> String {        
+        // create a variable named text of type string with self.type
+        var text: String = "Type=\(self.type.rawValue.convertStringToLengthPaddedString(11,.left," ")) "
+        // append self.timeStamp
+        text += "When=\(self.timeStamp.itsToString()) "
+        // append self.title
+        text += "Title=\(self.title) "
         // append self.text
-        text += "Text: \(self.text)"
-        // append two new lines, entries separated by a line
-        text += "\n\n"
-
+        text += "Description=\(self.text.replacingOccurrences(of: "\n", with: " "))"
+        // append next line
+        text += "\n"
+        // return text
         return text
     }
 }// PlayerLogEntry

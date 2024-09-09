@@ -19,13 +19,6 @@ internal enum LogMaxSizeReached: String {
     case EmptyLog = "EmptyLog"
 }
 ///
-/// What to do with log when application starts
-///
-internal enum LogApplicationStartLoadType: String {
-    case DoNotLoadOldLog = "DoNotLoadOldLog"
-    case LoadOldLog = "LoadOldLog"
-}
-///
 /// MainWindow View Type
 ///
 internal enum ViewType: String {
@@ -69,7 +62,7 @@ internal class PlayerPreferences {
     static var logError: Bool = true
     static var logDebug: Bool = true
     static var logOther: Bool = true
-    static var logMaxEntries: Int = 100
+    static var logMaxEntries: Int = 250
     static var historyMaxEntries: Int = 1000
     static var logMaxSizeReached: LogMaxSizeReached = LogMaxSizeReached.EmptyLog
     ///
