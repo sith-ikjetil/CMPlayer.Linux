@@ -95,7 +95,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     /// Renders main window frame on screen
     ///
-    func renderFrame() -> Void {
+    func renderTitle() -> Void {
         // render header
         MainWindow.renderHeader(showTime: true)        
         // render blank line y = 2
@@ -186,7 +186,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///     
     func renderAddendumText() -> Void {
         // render addendum text from self.addendumText
-        Console.printXY(1,g_rows-2, (self.addendumText.count > 0) ? self.addendumText : " ", g_cols, .left, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.none)
+        Console.printXY(1,g_rows-2, (self.addendumText.count > 0) ? self.addendumText : " ", g_cols, .left, " ", getThemeBgAddendumColor(), getThemeBgAddendumModifier(), getThemeFgAddendumColor(), getThemeFgAddendumModifier())
     }    
     ///
     /// Renders the command line on screen
@@ -328,8 +328,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // return
             return
         }        
-        // render frame        
-        renderFrame()
+        // render title        
+        renderTitle()
         // render songs
         renderSongs()
         // render addendum text
@@ -712,7 +712,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         // save preferences
         PlayerPreferences.savePreferences()
         // render frame
-        self.renderFrame()
+        self.renderTitle()
     }    
     ///
     /// Restarts current playing song.

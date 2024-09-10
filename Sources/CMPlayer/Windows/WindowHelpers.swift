@@ -410,7 +410,7 @@ internal func getThemeBgStatusLineModifier() -> ConsoleColorModifier {
 /// 
 /// getThemeFgStatusLineColor
 /// 
-/// - Returns: separator fg color
+/// - Returns: status line fg color
 internal func getThemeFgStatusLineColor() -> ConsoleColor {
     switch PlayerPreferences.colorTheme {
         case .Default: return ConsoleColor.white
@@ -422,13 +422,61 @@ internal func getThemeFgStatusLineColor() -> ConsoleColor {
 /// 
 /// getThemeFgStatusLineModifier
 /// 
-/// - Returns: separator fg color modifier
+/// - Returns: status line fg color modifier
 internal func getThemeFgStatusLineModifier() -> ConsoleColorModifier {
     switch PlayerPreferences.colorTheme {
         case .Default: return ConsoleColorModifier.bold
         case .Blue: return ConsoleColorModifier.bold
         case .Black: return ConsoleColorModifier.bold
         case .Custom: return PlayerPreferences.fgStatusLineModifier
+    }
+}
+/// 
+/// getThemeBgAddendumColor
+/// 
+/// - Returns: addendum bg color
+internal func getThemeBgAddendumColor() -> ConsoleColor {
+    switch PlayerPreferences.colorTheme {
+        case .Default: return ConsoleColor.black
+        case .Blue: return ConsoleColor.blue
+        case .Black: return ConsoleColor.black
+        case .Custom: return PlayerPreferences.bgAddendumColor
+    }
+}
+/// 
+/// getThemeBgAddendumModifier
+/// 
+/// - Returns: addendum bg color modifier
+internal func getThemeBgAddendumModifier() -> ConsoleColorModifier {
+    switch PlayerPreferences.colorTheme {
+        case .Default: return ConsoleColorModifier.none
+        case .Blue: return ConsoleColorModifier.bold
+        case .Black: return ConsoleColorModifier.none
+        case .Custom: return PlayerPreferences.bgAddendumModifier
+    }
+}
+/// 
+/// getThemeFgAddendumColor
+/// 
+/// - Returns: addendum fg color
+internal func getThemeFgAddendumColor() -> ConsoleColor {
+    switch PlayerPreferences.colorTheme {
+        case .Default: return ConsoleColor.white
+        case .Blue: return ConsoleColor.white
+        case .Black: return ConsoleColor.white
+        case .Custom: return PlayerPreferences.fgAddendumColor
+    }
+}
+/// 
+/// getThemeFgAddendumModifier
+/// 
+/// - Returns: addendum fg color modifier
+internal func getThemeFgAddendumModifier() -> ConsoleColorModifier {
+    switch PlayerPreferences.colorTheme {
+        case .Default: return ConsoleColorModifier.bold
+        case .Blue: return ConsoleColorModifier.bold
+        case .Black: return ConsoleColorModifier.bold
+        case .Custom: return PlayerPreferences.fgAddendumModifier
     }
 }
 ///
