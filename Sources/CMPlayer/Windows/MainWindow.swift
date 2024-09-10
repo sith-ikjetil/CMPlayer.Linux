@@ -120,17 +120,17 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // get layout info
             let layout: MainWindowLayout = MainWindowLayout.get()    
             // render song no and empty header
-            Console.printXY(1,3,"Song No.", layout.songNoCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(1,4," ", layout.songNoCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)                        
+            Console.printXY(1,3,"Song No.", layout.songNoCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
+            Console.printXY(1,4," ", layout.songNoCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())                        
             // render artist and album name header
-            Console.printXY(layout.artistX,3,"Artist", layout.artistCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(layout.artistX,4,"Album", layout.artistCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.artistX,3,"Artist", layout.artistCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
+            Console.printXY(layout.artistX,4,"Album", layout.artistCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
             // render title and genre header
-            Console.printXY(layout.titleX,3,"Title", layout.titleCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(layout.titleX,4,"Genre", layout.titleCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.titleX,3,"Title", layout.titleCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
+            Console.printXY(layout.titleX,4,"Genre", layout.titleCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
             // render time and empty header
-            Console.printXY(layout.durationX,3,"Time", layout.durationCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(layout.durationX,4," ", layout.durationCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.durationX,3,"Time", layout.durationCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
+            Console.printXY(layout.durationX,4," ", layout.durationCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
             // render separator line
             Console.printXY(1,5,"=", g_cols, .left, "=", getThemeBgSeparatorColor(), getThemeBgSeparatorModifier(), getThemeFgSeparatorColor(), getThemeFgSeparatorModifier())
         }
