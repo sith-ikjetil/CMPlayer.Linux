@@ -22,7 +22,7 @@ enum ConsoleColor : Int {
     case magenta = 35
     case cyan = 36
     case white = 37
-    case reset = 0
+    case reset = 0    
 }
 ///
 /// Console color modifier
@@ -37,9 +37,7 @@ enum ConsoleColorModifier : Int {
 internal class Console {
     //
     // static private constants.
-    //    
-    static private var originalTerm = termios() // Structure representing the terminal settings
-    static private var currentTerm = termios()  // Structure representing the terminal settings
+    //        
     static private let concurrentQueue1 = DispatchQueue(label: "cqueue.cmplayer.linux.console.1", attributes: .concurrent)
     //static private let concurrentQueue2 = DispatchQueue(label: "cqueue.console.music.player.macos.2.console", attributes: .concurrent)
     static private let sigintSrcSIGINT = DispatchSource.makeSignalSource(signal: Int32(SIGINT), queue: Console.concurrentQueue1) // Ctrl+C

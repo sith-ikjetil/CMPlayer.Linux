@@ -65,6 +65,43 @@ internal class PlayerPreferences {
     static var logMaxEntries: Int = 250
     static var historyMaxEntries: Int = 1000
     static var logMaxSizeReached: LogMaxSizeReached = LogMaxSizeReached.EmptyLog
+    static var fgHeaderColor: ConsoleColor = .white
+    static var bgHeaderColor: ConsoleColor = .blue
+    static var fgHeaderModifier: ConsoleColorModifier = .bold
+    static var bgHeaderModifier: ConsoleColorModifier = .bold
+    static var fgTitleColor: ConsoleColor = .white
+    static var bgTitleColor: ConsoleColor = .blue
+    static var fgTitleModifier: ConsoleColorModifier = .bold
+    static var bgTitleModifier: ConsoleColorModifier = .none
+    static var fgSeparatorColor: ConsoleColor = .green
+    static var bgSeparatorColor: ConsoleColor = .black
+    static var fgSeparatorModifier: ConsoleColorModifier = .bold
+    static var bgSeparatorModifier: ConsoleColorModifier = .none
+    static var fgQueueColor: ConsoleColor = .white
+    static var bgQueueColor: ConsoleColor = .blue
+    static var fgQueueModifier: ConsoleColorModifier = .bold
+    static var bgQueueModifier: ConsoleColorModifier = .bold
+    static var fgQueueSongNoColor: ConsoleColor = .cyan
+    static var bgQueueSongNoColor: ConsoleColor = .blue
+    static var fgQueueSongNoModifier: ConsoleColorModifier = .bold
+    static var bgQueueSongNoModifier: ConsoleColorModifier = .bold
+    static var fgCommandLineColor: ConsoleColor = .cyan
+    static var bgCommandLineColor: ConsoleColor = .black
+    static var fgCommandLineModifier: ConsoleColorModifier = .bold
+    static var bgCommandLineModifier: ConsoleColorModifier = .none
+    static var fgStatusLineColor: ConsoleColor = .white
+    static var bgStatusLineColor: ConsoleColor = .black
+    static var fgStatusLineModifier: ConsoleColorModifier = .bold
+    static var bgStatusLineModifier: ConsoleColorModifier = .none
+    static var fgAltColor: ConsoleColor = .white
+    static var bgAltColor: ConsoleColor = .black
+    static var fgAltModifier: ConsoleColorModifier = .bold
+    static var bgAltModifier: ConsoleColorModifier = .none
+    static var fgEmptySpaceColor: ConsoleColor = .white
+    static var bgEmptySpaceColor: ConsoleColor = .black
+    static var fgEmptySpaceModifier: ConsoleColorModifier = .bold
+    static var bgEmptySpaceModifier: ConsoleColorModifier = .bold
+    
     ///
     /// Default initializer.
     ///
@@ -130,6 +167,133 @@ internal class PlayerPreferences {
                         self.exclusionPaths.append(path)
                     }
                 }
+
+                // header colors
+                if let afgHeaderColor = xeGeneral.attribute(forName: "fgHeaderColor") {
+                    PlayerPreferences.fgHeaderColor = ConsoleColor.itsFromString(afgHeaderColor.stringValue ?? "white", .white)
+                }
+                if let abgHeaderColor = xeGeneral.attribute(forName: "bgHeaderColor") {
+                    PlayerPreferences.bgHeaderColor = ConsoleColor.itsFromString(abgHeaderColor.stringValue ?? "blue", .blue)
+                }
+                if let afgHeaderModifier = xeGeneral.attribute(forName: "fgHeaderModifier") {
+                    PlayerPreferences.fgHeaderModifier = ConsoleColorModifier.itsFromString(afgHeaderModifier.stringValue ?? "bold", .bold)
+                }
+                if let abgHeaderModifier = xeGeneral.attribute(forName: "bgHeaderModifier") {
+                    PlayerPreferences.bgHeaderModifier = ConsoleColorModifier.itsFromString(abgHeaderModifier.stringValue ?? "bold", .bold)
+                }
+
+                // title colors
+                if let afgTitleColor = xeGeneral.attribute(forName: "fgTitleColor") {
+                    PlayerPreferences.fgTitleColor = ConsoleColor.itsFromString(afgTitleColor.stringValue ?? "yellow", .yellow)
+                }
+                if let abgTitleColor = xeGeneral.attribute(forName: "bgTitleColor") {
+                    PlayerPreferences.bgTitleColor = ConsoleColor.itsFromString(abgTitleColor.stringValue ?? "black", .black)
+                }
+                if let afgTitleModifier = xeGeneral.attribute(forName: "fgTitleModifier") {
+                    PlayerPreferences.fgTitleModifier = ConsoleColorModifier.itsFromString(afgTitleModifier.stringValue ?? "bold", .bold)
+                }
+                if let abgTitleModifier = xeGeneral.attribute(forName: "bgTitleModifier") {
+                    PlayerPreferences.bgTitleModifier = ConsoleColorModifier.itsFromString(abgTitleModifier.stringValue ?? "none", .none)
+                }
+                
+                // spearator colors
+                if let afgSeparatorColor = xeGeneral.attribute(forName: "fgSeparatorColor") {
+                    PlayerPreferences.fgSeparatorColor = ConsoleColor.itsFromString(afgSeparatorColor.stringValue ?? "green", .green)
+                }
+                if let abgSeparatorColor = xeGeneral.attribute(forName: "bgSeparatorColor") {
+                    PlayerPreferences.bgSeparatorColor = ConsoleColor.itsFromString(abgSeparatorColor.stringValue ?? "black", .black)
+                }
+                if let afgSeparatorModifier = xeGeneral.attribute(forName: "fgSeparatorModifier") {
+                    PlayerPreferences.fgSeparatorModifier = ConsoleColorModifier.itsFromString(afgSeparatorModifier.stringValue ?? "bold", .bold)
+                }
+                if let abgSeparatorModifier = xeGeneral.attribute(forName: "bgSeparatorModifier") {
+                    PlayerPreferences.bgSeparatorModifier = ConsoleColorModifier.itsFromString(abgSeparatorModifier.stringValue ?? "none", .none)
+                }
+                
+                // queue colors
+                if let afgQueueColor = xeGeneral.attribute(forName: "fgQueueColor") {
+                    PlayerPreferences.fgQueueColor = ConsoleColor.itsFromString(afgQueueColor.stringValue ?? "white", .white)
+                }
+                if let abgQueueColor = xeGeneral.attribute(forName: "bgQueueColor") {
+                    PlayerPreferences.bgQueueColor = ConsoleColor.itsFromString(abgQueueColor.stringValue ?? "blue", .blue)
+                }
+                if let afgQueueModifier = xeGeneral.attribute(forName: "fgQueueModifier") {
+                    PlayerPreferences.fgQueueModifier = ConsoleColorModifier.itsFromString(afgQueueModifier.stringValue ?? "bold", .bold)
+                }
+                if let abgQueueModifier = xeGeneral.attribute(forName: "bgQueueModifier") {
+                    PlayerPreferences.bgQueueModifier = ConsoleColorModifier.itsFromString(abgQueueModifier.stringValue ?? "bold", .bold)
+                }
+                
+
+                // queue song no colors
+                if let afgQueueSongNoColor = xeGeneral.attribute(forName: "fgQueueSongNoColor") {
+                    PlayerPreferences.fgQueueSongNoColor = ConsoleColor.itsFromString(afgQueueSongNoColor.stringValue ?? "cyan", .cyan)
+                }
+                if let abgQueueSongNoColor = xeGeneral.attribute(forName: "bgQueueSongNoColor") {
+                    PlayerPreferences.bgQueueSongNoColor = ConsoleColor.itsFromString(abgQueueSongNoColor.stringValue ?? "blue", .blue)
+                }
+                if let afgQueueSongNoModifier = xeGeneral.attribute(forName: "fgQueueSongNoModifier") {
+                    PlayerPreferences.fgQueueSongNoModifier = ConsoleColorModifier.itsFromString(afgQueueSongNoModifier.stringValue ?? "bold", .bold)
+                }
+                if let abgQueueSongNoModifier = xeGeneral.attribute(forName: "bgQueueSongNoModifier") {
+                    PlayerPreferences.bgQueueSongNoModifier = ConsoleColorModifier.itsFromString(abgQueueSongNoModifier.stringValue ?? "bold", .bold)
+                }
+
+                // command line colors
+                if let afgCommandLineColor = xeGeneral.attribute(forName: "fgCommandLineColor") {
+                    PlayerPreferences.fgCommandLineColor = ConsoleColor.itsFromString(afgCommandLineColor.stringValue ?? "cyan", .cyan)
+                }
+                if let abgCommandLineColor = xeGeneral.attribute(forName: "bgCommandLineColor") {
+                    PlayerPreferences.bgCommandLineColor = ConsoleColor.itsFromString(abgCommandLineColor.stringValue ?? "black", .blue)
+                }
+                if let afgCommandLineModifier = xeGeneral.attribute(forName: "fgCommandLineModifier") {
+                    PlayerPreferences.fgCommandLineModifier = ConsoleColorModifier.itsFromString(afgCommandLineModifier.stringValue ?? "bold", .bold)
+                }
+                if let abgCommandLineModifier = xeGeneral.attribute(forName: "bgCommandLineModifier") {
+                    PlayerPreferences.bgCommandLineModifier = ConsoleColorModifier.itsFromString(abgCommandLineModifier.stringValue ?? "none", .none)
+                }
+
+                // status line colors
+                if let afgStatusLineColor = xeGeneral.attribute(forName: "fgStatusLineColor") {
+                    PlayerPreferences.fgStatusLineColor = ConsoleColor.itsFromString(afgStatusLineColor.stringValue ?? "white", .white)
+                }
+                if let abgStatusLineColor = xeGeneral.attribute(forName: "bgStatusLineColor") {
+                    PlayerPreferences.bgStatusLineColor = ConsoleColor.itsFromString(abgStatusLineColor.stringValue ?? "black", .black)
+                }
+                if let afgStatusLineModifier = xeGeneral.attribute(forName: "fgStatusLineModifier") {
+                    PlayerPreferences.fgStatusLineModifier = ConsoleColorModifier.itsFromString(afgStatusLineModifier.stringValue ?? "bold", .bold)
+                }
+                if let abgStatusLineModifier = xeGeneral.attribute(forName: "bgStatusLineModifier") {
+                    PlayerPreferences.bgStatusLineModifier = ConsoleColorModifier.itsFromString(abgStatusLineModifier.stringValue ?? "none", .none)
+                }
+                 
+                // alt colors
+                if let afgAltColor = xeGeneral.attribute(forName: "fgAltColor") {
+                    PlayerPreferences.fgAltColor = ConsoleColor.itsFromString(afgAltColor.stringValue ?? "white", .white)
+                }
+                if let abgAltColor = xeGeneral.attribute(forName: "bgAltColor") {
+                    PlayerPreferences.bgAltColor = ConsoleColor.itsFromString(abgAltColor.stringValue ?? "black", .black)
+                }
+                if let afgAltModifier = xeGeneral.attribute(forName: "fgAltModifier") {
+                    PlayerPreferences.fgAltModifier = ConsoleColorModifier.itsFromString(afgAltModifier.stringValue ?? "bold", .bold)
+                }
+                if let abgAltModifier = xeGeneral.attribute(forName: "bgAltModifier") {
+                    PlayerPreferences.bgAltModifier = ConsoleColorModifier.itsFromString(abgAltModifier.stringValue ?? "none", .none)
+                }
+
+                // empty space color
+                if let afgEmptySpaceColor = xeGeneral.attribute(forName: "fgEmptySpaceColor") {
+                    PlayerPreferences.fgEmptySpaceColor = ConsoleColor.itsFromString(afgEmptySpaceColor.stringValue ?? "white", .white)
+                }
+                if let abgEmptySpaceColor = xeGeneral.attribute(forName: "bgEmptySpaceColor") {
+                    PlayerPreferences.bgEmptySpaceColor = ConsoleColor.itsFromString(abgEmptySpaceColor.stringValue ?? "black", .black)
+                }
+                if let afgEmptySpaceModifier = xeGeneral.attribute(forName: "fgEmptySpaceModifier") {
+                    PlayerPreferences.fgEmptySpaceModifier = ConsoleColorModifier.itsFromString(afgEmptySpaceModifier.stringValue ?? "bold", .bold)
+                }
+                if let abgEmptySpaceModifier = xeGeneral.attribute(forName: "bgEmptySpaceModifier") {
+                    PlayerPreferences.bgEmptySpaceModifier = ConsoleColorModifier.itsFromString(abgEmptySpaceModifier.stringValue ?? "none", .none)
+                }                
             }
             
             // log
@@ -233,6 +397,198 @@ internal class PlayerPreferences {
         xnHistoryMaxEntries.name = "historyMaxEntries"
         xnHistoryMaxEntries.setStringValue(String(self.historyMaxEntries), resolvingEntities: false)
         xeGeneral.addAttribute(xnHistoryMaxEntries)
+
+        //
+        // colors
+        //
+        // header color
+        let xnfgHeaderColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgHeaderColor.name = "fgHeaderColor"
+        xnfgHeaderColor.setStringValue(self.fgHeaderColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgHeaderColor)
+
+        let xnbgHeaderColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgHeaderColor.name = "bgHeaderColor"
+        xnbgHeaderColor.setStringValue(self.bgHeaderColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgHeaderColor)
+
+        let xnfgHeaderModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgHeaderModifier.name = "fgHeaderModifier"
+        xnfgHeaderModifier.setStringValue(self.fgHeaderModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgHeaderModifier)
+
+        let xnbgHeaderModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgHeaderModifier.name = "bgHeaderModifier"
+        xnbgHeaderModifier.setStringValue(self.bgHeaderModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgHeaderModifier)
+        
+        // title color
+        let xnfgTitleColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgTitleColor.name = "fgTitleColor"
+        xnfgTitleColor.setStringValue(self.fgTitleColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgTitleColor)
+        
+        let xnbgTitleColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgTitleColor.name = "bgTitleColor"
+        xnbgTitleColor.setStringValue(self.bgTitleColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgTitleColor)
+
+        let xnfgTitleModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgTitleModifier.name = "fgTitleModifier"
+        xnfgTitleModifier.setStringValue(self.fgTitleModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgTitleModifier)
+
+        let xnbgTitleModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgTitleModifier.name = "bgTitleModifier"
+        xnbgTitleModifier.setStringValue(self.bgTitleModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgTitleModifier)
+        
+        // separator
+        let xnfgSeparatorColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgSeparatorColor.name = "fgSeparatorColor"
+        xnfgSeparatorColor.setStringValue(self.fgSeparatorColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgSeparatorColor)
+        
+        let xnbgSeparatorColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgSeparatorColor.name = "bgSeparatorColor"
+        xnbgSeparatorColor.setStringValue(self.bgSeparatorColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgSeparatorColor)
+
+        let xnfgSeparatorModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgSeparatorModifier.name = "fgSeparatorModifier"
+        xnfgSeparatorModifier.setStringValue(self.fgSeparatorModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgSeparatorModifier)
+
+        let xnbgSeparatorModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgSeparatorModifier.name = "bgSeparatorModifier"
+        xnbgSeparatorModifier.setStringValue(self.bgSeparatorModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgSeparatorModifier)
+        
+        // queue
+        let xnfgQueueColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgQueueColor.name = "fgQueueColor"
+        xnfgQueueColor.setStringValue(self.fgQueueColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgQueueColor)
+        
+        let xnbgQueueColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgQueueColor.name = "bgQueueColor"
+        xnbgQueueColor.setStringValue(self.bgQueueColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgQueueColor)
+
+        let xnfgQueueModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgQueueModifier.name = "fgQueueModifier"
+        xnfgQueueModifier.setStringValue(self.fgQueueModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgQueueModifier)
+
+        let xnbgQueueModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgQueueModifier.name = "bgQueueModifier"
+        xnbgQueueModifier.setStringValue(self.bgQueueModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgQueueModifier)        
+
+        // queue song no
+        let xnfgQueueSongNoColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgQueueSongNoColor.name = "fgQueueSongNoColor"
+        xnfgQueueSongNoColor.setStringValue(self.fgQueueSongNoColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgQueueSongNoColor)
+        
+        let xnbgQueueSongNoColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgQueueSongNoColor.name = "bgQueueSongNoColor"
+        xnbgQueueSongNoColor.setStringValue(self.bgQueueSongNoColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgQueueSongNoColor)
+
+        let xnfgQueueSongNoModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgQueueSongNoModifier.name = "fgQueueSongNoModifier"
+        xnfgQueueSongNoModifier.setStringValue(self.fgQueueSongNoModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgQueueSongNoModifier)
+
+        let xnbgQueueSongNoModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgQueueSongNoModifier.name = "bgQueueSongNoModifier"
+        xnbgQueueSongNoModifier.setStringValue(self.bgQueueSongNoModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgQueueSongNoModifier)
+        
+        // command line
+        let xnfgCommandLineColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgCommandLineColor.name = "fgCommandLineColor"
+        xnfgCommandLineColor.setStringValue(self.fgCommandLineColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgCommandLineColor)
+        
+        let xnbgCommandLineColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgCommandLineColor.name = "bgCommandLineColor"
+        xnbgCommandLineColor.setStringValue(self.bgCommandLineColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgCommandLineColor)
+
+        let xnfgCommandLineModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgCommandLineModifier.name = "fgCommandLineModifier"
+        xnfgCommandLineModifier.setStringValue(self.fgCommandLineModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgCommandLineModifier)
+
+        let xnbgCommandLineModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgCommandLineModifier.name = "bgCommandLineModifier"
+        xnbgCommandLineModifier.setStringValue(self.bgCommandLineModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgCommandLineModifier)
+        
+        // status lines
+        let xnfgStatusLineColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgStatusLineColor.name = "fgStatusLineColor"
+        xnfgStatusLineColor.setStringValue(self.fgStatusLineColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgStatusLineColor)
+        
+        let xnbgStatusLineColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgStatusLineColor.name = "bgStatusLineColor"
+        xnbgStatusLineColor.setStringValue(self.bgStatusLineColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgStatusLineColor)
+
+        let xnfgStatusLineModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgStatusLineModifier.name = "fgStatusLineModifier"
+        xnfgStatusLineModifier.setStringValue(self.fgStatusLineModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgStatusLineModifier)
+
+        let xnbgStatusLineModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgStatusLineModifier.name = "bgStatusLineModifier"
+        xnbgStatusLineModifier.setStringValue(self.bgStatusLineModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgStatusLineModifier)
+
+        // alt
+        let xnfgAltColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgAltColor.name = "fgAltColor"
+        xnfgAltColor.setStringValue(self.fgAltColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgAltColor)
+        
+        let xnbgAltColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgAltColor.name = "bgAltColor"
+        xnbgAltColor.setStringValue(self.bgAltColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgAltColor)
+
+        let xnfgAltModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgAltModifier.name = "fgAltModifier"
+        xnfgAltModifier.setStringValue(self.fgAltModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgAltModifier)
+
+        let xnbgAltModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgAltModifier.name = "bgAltModifier"
+        xnbgAltModifier.setStringValue(self.bgAltModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgAltModifier)
+        
+        // empty space
+        let xnfgEmptySpaceColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgEmptySpaceColor.name = "fgEmptySpaceColor"
+        xnfgEmptySpaceColor.setStringValue(self.fgEmptySpaceColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgEmptySpaceColor)
+        
+        let xnbgEmptySpaceColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgEmptySpaceColor.name = "bgEmptySpaceColor"
+        xnbgEmptySpaceColor.setStringValue(self.bgEmptySpaceColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgEmptySpaceColor)
+
+        let xnfgEmptySpaceModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgEmptySpaceModifier.name = "fgEmptySpaceModifier"
+        xnfgEmptySpaceModifier.setStringValue(self.fgEmptySpaceModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgEmptySpaceModifier)
+
+        let xnbgEmptySpaceModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgEmptySpaceModifier.name = "bgEmptySpaceModifier"
+        xnbgEmptySpaceModifier.setStringValue(self.bgEmptySpaceModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgEmptySpaceModifier)
         
         //
         // log

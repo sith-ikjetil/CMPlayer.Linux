@@ -24,6 +24,60 @@ internal extension Int {
         formatter.numberStyle = .decimal
         formatter.locale = Locale(identifier: "nb_NO")
         return formatter.string(from: NSNumber(value: self))!
+    }    
+}
+//
+// ConsoleColorModifier extension methods
+//
+internal extension ConsoleColorModifier {
+    // convert to string
+    func itsToString() -> String {
+        switch self {
+            case .bold: return "bold"
+            case .none: return "none"        
+        }
+    }
+    // convert from string
+    static func itsFromString(_ source: String, _ defaultValue: ConsoleColorModifier) -> ConsoleColorModifier {
+        switch source {
+            case "bold": return .bold
+            case "none": return .none            
+            default: return defaultValue
+        }
+    }
+}
+//
+// ConsoleColor extensions methods
+//
+internal extension ConsoleColor {
+    // convert to string
+    func itsToString() -> String {
+        switch self {
+            case .black: return "black"
+            case .blue: return "blue"
+            case .cyan: return "cyan"
+            case .green: return "green"
+            case .magenta: return "magenta"
+            case .red: return "red"
+            case .white: return "white"
+            case .yellow: return "yellow"
+            case .reset: return "reset"            
+        }
+    }
+    // convert from string
+    static func itsFromString(_ source: String, _ defaultValue: ConsoleColor) -> ConsoleColor {
+        switch source {
+            case "black": return .black
+            case "blue": return .blue
+            case "cyan": return .cyan
+            case "green": return .green
+            case "magenta": return .magenta
+            case "red": return .red
+            case "white": return .white
+            case "yellow": return .yellow
+            case "reset": return .reset
+            default: return defaultValue
+        }
     }
 }
 ///
