@@ -61,8 +61,28 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                                       " info <song no>", " :: show information about song with given song number",
                                       //" update cmplayer", " :: updates cmplayer if new version is found online",
                                       " set viewtype <type>", " :: sets view type. can be 'default' or 'details'",
-                                      " set theme <color>", " :: sets theme color. color can be 'default', 'blue' or 'black'",
-                                      " clear history", " :: clears command history"]
+                                      " set theme <name>", " :: sets theme. name can be 'default', 'blue', 'black' or 'custom'",
+                                      " clear history", " :: clears command history",
+                                      " set custom-theme fgHeaderColor <color> <bold/none>", " :: sets foreground color of header text",
+                                      " set custom-theme bgHeaderColor <color> <bold/none>", " :: sets background color of header text",
+                                      " set custom-theme fgTitleColor <color> <bold/none>", " :: sets foreground color of title text",
+                                      " set custom-theme bgTitleColor <color> <bold/none>", " :: sets background color of title text",
+                                      " set custom-theme fgSeparatorColor <color> <bold/none>", " :: sets foreground color of separator line",
+                                      " set custom-theme bgSeparatorColor <color> <bold/none>", " :: sets background color of separator line",
+                                      " set custom-theme fgQueueColor <color> <bold/none>", " :: sets foreground color of queue text",
+                                      " set custom-theme bgQueueColor <color> <bold/none>", " :: sets background color of queue text",
+                                      " set custom-theme fgQueueSongNoColor <color> <bold/none>", " :: sets foreground color of song no in queue text",
+                                      " set custom-theme bgQueueSongNoColor <color> <bold/none>", " :: sets background color of song no in queue text",
+                                      " set custom-theme fgCommandLineColor <color> <bold/none>", " :: sets foreground color of command line text",
+                                      " set custom-theme bgCommandLineColor <color> <bold/none>", " :: sets background color of command line text",
+                                      " set custom-theme fgStatusLineColor <color> <bold/none>", " :: sets foreground color of status line text",
+                                      " set custom-theme bgStatusLineColor <color> <bold/none>", " :: sets background color of status line text",
+                                      " set custom-theme fgAddendumColor <color> <bold/none>", " :: sets foreground color of addendum text",
+                                      " set custom-theme bgAddendumColor <color> <bold/none>", " :: sets background color of addendum text",
+                                      " set custom-theme fgEmptySpaceColor <color> <bold/none>", " :: sets foreground color of empty text",
+                                      " set custom-theme bgEmptySpaceColor <color> <bold/none>", " :: sets background color of empty text",
+                                      " set custom-theme separatorChar <char>", " :: sets char for separator line",
+                                      " custom-theme colors", " :: 'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan' or 'white'"]
                                       //" restart", " :: restarts the application. picks up changes when files are removed or added"]    
     ///
     /// Shows this HelpWindow on screen.q
