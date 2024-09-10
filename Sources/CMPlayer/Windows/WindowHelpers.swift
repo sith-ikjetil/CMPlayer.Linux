@@ -479,6 +479,18 @@ internal func getThemeFgAddendumModifier() -> ConsoleColorModifier {
         case .Custom: return PlayerPreferences.fgAddendumModifier
     }
 }
+/// 
+/// getSeparatorChar
+/// 
+/// - Returns: separator char for given theme
+internal func getSeparatorChar() -> String {
+    switch PlayerPreferences.colorTheme {
+        case .Default: return "="
+        case .Blue: return "="
+        case .Black: return "="
+        case .Custom: return (PlayerPreferences.separatorChar.count >= 1) ? PlayerPreferences.separatorChar : "="
+    }
+}
 ///
 ///
 /// Get mode information

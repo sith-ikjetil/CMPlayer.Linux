@@ -113,7 +113,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // render time header
             Console.printXY(layout.durationX,3,"Time", layout.durationCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
             // render separator line
-            Console.printXY(1,4,"=", g_cols, .left, "=", getThemeBgSeparatorColor(), getThemeBgSeparatorModifier(), getThemeFgSeparatorColor(), getThemeFgSeparatorModifier())
+            Console.printXY(1,4,String(getSeparatorChar().first!), g_cols, .left, getSeparatorChar().first!, getThemeBgSeparatorColor(), getThemeBgSeparatorModifier(), getThemeFgSeparatorColor(), getThemeFgSeparatorModifier())
         }
         // else render details view
         else if PlayerPreferences.viewType == ViewType.Details {
@@ -132,7 +132,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             Console.printXY(layout.durationX,3,"Time", layout.durationCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
             Console.printXY(layout.durationX,4," ", layout.durationCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
             // render separator line
-            Console.printXY(1,5,"=", g_cols, .left, "=", getThemeBgSeparatorColor(), getThemeBgSeparatorModifier(), getThemeFgSeparatorColor(), getThemeFgSeparatorModifier())
+            Console.printXY(1,5,String(getSeparatorChar().first!), g_cols, .left, getSeparatorChar().first!, getThemeBgSeparatorColor(), getThemeBgSeparatorModifier(), getThemeFgSeparatorColor(), getThemeFgSeparatorModifier())
         }
     }
     ///
@@ -398,7 +398,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                          PlayerCommand(commands: [["prev"]], closure: self.onCommandPrev),
                          PlayerCommand(commands: [["#"]], closure: self.onCommandAddSongToPlaylist),                         
                          PlayerCommand(commands: [["clear", "history"]], closure: self.onCommandClearHistory),
-                         PlayerCommand(commands: [["set", "color"]], closure: self.onSetColor),]
+                         PlayerCommand(commands: [["set", "custom-theme"]], closure: self.onSetColor),]
     
         // Count down and render songs        
         concurrentQueue1.async {
@@ -1610,9 +1610,21 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
 
     func onSetColor(parts: [String]) -> Void {
         // check we have two arguments
-        // command is:> set color <name-to-change> <color-name> <bold/none>
-        if parts.count != 3 {            
+        // command is:> set custom-theme <name-to-change> <value1>         
+        if parts.count == 2 
+        {
+            switch parts[0] {
+                case "separatorChar":
+                    PlayerPreferences.separatorChar = String(parts[1].first!)
+                default:
+                    return
+            }   
+            PlayerPreferences.savePreferences()         
             return
+        }
+        // command is:> set custom-theme <name-to-change> <value1> <value2> 
+        if parts.count != 3 {
+            return;
         }
         // set colors/modifiers
         switch parts[0] {
@@ -1669,7 +1681,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 PlayerPreferences.fgEmptySpaceModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)                        
             case "bgEmptySpaceColor":
                 PlayerPreferences.bgEmptySpaceColor = ConsoleColor.itsFromString(parts[1], .black)
-                PlayerPreferences.bgEmptySpaceModifier = ConsoleColorModifier.itsFromString(parts[2], .none)
+                PlayerPreferences.bgEmptySpaceModifier = ConsoleColorModifier.itsFromString(parts[2], .none)            
             default: 
                 return                
         }

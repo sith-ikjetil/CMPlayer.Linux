@@ -66,6 +66,7 @@ internal class PlayerPreferences {
     static var logMaxEntries: Int = 250
     static var historyMaxEntries: Int = 1000
     static var logMaxSizeReached: LogMaxSizeReached = LogMaxSizeReached.EmptyLog
+    static var separatorChar: String = "="
     static var fgHeaderColor: ConsoleColor = .white
     static var bgHeaderColor: ConsoleColor = .blue
     static var fgHeaderModifier: ConsoleColorModifier = .bold
@@ -169,6 +170,17 @@ internal class PlayerPreferences {
                     }
                 }
 
+                // separator char
+                if let aseparatorChar = xeGeneral.attribute(forName: "separatorChar") {
+                    PlayerPreferences.separatorChar = aseparatorChar.stringValue ?? "="
+                    if PlayerPreferences.separatorChar.count == 0 {
+                        PlayerPreferences.separatorChar = "="
+                    }
+                    else if PlayerPreferences.separatorChar.count > 1 {
+                        PlayerPreferences.separatorChar = String(PlayerPreferences.separatorChar.first!)
+                    }
+                }
+                
                 // header colors
                 if let afgHeaderColor = xeGeneral.attribute(forName: "fgHeaderColor") {
                     PlayerPreferences.fgHeaderColor = ConsoleColor.itsFromString(afgHeaderColor.stringValue ?? "white", .white)
@@ -398,6 +410,11 @@ internal class PlayerPreferences {
         xnHistoryMaxEntries.name = "historyMaxEntries"
         xnHistoryMaxEntries.setStringValue(String(self.historyMaxEntries), resolvingEntities: false)
         xeGeneral.addAttribute(xnHistoryMaxEntries)
+
+        let xnseparatorChar: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnseparatorChar.name = "separatorChar"
+        xnseparatorChar.setStringValue(self.separatorChar, resolvingEntities: false)
+        xeGeneral.addAttribute(xnseparatorChar)
 
         //
         // colors
