@@ -44,38 +44,8 @@ internal func getThemeBgColor() -> ConsoleColor {
     case .Black:
         return ConsoleColor.black
     case .Custom:
-        return ConsoleColor.black
+        return PlayerPreferences.bgEmptySpaceColor
   }
-}
-///
-/// Give song background theme color
-///
-internal func getThemeSongBgColor() -> ConsoleColor {
-    switch PlayerPreferences.colorTheme {
-        case .Default:
-            return ConsoleColor.blue
-        case .Blue:
-            return ConsoleColor.blue
-        case .Black:
-            return ConsoleColor.black
-        case .Custom:
-            return PlayerPreferences.bgQueueColor
-    }
-}
-///
-/// Give song background theme color
-///
-internal func getThemeSongBgModifier() -> ConsoleColorModifier {
-    switch PlayerPreferences.colorTheme {
-        case .Default:
-            return ConsoleColorModifier.bold
-        case .Blue:
-            return ConsoleColorModifier.bold
-        case .Black:
-            return ConsoleColorModifier.none
-        case .Custom:
-            return PlayerPreferences.bgQueueModifier
-    }
 }
 /// 
 /// getThemeBgHeaderColor
@@ -85,7 +55,7 @@ internal func getThemeBgHeaderColor() -> ConsoleColor {
     switch PlayerPreferences.colorTheme {
         case .Default: return ConsoleColor.blue
         case .Blue: return ConsoleColor.blue
-        case .Black: return ConsoleColor.blue
+        case .Black: return ConsoleColor.black
         case .Custom: return PlayerPreferences.bgHeaderColor
     }
 }
@@ -365,7 +335,103 @@ internal func getThemeFgQueueModifier() -> ConsoleColorModifier {
         case .Custom: return PlayerPreferences.fgQueueModifier
     }
 }
-//
+/// 
+/// getThemeBgCommandLineColor
+/// 
+/// - Returns: command line bg color
+internal func getThemeBgCommandLineColor() -> ConsoleColor {
+    switch PlayerPreferences.colorTheme {
+        case .Default: return ConsoleColor.black
+        case .Blue: return ConsoleColor.blue
+        case .Black: return ConsoleColor.black
+        case .Custom: return PlayerPreferences.bgCommandLineColor
+    }
+}
+/// 
+/// getThemeBgCommandLineModifier
+/// 
+/// - Returns: command line bg color modifier
+internal func getThemeBgCommandLineModifier() -> ConsoleColorModifier {
+    switch PlayerPreferences.colorTheme {
+        case .Default: return ConsoleColorModifier.none
+        case .Blue: return ConsoleColorModifier.bold
+        case .Black: return ConsoleColorModifier.none
+        case .Custom: return PlayerPreferences.bgCommandLineModifier
+    }
+}
+/// 
+/// getThemeFgCommandLineColor
+/// 
+/// - Returns: separator fg color
+internal func getThemeFgCommandLineColor() -> ConsoleColor {
+    switch PlayerPreferences.colorTheme {
+        case .Default: return ConsoleColor.cyan
+        case .Blue: return ConsoleColor.white
+        case .Black: return ConsoleColor.cyan
+        case .Custom: return PlayerPreferences.fgQueueColor
+    }
+}
+/// 
+/// getThemeFgCommandLineModifier
+/// 
+/// - Returns: separator fg color modifier
+internal func getThemeFgCommandLineModifier() -> ConsoleColorModifier {
+    switch PlayerPreferences.colorTheme {
+        case .Default: return ConsoleColorModifier.bold
+        case .Blue: return ConsoleColorModifier.bold
+        case .Black: return ConsoleColorModifier.bold
+        case .Custom: return PlayerPreferences.fgQueueModifier
+    }
+}
+/// 
+/// getThemeBgStatusLineColor
+/// 
+/// - Returns: status line bg color
+internal func getThemeBgStatusLineColor() -> ConsoleColor {
+    switch PlayerPreferences.colorTheme {
+        case .Default: return ConsoleColor.black
+        case .Blue: return ConsoleColor.blue
+        case .Black: return ConsoleColor.black
+        case .Custom: return PlayerPreferences.bgStatusLineColor
+    }
+}
+/// 
+/// getThemeBgStatusLineModifier
+/// 
+/// - Returns: status line bg color modifier
+internal func getThemeBgStatusLineModifier() -> ConsoleColorModifier {
+    switch PlayerPreferences.colorTheme {
+        case .Default: return ConsoleColorModifier.none
+        case .Blue: return ConsoleColorModifier.bold
+        case .Black: return ConsoleColorModifier.none
+        case .Custom: return PlayerPreferences.bgStatusLineModifier
+    }
+}
+/// 
+/// getThemeFgStatusLineColor
+/// 
+/// - Returns: separator fg color
+internal func getThemeFgStatusLineColor() -> ConsoleColor {
+    switch PlayerPreferences.colorTheme {
+        case .Default: return ConsoleColor.white
+        case .Blue: return ConsoleColor.white
+        case .Black: return ConsoleColor.white
+        case .Custom: return PlayerPreferences.fgStatusLineColor
+    }
+}
+/// 
+/// getThemeFgStatusLineModifier
+/// 
+/// - Returns: separator fg color modifier
+internal func getThemeFgStatusLineModifier() -> ConsoleColorModifier {
+    switch PlayerPreferences.colorTheme {
+        case .Default: return ConsoleColorModifier.bold
+        case .Blue: return ConsoleColorModifier.bold
+        case .Black: return ConsoleColorModifier.bold
+        case .Custom: return PlayerPreferences.fgStatusLineModifier
+    }
+}
+///
 ///
 /// Get mode information
 ///

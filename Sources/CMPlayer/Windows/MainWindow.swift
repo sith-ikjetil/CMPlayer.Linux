@@ -207,7 +207,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             cursor = "_"
         }
         // render command line
-        Console.printXY(1,g_rows-1,">: \(text)\(cursor)", g_cols, .left, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows-1,">: \(text)\(cursor)", g_cols, .left, " ", getThemeBgCommandLineColor(), getThemeBgCommandLineModifier(), getThemeFgCommandLineColor(), getThemeFgCommandLineModifier())
     }    
     ///
     /// Renders the status line on screen
@@ -244,7 +244,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             text.append( " | Mode: off | \(g_cols)x\(g_rows) | \(g_playlist.count) Songs in Queue" )
         }
         // render status line
-        Console.printXY(1,g_rows, text, g_cols, .center, " ", getThemeBgColor(), ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows, text, g_cols, .center, " ", getThemeBgStatusLineColor(), getThemeBgStatusLineModifier(), getThemeFgStatusLineColor(), getThemeFgStatusLineModifier())
     }    
     ///
     /// Traverses all songs and ask the screen renderer to render them on screen
@@ -682,6 +682,11 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         else if parts[0] == "default" {
             PlayerPreferences.colorTheme = ColorTheme.Default
             PlayerPreferences.savePreferences()
+        }
+        // else if request for color theme change is color theme default
+        else if parts[0] == "custom" {
+            PlayerPreferences.colorTheme = ColorTheme.Custom
+            PlayerPreferences.savePreferences()            
         }
         // render window
         self.renderWindow()
