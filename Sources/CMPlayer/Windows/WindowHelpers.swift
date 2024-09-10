@@ -107,9 +107,9 @@ internal func getThemeBgHeaderModifier() -> ConsoleColorModifier {
 /// - Returns: current theme bg header color
 internal func getThemeFgHeaderColor() -> ConsoleColor {
     switch PlayerPreferences.colorTheme {
-        case .Default: return ConsoleColor.blue
-        case .Blue: return ConsoleColor.blue
-        case .Black: return ConsoleColor.blue
+        case .Default: return ConsoleColor.white
+        case .Blue: return ConsoleColor.white
+        case .Black: return ConsoleColor.white
         case .Custom: return PlayerPreferences.fgHeaderColor
     }
 }
