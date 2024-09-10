@@ -69,7 +69,7 @@ internal class PlayerPreferences {
     static var bgHeaderColor: ConsoleColor = .blue
     static var fgHeaderModifier: ConsoleColorModifier = .bold
     static var bgHeaderModifier: ConsoleColorModifier = .bold
-    static var fgTitleColor: ConsoleColor = .white
+    static var fgTitleColor: ConsoleColor = .yellow
     static var bgTitleColor: ConsoleColor = .blue
     static var fgTitleModifier: ConsoleColorModifier = .bold
     static var bgTitleModifier: ConsoleColorModifier = .none

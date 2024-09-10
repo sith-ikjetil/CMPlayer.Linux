@@ -78,7 +78,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     static func renderHeader(showTime: Bool) -> Void {
         // set header background color
-        let bgColor = ConsoleColor.blue
+        //let bgColor = ConsoleColor.blue
         // create message
         var msg: String = "CMPlayer | v\(g_versionString)"
         // if showTime flag is true
@@ -92,7 +92,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             msg += " | [paused]"
         }
         // render header with message
-        Console.printXY(1, 1, msg, g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)        
+        //Console.printXY(1, 1, msg, g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)        
+        Console.printXY(1, 1, msg, g_cols, .center, " ", PlayerPreferences.bgHeaderColor, PlayerPreferences.bgHeaderModifier, PlayerPreferences.fgHeaderColor, PlayerPreferences.fgHeaderModifier)        
     }    
     ///
     /// Renders main window frame on screen
@@ -405,7 +406,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                          PlayerCommand(commands: [["p"]], closure: self.onCommandPlayOrPause),
                          PlayerCommand(commands: [["prev"]], closure: self.onCommandPrev),
                          PlayerCommand(commands: [["#"]], closure: self.onCommandAddSongToPlaylist),                         
-                         PlayerCommand(commands: [["clear", "history"]], closure: self.onCommandClearHistory),]                
+                         PlayerCommand(commands: [["clear", "history"]], closure: self.onCommandClearHistory),
+                         PlayerCommand(commands: [["set", "color"]], closure: self.onSetColor),]
+    
         // Count down and render songs        
         concurrentQueue1.async {
             // while g_quit flag is false
@@ -1607,5 +1610,74 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         catch {
 
         }
+    }
+
+    func onSetColor(parts: [String]) -> Void {
+        // check we have two arguments
+        // command is:> set color <name-to-change> <color-name> <bold/none>
+        if parts.count != 3 {            
+            return
+        }
+        // set colors/modifiers
+        switch parts[0] {
+            case "fgHeaderColor": 
+                PlayerPreferences.fgHeaderColor = ConsoleColor.itsFromString(parts[1], .white)
+                PlayerPreferences.fgHeaderModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)
+            case "bgHeaderColor":
+                PlayerPreferences.bgHeaderColor = ConsoleColor.itsFromString(parts[1], .blue)
+                PlayerPreferences.bgHeaderModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)            
+            case "fgTitleColor":
+                PlayerPreferences.fgTitleColor = ConsoleColor.itsFromString(parts[1], .yellow)
+                PlayerPreferences.fgTitleModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)
+            case "bgTitleColor":
+                PlayerPreferences.bgTitleColor = ConsoleColor.itsFromString(parts[1], .black)
+                PlayerPreferences.bgTitleModifier = ConsoleColorModifier.itsFromString(parts[2], .none)            
+            case "fgSeparatorColor":
+                PlayerPreferences.fgSeparatorColor = ConsoleColor.itsFromString(parts[1], .green)
+                PlayerPreferences.fgSeparatorModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)            
+            case "bgSeparatorColor":
+                PlayerPreferences.bgSeparatorColor = ConsoleColor.itsFromString(parts[1], .black)
+                PlayerPreferences.bgSeparatorModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)                        
+            case "fgQueueColor":
+                PlayerPreferences.fgQueueColor = ConsoleColor.itsFromString(parts[1], .white)
+                PlayerPreferences.fgQueueModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)            
+            case "bgQueueColor":
+                PlayerPreferences.bgQueueColor = ConsoleColor.itsFromString(parts[1], .blue)
+                PlayerPreferences.bgQueueModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)                        
+            case "fgQueueSongNoColor":
+                PlayerPreferences.fgQueueSongNoColor = ConsoleColor.itsFromString(parts[1], .cyan)
+                PlayerPreferences.fgQueueSongNoModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)                        
+            case "bgQueueSongNoColor":
+                PlayerPreferences.bgQueueSongNoColor = ConsoleColor.itsFromString(parts[1], .blue)
+                PlayerPreferences.bgQueueSongNoModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)                                    
+            case "fgCommandLineColor":
+                PlayerPreferences.fgCommandLineColor = ConsoleColor.itsFromString(parts[1], .cyan)
+                PlayerPreferences.fgCommandLineModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)                                    
+            case "bgCommandLineColor":
+                PlayerPreferences.bgCommandLineColor = ConsoleColor.itsFromString(parts[1], .black)
+                PlayerPreferences.bgCommandLineModifier = ConsoleColorModifier.itsFromString(parts[2], .none)
+            case "fgStatusLineColor":
+                PlayerPreferences.fgStatusLineColor = ConsoleColor.itsFromString(parts[1], .white)
+                PlayerPreferences.fgStatusLineModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)
+            case "bgStatusLineColor":
+                PlayerPreferences.bgStatusLineColor = ConsoleColor.itsFromString(parts[1], .black)
+                PlayerPreferences.bgStatusLineModifier = ConsoleColorModifier.itsFromString(parts[2], .none)
+            case "fgAltColor":
+                PlayerPreferences.fgAltColor = ConsoleColor.itsFromString(parts[1], .white)
+                PlayerPreferences.fgAltModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)            
+            case "bgAltColor":
+                PlayerPreferences.bgAltColor = ConsoleColor.itsFromString(parts[1], .black)
+                PlayerPreferences.bgAltModifier = ConsoleColorModifier.itsFromString(parts[2], .none)
+            case "fgEmptySpaceColor":
+                PlayerPreferences.fgEmptySpaceColor = ConsoleColor.itsFromString(parts[1], .white)
+                PlayerPreferences.fgEmptySpaceModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)                        
+            case "bgEmptySpaceColor":
+                PlayerPreferences.bgEmptySpaceColor = ConsoleColor.itsFromString(parts[1], .black)
+                PlayerPreferences.bgEmptySpaceModifier = ConsoleColorModifier.itsFromString(parts[2], .none)
+            default: 
+                return                
+        }
+        // save preferences
+        PlayerPreferences.savePreferences()
     }
 }// MainWindow
