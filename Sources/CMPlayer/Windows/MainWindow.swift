@@ -76,9 +76,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     ///
     /// parameter showTime: True if time string is to be shown in header. False otherwise.
     ///
-    static func renderHeader(showTime: Bool) -> Void {
-        // set header background color
-        //let bgColor = ConsoleColor.blue
+    static func renderHeader(showTime: Bool) -> Void {        
         // create message
         var msg: String = "CMPlayer | v\(g_versionString)"
         // if showTime flag is true
@@ -91,53 +89,50 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // append paused to message
             msg += " | [paused]"
         }
-        // render header with message
-        //Console.printXY(1, 1, msg, g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)        
-        Console.printXY(1, 1, msg, g_cols, .center, " ", PlayerPreferences.bgHeaderColor, PlayerPreferences.bgHeaderModifier, PlayerPreferences.fgHeaderColor, PlayerPreferences.fgHeaderModifier)        
+        // render header with message        
+        Console.printXY(1, 1, msg, g_cols, .center, " ", getThemeBgHeaderColor(), getThemeBgHeaderModifier(), getThemeFgHeaderColor(), getThemeFgHeaderModifier())        
     }    
     ///
     /// Renders main window frame on screen
     ///
     func renderFrame() -> Void {
         // render header
-        MainWindow.renderHeader(showTime: true)
-        // set background color from theme
-        let bgColor = getThemeBgColor()
+        MainWindow.renderHeader(showTime: true)        
         // render blank line y = 2
-        Console.printXY(1,2," ", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,2," ", g_cols, .center, " ", getThemeBgEmptySpaceColor(), getThemeBgEmptySpaceModifier(), getThemeFgEmptySpaceColor(), getThemeFgEmptySpaceModifier())
         // render default view
         if PlayerPreferences.viewType == ViewType.Default {  
             // get layout info
             let layout: MainWindowLayout = MainWindowLayout.get()    
             // render song no header
-            Console.printXY(layout.songNoX,3,"Song No.", layout.songNoCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)                    
+            Console.printXY(layout.songNoX,3,"Song No.", layout.songNoCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
             // render artist header
-            Console.printXY(layout.artistX,3,"Artist", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.artistX,3,"Artist", layout.artistCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
             // render title header
-            Console.printXY(layout.titleX,3,"Title", layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.titleX,3,"Title", layout.titleCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
             // render time header
-            Console.printXY(layout.durationX,3,"Time", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.durationX,3,"Time", layout.durationCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
             // render separator line
-            Console.printXY(1,4,"=", g_cols, .left, "=", bgColor, ConsoleColorModifier.none, ConsoleColor.green, ConsoleColorModifier.bold)
+            Console.printXY(1,4,"=", g_cols, .left, "=", getThemeBgSeparatorColor(), getThemeBgSeparatorModifier(), getThemeFgSeparatorColor(), getThemeFgSeparatorModifier())
         }
         // else render details view
         else if PlayerPreferences.viewType == ViewType.Details {
             // get layout info
             let layout: MainWindowLayout = MainWindowLayout.get()    
             // render song no and empty header
-            Console.printXY(1,3,"Song No.", layout.songNoCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(1,4," ", layout.songNoCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)                        
+            Console.printXY(1,3,"Song No.", layout.songNoCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(1,4," ", layout.songNoCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)                        
             // render artist and album name header
-            Console.printXY(layout.artistX,3,"Artist", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(layout.artistX,4,"Album", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.artistX,3,"Artist", layout.artistCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.artistX,4,"Album", layout.artistCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
             // render title and genre header
-            Console.printXY(layout.titleX,3,"Title", layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(layout.titleX,4,"Genre", layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.titleX,3,"Title", layout.titleCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.titleX,4,"Genre", layout.titleCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
             // render time and empty header
-            Console.printXY(layout.durationX,3,"Time", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-            Console.printXY(layout.durationX,4," ", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.durationX,3,"Time", layout.durationCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
+            Console.printXY(layout.durationX,4," ", layout.durationCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
             // render separator line
-            Console.printXY(1,5,"=", g_cols, .left, "=", bgColor, ConsoleColorModifier.none, ConsoleColor.green, ConsoleColorModifier.bold)
+            Console.printXY(1,5,"=", g_cols, .left, "=", getThemeBgSeparatorColor(), getThemeBgSeparatorModifier(), ConsoleColor.green, ConsoleColorModifier.bold)
         }
     }
     ///
@@ -148,46 +143,42 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// parameter time: duration.    
     ///
     func renderSong(_ y: Int, _ song: SongEntry, _ time: UInt64) -> Void
-    {
-        // get background color from current theme
-        let bgColor = getThemeSongBgColor()
-        // set song no color
-        let songNoColor = ConsoleColor.cyan
+    {        
         // if viewtype is set to default
         if PlayerPreferences.viewType == ViewType.Default {
             // get layout info
             let layout: MainWindowLayout = MainWindowLayout.get() 
             // render song no
-            Console.printXY(layout.songNoX, y, "\(song.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
+            Console.printXY(layout.songNoX, y, "\(song.songNo) ", layout.songNoCols, .right, " ", getThemeBgQueueSongNoColor(), getThemeBgQueueSongNoModifier(), getThemeFgQueueSongNoColor(), getThemeFgQueueSongNoModifier())
             // render artist
-            Console.printXY(layout.artistX, y, song.getArtist(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)            
+            Console.printXY(layout.artistX, y, song.getArtist(), layout.artistCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
             // render title
-            Console.printXY(layout.titleX, y, song.getTitle(), layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(layout.titleX, y, song.getTitle(), layout.titleCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
             // set time string
             let timeString: String = itsRenderMsToFullString(time, false)
             let endTimePart: String = String(timeString[timeString.index(timeString.endIndex, offsetBy: -5)..<timeString.endIndex])
             // render duration left
-            Console.printXY(layout.durationX, y, endTimePart, layout.durationCols, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(layout.durationX, y, endTimePart, layout.durationCols, .ignore, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
         }
         // if viewtype is set to details
         else if PlayerPreferences.viewType == ViewType.Details {
             // get layout info
             let layout: MainWindowLayout = MainWindowLayout.get() 
             // render song no and empty field
-            Console.printXY(layout.songNoX, y, "\(song.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
-            Console.printXY(layout.songNoX, y+1, " ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(layout.songNoX, y, "\(song.songNo) ", layout.songNoCols, .right, " ", getThemeBgQueueSongNoColor(), getThemeBgQueueSongNoModifier(), getThemeFgQueueSongNoColor(), getThemeFgQueueSongNoModifier())
+            Console.printXY(layout.songNoX, y+1, " ", layout.songNoCols, .right, " ", getThemeBgQueueSongNoColor(), getThemeBgQueueSongNoModifier(), getThemeFgQueueSongNoColor(), getThemeFgQueueSongNoModifier())
             // render artist and album name
-            Console.printXY(layout.artistX, y, song.getArtist(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-            Console.printXY(layout.artistX, y+1, song.getAlbumName(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(layout.artistX, y, song.getArtist(), layout.artistCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+            Console.printXY(layout.artistX, y+1, song.getAlbumName(), layout.artistCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
             // render title and genre
-            Console.printXY(layout.titleX, y, song.getTitle(), layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-            Console.printXY(layout.titleX, y+1, song.getGenre(), layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(layout.titleX, y, song.getTitle(), layout.titleCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+            Console.printXY(layout.titleX, y+1, song.getGenre(), layout.titleCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
             // set time string
             let timeString: String = itsRenderMsToFullString(time, false)
             let endTimePart: String = String(timeString[timeString.index(timeString.endIndex, offsetBy: -5)..<timeString.endIndex])
             // render duration and empty field
-            Console.printXY(layout.durationX, y, endTimePart, layout.durationCols, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)            
-            Console.printXY(layout.durationX, y+1, " ", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(layout.durationX, y, endTimePart, layout.durationCols, .ignore, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+            Console.printXY(layout.durationX, y+1, " ", layout.durationCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
         }
     }
     /// 

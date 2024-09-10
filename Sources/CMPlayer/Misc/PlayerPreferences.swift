@@ -32,6 +32,7 @@ internal enum ColorTheme: String {
     case Default = "default"
     case Blue = "blue"
     case Black = "black"
+    case Custom = "custom"
 }
 //
 // Sound output library to use
@@ -142,7 +143,7 @@ internal class PlayerPreferences {
                     PlayerPreferences.viewType = ViewType(rawValue: aViewType.stringValue ?? "default") ?? ViewType.Default
                 }
                 if let aColorTheme = xeGeneral.attribute(forName: "colorTheme") {
-                    PlayerPreferences.colorTheme = ColorTheme(rawValue: aColorTheme.stringValue ?? "blue") ?? ColorTheme.Blue
+                    PlayerPreferences.colorTheme = ColorTheme(rawValue: aColorTheme.stringValue ?? "default") ?? ColorTheme.Default
                 }
                 if let aOutputSoundLibrary = xeGeneral.attribute(forName: "outputSoundLibrary") {
                     PlayerPreferences.outputSoundLibrary = OutputSoundLibrary(rawValue: aOutputSoundLibrary.stringValue ?? "ao") ?? OutputSoundLibrary.ao

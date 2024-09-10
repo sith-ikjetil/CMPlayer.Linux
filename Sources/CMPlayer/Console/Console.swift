@@ -104,6 +104,9 @@ internal class Console {
         case .Black:
             // clear screen given black color theme
             Console.printXY(1,1," ", g_rows*g_cols, .left, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.none)
+        case .Custom:
+            // clear screen given default color theme
+            Console.printXY(1,1," ", g_rows*g_cols, .left, " ", ConsoleColor.black, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.none)
         }        
     }    
     ///
