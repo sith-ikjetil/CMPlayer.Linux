@@ -94,10 +94,10 @@ internal class PlayerPreferences {
     static var bgStatusLineColor: ConsoleColor = .black
     static var fgStatusLineModifier: ConsoleColorModifier = .bold
     static var bgStatusLineModifier: ConsoleColorModifier = .none
-    static var fgAltColor: ConsoleColor = .white
-    static var bgAltColor: ConsoleColor = .black
-    static var fgAltModifier: ConsoleColorModifier = .bold
-    static var bgAltModifier: ConsoleColorModifier = .none
+    static var fgAddendumColor: ConsoleColor = .white
+    static var bgAddendumColor: ConsoleColor = .black
+    static var fgAddendumModifier: ConsoleColorModifier = .bold
+    static var bgAddendumModifier: ConsoleColorModifier = .none
     static var fgEmptySpaceColor: ConsoleColor = .white
     static var bgEmptySpaceColor: ConsoleColor = .black
     static var fgEmptySpaceModifier: ConsoleColorModifier = .bold
@@ -267,19 +267,19 @@ internal class PlayerPreferences {
                 if let abgStatusLineModifier = xeGeneral.attribute(forName: "bgStatusLineModifier") {
                     PlayerPreferences.bgStatusLineModifier = ConsoleColorModifier.itsFromString(abgStatusLineModifier.stringValue ?? "none", .none)
                 }
-                 
+                
                 // alt colors
-                if let afgAltColor = xeGeneral.attribute(forName: "fgAltColor") {
-                    PlayerPreferences.fgAltColor = ConsoleColor.itsFromString(afgAltColor.stringValue ?? "white", .white)
+                if let afgAddendumColor = xeGeneral.attribute(forName: "fgAddendumColor") {
+                    PlayerPreferences.fgAddendumColor = ConsoleColor.itsFromString(afgAddendumColor.stringValue ?? "white", .white)
                 }
-                if let abgAltColor = xeGeneral.attribute(forName: "bgAltColor") {
-                    PlayerPreferences.bgAltColor = ConsoleColor.itsFromString(abgAltColor.stringValue ?? "black", .black)
+                if let abgAddendumColor = xeGeneral.attribute(forName: "bgAddendumColor") {
+                    PlayerPreferences.bgAddendumColor = ConsoleColor.itsFromString(abgAddendumColor.stringValue ?? "black", .black)
                 }
-                if let afgAltModifier = xeGeneral.attribute(forName: "fgAltModifier") {
-                    PlayerPreferences.fgAltModifier = ConsoleColorModifier.itsFromString(afgAltModifier.stringValue ?? "bold", .bold)
+                if let afgAddendumModifier = xeGeneral.attribute(forName: "fgAddendumModifier") {
+                    PlayerPreferences.fgAddendumModifier = ConsoleColorModifier.itsFromString(afgAddendumModifier.stringValue ?? "bold", .bold)
                 }
-                if let abgAltModifier = xeGeneral.attribute(forName: "bgAltModifier") {
-                    PlayerPreferences.bgAltModifier = ConsoleColorModifier.itsFromString(abgAltModifier.stringValue ?? "none", .none)
+                if let abgAddendumModifier = xeGeneral.attribute(forName: "bgAddendumModifier") {
+                    PlayerPreferences.bgAddendumModifier = ConsoleColorModifier.itsFromString(abgAddendumModifier.stringValue ?? "none", .none)
                 }
 
                 // empty space color
@@ -550,25 +550,25 @@ internal class PlayerPreferences {
         xeGeneral.addAttribute(xnbgStatusLineModifier)
 
         // alt
-        let xnfgAltColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
-        xnfgAltColor.name = "fgAltColor"
-        xnfgAltColor.setStringValue(self.fgAltColor.itsToString(), resolvingEntities: false)
-        xeGeneral.addAttribute(xnfgAltColor)
+        let xnfgAddendumColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgAddendumColor.name = "fgAddendumColor"
+        xnfgAddendumColor.setStringValue(self.fgAddendumColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgAddendumColor)
         
-        let xnbgAltColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
-        xnbgAltColor.name = "bgAltColor"
-        xnbgAltColor.setStringValue(self.bgAltColor.itsToString(), resolvingEntities: false)
-        xeGeneral.addAttribute(xnbgAltColor)
+        let xnbgAddendumColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgAddendumColor.name = "bgAddendumColor"
+        xnbgAddendumColor.setStringValue(self.bgAddendumColor.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgAddendumColor)
 
-        let xnfgAltModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
-        xnfgAltModifier.name = "fgAltModifier"
-        xnfgAltModifier.setStringValue(self.fgAltModifier.itsToString(), resolvingEntities: false)
-        xeGeneral.addAttribute(xnfgAltModifier)
+        let xnfgAddendumModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnfgAddendumModifier.name = "fgAddendumModifier"
+        xnfgAddendumModifier.setStringValue(self.fgAddendumModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnfgAddendumModifier)
 
-        let xnbgAltModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
-        xnbgAltModifier.name = "bgAltModifier"
-        xnbgAltModifier.setStringValue(self.bgAltModifier.itsToString(), resolvingEntities: false)
-        xeGeneral.addAttribute(xnbgAltModifier)
+        let xnbgAddendumModifier: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)
+        xnbgAddendumModifier.name = "bgAddendumModifier"
+        xnbgAddendumModifier.setStringValue(self.bgAddendumModifier.itsToString(), resolvingEntities: false)
+        xeGeneral.addAttribute(xnbgAddendumModifier)
         
         // empty space
         let xnfgEmptySpaceColor: XMLNode = XMLNode(kind: XMLNode.Kind.attribute)

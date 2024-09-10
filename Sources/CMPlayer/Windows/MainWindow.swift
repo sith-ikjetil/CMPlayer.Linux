@@ -132,7 +132,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             Console.printXY(layout.durationX,3,"Time", layout.durationCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
             Console.printXY(layout.durationX,4," ", layout.durationCols, .left, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), ConsoleColor.yellow, ConsoleColorModifier.bold)
             // render separator line
-            Console.printXY(1,5,"=", g_cols, .left, "=", getThemeBgSeparatorColor(), getThemeBgSeparatorModifier(), ConsoleColor.green, ConsoleColorModifier.bold)
+            Console.printXY(1,5,"=", g_cols, .left, "=", getThemeBgSeparatorColor(), getThemeBgSeparatorModifier(), getThemeFgSeparatorColor(), getThemeFgSeparatorModifier())
         }
     }
     ///
@@ -1658,12 +1658,12 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             case "bgStatusLineColor":
                 PlayerPreferences.bgStatusLineColor = ConsoleColor.itsFromString(parts[1], .black)
                 PlayerPreferences.bgStatusLineModifier = ConsoleColorModifier.itsFromString(parts[2], .none)
-            case "fgAltColor":
-                PlayerPreferences.fgAltColor = ConsoleColor.itsFromString(parts[1], .white)
-                PlayerPreferences.fgAltModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)            
-            case "bgAltColor":
-                PlayerPreferences.bgAltColor = ConsoleColor.itsFromString(parts[1], .black)
-                PlayerPreferences.bgAltModifier = ConsoleColorModifier.itsFromString(parts[2], .none)
+            case "fgAddendumColor":
+                PlayerPreferences.fgAddendumColor = ConsoleColor.itsFromString(parts[1], .white)
+                PlayerPreferences.fgAddendumModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)            
+            case "bgAddendumColor":
+                PlayerPreferences.bgAddendumColor = ConsoleColor.itsFromString(parts[1], .black)
+                PlayerPreferences.bgAddendumModifier = ConsoleColorModifier.itsFromString(parts[2], .none)
             case "fgEmptySpaceColor":
                 PlayerPreferences.fgEmptySpaceColor = ConsoleColor.itsFromString(parts[1], .white)
                 PlayerPreferences.fgEmptySpaceModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)                        

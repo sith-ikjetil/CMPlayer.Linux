@@ -368,7 +368,7 @@ internal func getThemeFgCommandLineColor() -> ConsoleColor {
         case .Default: return ConsoleColor.cyan
         case .Blue: return ConsoleColor.white
         case .Black: return ConsoleColor.cyan
-        case .Custom: return PlayerPreferences.fgQueueColor
+        case .Custom: return PlayerPreferences.fgCommandLineColor
     }
 }
 /// 
@@ -380,7 +380,7 @@ internal func getThemeFgCommandLineModifier() -> ConsoleColorModifier {
         case .Default: return ConsoleColorModifier.bold
         case .Blue: return ConsoleColorModifier.bold
         case .Black: return ConsoleColorModifier.bold
-        case .Custom: return PlayerPreferences.fgQueueModifier
+        case .Custom: return PlayerPreferences.fgCommandLineModifier
     }
 }
 /// 
