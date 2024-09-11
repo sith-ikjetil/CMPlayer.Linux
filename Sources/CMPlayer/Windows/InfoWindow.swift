@@ -165,6 +165,8 @@ internal class InfoWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             index_screen_lines += 1
         }
         // render forbidden area
+        // render empty line
+        Console.printXY(1,g_rows-2," ", g_cols, .center, " ", getThemeBgEmptySpaceColor(), getThemeBgEmptySpaceModifier(), getThemeFgEmptySpaceColor(), getThemeFgEmptySpaceModifier())                
         // render information
         Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", getThemeBgStatusLineColor(), getThemeBgStatusLineModifier(), getThemeFgStatusLineColor(), getThemeFgStatusLineModifier())
         // render status line

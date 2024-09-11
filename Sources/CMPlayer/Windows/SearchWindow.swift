@@ -446,13 +446,15 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             return
         }
         // clear screen current theme
-        Console.clearScreenCurrentTheme()                
+        //Console.clearScreenCurrentTheme()                
         // render header
-        MainWindow.renderHeader(showTime: false)
-        // get bg color from current theme
-        let bgColor = getThemeBgColor()
+        MainWindow.renderHeader(showTime: false)        
+        // render empty line
+        Console.printXY(1,2," ", g_cols, .center, " ", getThemeBgEmptySpaceColor(), getThemeBgEmptySpaceModifier(), getThemeFgEmptySpaceColor(), getThemeFgEmptySpaceModifier())        
         // render title
-        Console.printXY(1,3,":: SEARCH RESULT ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+        Console.printXY(1,3,":: SEARCH RESULT ::", g_cols, .center, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
+        // render empty line
+        Console.printXY(1,4," ", g_cols, .center, " ", getThemeBgEmptySpaceColor(), getThemeBgEmptySpaceModifier(), getThemeFgEmptySpaceColor(), getThemeFgEmptySpaceModifier())        
         // if view type is default
         if PlayerPreferences.viewType == ViewType.Default {
             // get main window layout
@@ -466,7 +468,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             // loop while index_search is less than max but...
             while index_search < max {
                 // if index_screen_lines is reaching forbidden area on screen
-                if index_screen_lines >= (g_rows-3) {
+                if index_screen_lines > (g_rows-3) {
                     // discontinue loop
                     break
                 }
@@ -478,17 +480,24 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
                 // set se to searchResults current SongEntry
                 let se = self.searchResult[index_search]
                 // render song no
-                Console.printXY(layout.songNoX, index_screen_lines, "\(se.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+                Console.printXY(layout.songNoX, index_screen_lines, "\(se.songNo) ", layout.songNoCols, .right, " ", getThemeBgQueueSongNoColor(), getThemeBgQueueSongNoModifier(), getThemeFgQueueSongNoColor(), getThemeFgQueueSongNoModifier())
                 // render artist
-                Console.printXY(layout.artistX, index_screen_lines, se.getArtist(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(layout.artistX, index_screen_lines, se.getArtist(), layout.artistCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
                 // render title
-                Console.printXY(layout.titleX, index_screen_lines, se.getTitle(), layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(layout.titleX, index_screen_lines, se.getTitle(), layout.titleCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
                 // render duration
-                Console.printXY(layout.durationX, index_screen_lines, itsRenderMsToFullString(se.duration, false), layout.durationCols, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(layout.durationX, index_screen_lines, itsRenderMsToFullString(se.duration, false), layout.durationCols, .ignore, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
                 // increase index_screen_lines by 1 for next round of loop
                 index_screen_lines += 1
                 // increase index_search by 1 for next round of loop
                 index_search += 1
+            }
+            // render the last of the lines empty
+            while index_screen_lines <= (g_rows-3) {
+                // render line
+                Console.printXY(1, index_screen_lines, " ", g_cols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+                // increase index_search by 1
+                index_screen_lines += 1
             }
         }
         // else if view type is details
@@ -504,7 +513,7 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             // loop while index_search is less than max but...
             while index_search < max {
                 // if index_screen_lines is reaching forbidden area on screen
-                if index_screen_lines >= (g_rows-3) {
+                if index_screen_lines > (g_rows-3) {
                     // discontinue loop
                     break
                 }
@@ -516,39 +525,48 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
                 // set se to searchResults current SongEntry
                 let song = self.searchResult[index_search]
                 // render song no
-                Console.printXY(1, index_screen_lines, "\(song.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
-                Console.printXY(1, index_screen_lines+1, " ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)                                
+                Console.printXY(1, index_screen_lines, "\(song.songNo) ", layout.songNoCols, .right, " ", getThemeBgQueueSongNoColor(), getThemeBgQueueSongNoModifier(), getThemeFgQueueSongNoColor(), getThemeFgQueueSongNoModifier())
+                Console.printXY(1, index_screen_lines+1, " ", layout.songNoCols, .right, " ", getThemeBgQueueSongNoColor(), getThemeBgQueueSongNoModifier(), getThemeFgQueueSongNoColor(), getThemeFgQueueSongNoModifier())
                 // render artist/albumName
-                Console.printXY(layout.artistX, index_screen_lines, song.getArtist(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-                Console.printXY(layout.artistX, index_screen_lines+1, song.getAlbumName(), layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(layout.artistX, index_screen_lines, song.getArtist(), layout.artistCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+                Console.printXY(layout.artistX, index_screen_lines+1, song.getAlbumName(), layout.artistCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
                 // render title/genre
-                Console.printXY(layout.titleX, index_screen_lines, song.getTitle(), layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-                Console.printXY(layout.titleX, index_screen_lines+1, song.getGenre(), layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(layout.titleX, index_screen_lines, song.getTitle(), layout.titleCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+                Console.printXY(layout.titleX, index_screen_lines+1, song.getGenre(), layout.titleCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
                 // create constant with value of duration as time string
                 let timeString: String = itsRenderMsToFullString(song.duration, false)
                 // create a constant with only the last part of timeString
                 let endTimePart: String = String(timeString[timeString.index(timeString.endIndex, offsetBy: -5)..<timeString.endIndex])
                 // render duration using endTimePart
-                Console.printXY(layout.durationX, index_screen_lines, endTimePart, layout.durationCols, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-                Console.printXY(layout.durationX, index_screen_lines+1, " ", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(layout.durationX, index_screen_lines, endTimePart, layout.durationCols, .ignore, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+                Console.printXY(layout.durationX, index_screen_lines+1, " ", layout.durationCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
                 // increase index_screen_lines by 2 for next round of loop
                 index_screen_lines += 2
                 // increase index_search by 1 for next round of loop
                 index_search += 1
             }
+            // render the last of the lines empty
+            while index_screen_lines <= (g_rows-3) {
+                // render line
+                Console.printXY(1, index_screen_lines, " ", g_cols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+                // increase index_search by 1
+                index_screen_lines += 1
+            }
         }
         // render forbidden area
+        // render empty line
+        Console.printXY(1,g_rows-2," ", g_cols, .center, " ", getThemeBgEmptySpaceColor(), getThemeBgEmptySpaceModifier(), getThemeFgEmptySpaceColor(), getThemeFgEmptySpaceModifier())        
         // if we have a search result
         if self.searchResult.count > 0 {
             // render information - mode then exit
-            Console.printXY(1,g_rows-1,"PRESS 'SPACEBAR' TO SET MODE. PRESS ANY OTHER KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(1,g_rows-1,"PRESS 'SPACEBAR' TO SET MODE. PRESS ANY OTHER KEY TO EXIT", g_cols, .center, " ", getThemeBgStatusLineColor(), getThemeBgStatusLineModifier(), getThemeFgStatusLineColor(), getThemeFgStatusLineModifier())
         }
         else {
             // render information - no mode just exit
-            Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", getThemeBgStatusLineColor(), getThemeBgStatusLineModifier(), getThemeFgStatusLineColor(), getThemeFgStatusLineModifier())
         }
         // render status line
-        Console.printXY(1,g_rows,"\(self.searchResult.count.itsToString()) Songs", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows,"\(self.searchResult.count.itsToString()) Songs", g_cols, .center, " ", getThemeBgStatusLineColor(), getThemeBgStatusLineModifier(), getThemeFgStatusLineColor(), getThemeFgStatusLineModifier())
         // goto g_cols, 1
         Console.gotoXY(g_cols,1)
         // print nothing

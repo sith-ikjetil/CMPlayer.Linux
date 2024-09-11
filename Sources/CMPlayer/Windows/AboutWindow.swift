@@ -114,7 +114,9 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             Console.printXY(1, index_screen_lines, " ", g_cols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
             // increase index_search by 1
             index_screen_lines += 1
-        }        
+        }                
+        // render empty line
+        Console.printXY(1,g_rows-2," ", g_cols, .center, " ", getThemeBgEmptySpaceColor(), getThemeBgEmptySpaceModifier(), getThemeFgEmptySpaceColor(), getThemeFgEmptySpaceModifier())                
         // render status line
         Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", getThemeBgStatusLineColor(), getThemeBgStatusLineModifier(), getThemeFgStatusLineColor(), getThemeFgStatusLineModifier())
         // render empty line
