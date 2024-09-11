@@ -120,15 +120,15 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             return
         }
         // clear screen current theme
-        Console.clearScreenCurrentTheme()
+        //Console.clearScreenCurrentTheme()
         // render header
-        MainWindow.renderHeader(showTime: false)
-        // get bg color from current theme
-        let bgColor = getThemeBgColor()
+        MainWindow.renderHeader(showTime: false)  
+        // render empty line
+        Console.printXY(1,2," ", g_cols, .center, " ", getThemeBgEmptySpaceColor(), getThemeBgEmptySpaceModifier(), getThemeFgEmptySpaceColor(), getThemeFgEmptySpaceModifier())      
         // render title
-        Console.printXY(1,3,":: HELP ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
-         // render empty line
-        Console.printXY(1,4," ", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,3,":: HELP ::", g_cols, .center, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
+        // render empty line
+        Console.printXY(1,4," ", g_cols, .center, " ", getThemeBgEmptySpaceColor(), getThemeBgEmptySpaceModifier(), getThemeFgEmptySpaceColor(), getThemeFgEmptySpaceModifier())
         // line index on screen. start at 5
         var index_screen_lines: Int = 5
         // index into helpText
@@ -138,7 +138,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         // loop while index_search is less than max but...
         while index_search < max {
             // if index_screen_lines is reaching forbidden area on screen
-            if index_screen_lines >= (g_rows - 3) {
+            if index_screen_lines > (g_rows - 3) {
                 // discontinue loop
                 break
             }
@@ -152,23 +152,30 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // if even row
             if index_search % 2 == 0 {
                 // print help title in cyan
-                Console.printXY(1, index_screen_lines, se, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+                Console.printXY(1, index_screen_lines, se, g_cols, .left, " ", getThemeBgQueueSongNoColor(), getThemeBgQueueSongNoModifier(), getThemeFgQueueSongNoColor(), getThemeFgQueueSongNoModifier())
             }
             // else odd
             else {
                 // print help text in white
-                Console.printXY(1, index_screen_lines, se, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                Console.printXY(1, index_screen_lines, se, g_cols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
             }
             // increase index_screen_lines by 1 for next round of loop
             index_screen_lines += 1
             // increase index_search by 1 for next round of loop
             index_search += 1
         }
+        // render the last of the lines empty
+        while index_screen_lines <= (g_rows-3) {
+            // render line
+            Console.printXY(1, index_screen_lines, " ", g_cols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+            // increase index_search by 1
+            index_screen_lines += 1
+        }
         // render forbidden area
         // render information
-        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", getThemeBgStatusLineColor(), getThemeBgStatusLineModifier(), getThemeFgStatusLineColor(), getThemeFgStatusLineModifier())
         // render status line
-        Console.printXY(1,g_rows,"\((self.helpText.count/2).itsToString()) Commands", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows,"\((self.helpText.count/2).itsToString()) Commands", g_cols, .center, " ", getThemeBgStatusLineColor(), getThemeBgStatusLineModifier(), getThemeFgStatusLineColor(), getThemeFgStatusLineModifier())
         // goto g_cols, 1
         Console.gotoXY(g_cols,1)
         // print nothing

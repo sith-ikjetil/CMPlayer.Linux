@@ -256,7 +256,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
         // render header
         MainWindow.renderHeader(showTime: false)
         // get bg color from current theme
-        let bgColor = getThemeBgColor()
+        let bgColor: ConsoleColor = ConsoleColor.black
         // render title
         Console.printXY(1,3,":: INITIALIZE ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
         // render current path

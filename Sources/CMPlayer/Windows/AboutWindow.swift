@@ -72,13 +72,15 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
             return
         }        
         // clear screen current theme
-        Console.clearScreenCurrentTheme()
+        //Console.clearScreenCurrentTheme()
         // render header
-        MainWindow.renderHeader(showTime: false)        
-        //  create bgColor constant with current theme bg color
-        let bgColor = getThemeBgColor()
+        MainWindow.renderHeader(showTime: false)
+        // render empty line
+        Console.printXY(1,2," ", g_cols, .center, " ", getThemeBgEmptySpaceColor(), getThemeBgEmptySpaceModifier(), getThemeFgEmptySpaceColor(), getThemeFgEmptySpaceModifier())                
         // render title
-        Console.printXY(1,3,":: ABOUT ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)        
+        Console.printXY(1,3,":: ABOUT ::", g_cols, .center, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())        
+        // render empty line
+        Console.printXY(1,4," ", g_cols, .center, " ", getThemeBgEmptySpaceColor(), getThemeBgEmptySpaceModifier(), getThemeFgEmptySpaceColor(), getThemeFgEmptySpaceModifier())
         // set index_screen_lines to start at line 5
         var index_screen_lines: Int = 5
         // set index_search to aboutIndex
@@ -93,21 +95,30 @@ internal class AboutWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoco
                 break
             }
             // if index into aboutText is greater or equal to aboutText.count discontinue loop
-            if index_search >= self.aboutText.count {
+            if index_search >= self.aboutText.count {                
                 // discontinue loop
                 break
             }            
             // set se to current item in aboutText
             let se = self.aboutText[index_search]
-            // render item in abouText
-            Console.printXY(1, index_screen_lines, se, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+            // render item in aboutText
+            Console.printXY(1, index_screen_lines, se, g_cols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
             // increase index_screen_lines by 1 (y coordinate)
             index_screen_lines += 1
             // increase index_search by 1 (aboutText index)
             index_search += 1
         }
+        // render the last of the lines empty
+        while index_screen_lines <= (g_rows-3) {
+            // render line
+            Console.printXY(1, index_screen_lines, " ", g_cols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+            // increase index_search by 1
+            index_screen_lines += 1
+        }        
         // render status line
-        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", getThemeBgStatusLineColor(), getThemeBgStatusLineModifier(), getThemeFgStatusLineColor(), getThemeFgStatusLineModifier())
+        // render empty line
+        Console.printXY(1,g_rows," ", g_cols, .center, " ", getThemeBgEmptySpaceColor(), getThemeBgEmptySpaceModifier(), getThemeFgEmptySpaceColor(), getThemeFgEmptySpaceModifier())        
         // goto g_cols,1
         Console.gotoXY(g_cols,1)
         // print nothing

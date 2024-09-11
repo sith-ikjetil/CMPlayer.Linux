@@ -97,17 +97,15 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             return
         }
         // clear screen current theme
-        Console.clearScreenCurrentTheme()
+        //Console.clearScreenCurrentTheme()
         // render header
-        MainWindow.renderHeader(showTime: false)
-        // get bg color from current theme
-        let bgColor = getThemeBgColor()
-        // set song no color
-        let songNoColor = ConsoleColor.cyan
+        MainWindow.renderHeader(showTime: false)        
+        // render empty line
+        Console.printXY(1,2," ", g_cols, .center, " ", getThemeBgEmptySpaceColor(), getThemeBgEmptySpaceModifier(), getThemeFgEmptySpaceColor(), getThemeFgEmptySpaceModifier())
         // render title
-        Console.printXY(1,3,":: MODE ::", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.yellow, ConsoleColorModifier.bold)
+        Console.printXY(1,3,":: MODE ::", g_cols, .center, " ", getThemeBgTitleColor(), getThemeBgTitleModifier(), getThemeFgTitleColor(), getThemeFgTitleModifier())
         // render mode information
-        Console.printXY(1,4,"mode is: \((g_searchType.count > 0) ? "on" : "off")", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,4,"mode is: \((g_searchType.count > 0) ? "on" : "off")", g_cols, .center, " ", getThemeBgStatusLineColor(), getThemeBgStatusLineModifier(), getThemeFgStatusLineColor(), getThemeFgStatusLineModifier())
         // line index on screen. start at 5
         var index_screen_lines: Int = 5
         // index into modeText
@@ -121,12 +119,12 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // loop while index_search is less than max but...
             while index_search < max {
                 // if index_screen_lines is reaching forbidden area on screen
-                if index_screen_lines >= (g_rows-3) {
+                if index_screen_lines > (g_rows-3) {
                     // discontinue loop
                     break
                 }
                 // if index_search has reached modeText + searchResult counts
-                if index_search > ((self.modeText.count + self.searchResult.count) - 1) {
+                if index_search > ((self.modeText.count + self.searchResult.count)) {
                     // discontinue loop
                     break
                 }
@@ -137,12 +135,12 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     // if sub item
                     if mt.hasPrefix(" ::") {
                         // render sub item
-                        Console.printXY(1, index_screen_lines, mt, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                        Console.printXY(1, index_screen_lines, mt, g_cols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
                     }
                     // else, we have item
                     else {
                         // render item
-                        Console.printXY(1, index_screen_lines, mt, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+                        Console.printXY(1, index_screen_lines, mt, g_cols, .left, " ", getThemeBgQueueSongNoColor(), getThemeBgQueueSongNoModifier(), getThemeFgQueueSongNoColor(), getThemeFgQueueSongNoModifier())
                     }
                 }
                 // index_serach is in modeText count +
@@ -150,18 +148,25 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     // set constant to SongEntry from searchResult
                     let se = self.searchResult[index_search-self.modeText.count]
                     // render song no
-                    Console.printXY(layout.songNoX, index_screen_lines, "\(se.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+                    Console.printXY(layout.songNoX, index_screen_lines, "\(se.songNo) ", layout.songNoCols, .right, " ", getThemeBgQueueSongNoColor(), getThemeBgQueueSongNoModifier(), getThemeFgQueueSongNoColor(), getThemeFgQueueSongNoModifier())
                     // render artist
-                    Console.printXY(layout.artistX, index_screen_lines, "\(se.artist)", layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.artistX, index_screen_lines, "\(se.artist)", layout.artistCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
                     // render title
-                    Console.printXY(layout.titleX, index_screen_lines, "\(se.title)", layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.titleX, index_screen_lines, "\(se.title)", layout.titleCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
                     // render duration
-                    Console.printXY(layout.durationX, index_screen_lines, itsRenderMsToFullString(se.duration, false), layout.durationCols, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.durationX, index_screen_lines, itsRenderMsToFullString(se.duration, false), layout.durationCols, .ignore, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
                 }
                 // increase index_screen_lines by 1 for next round of loop
                 index_screen_lines += 1
                 // increase index_search by 1 for next round of loop
                 index_search += 1
+            }
+            // render the last of the lines empty
+            while index_screen_lines <= (g_rows-3) {
+                // render line
+                Console.printXY(1, index_screen_lines, " ", g_cols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+                // increase index_search by 1
+                index_screen_lines += 1
             }
         }
         else if PlayerPreferences.viewType == ViewType.Details { 
@@ -170,7 +175,7 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // loop while index_search is less than max but...
             while index_search < max {
                 // if index_screen_lines is reaching forbidden area on screen
-                if index_screen_lines >= (g_rows-3) {
+                if index_screen_lines > (g_rows-3) {
                     // discontinue loop
                     break
                 }
@@ -186,12 +191,12 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     // if sub item
                     if mt.hasPrefix(" ::") {
                         // render sub item
-                        Console.printXY(1, index_screen_lines, mt, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                        Console.printXY(1, index_screen_lines, mt, g_cols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
                     }
                     // else, we have item
                     else {
                         // if item
-                        Console.printXY(1, index_screen_lines, mt, g_cols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.cyan, ConsoleColorModifier.bold)
+                        Console.printXY(1, index_screen_lines, mt, g_cols, .left, " ", getThemeBgQueueSongNoColor(), getThemeBgQueueSongNoModifier(), getThemeFgQueueSongNoColor(), getThemeFgQueueSongNoModifier())
                     }
                     // increase index_screen_lines by 1 for next round of loop
                     index_screen_lines += 1
@@ -202,35 +207,42 @@ internal class ModeWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                     // set constant to SongEntry from searchResult
                     let song = self.searchResult[index_search-self.modeText.count]
                     // render song no
-                    Console.printXY(layout.songNoX, index_screen_lines, "\(song.songNo) ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, songNoColor, ConsoleColorModifier.bold)
-                    Console.printXY(layout.songNoX, index_screen_lines+1, " ", layout.songNoCols, .right, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.songNoX, index_screen_lines, "\(song.songNo) ", layout.songNoCols, .right, " ", getThemeBgQueueSongNoColor(), getThemeBgQueueSongNoModifier(), getThemeFgQueueSongNoColor(), getThemeFgQueueSongNoModifier())
+                    Console.printXY(layout.songNoX, index_screen_lines+1, " ", layout.songNoCols, .right, " ", getThemeBgQueueSongNoColor(), getThemeBgQueueSongNoModifier(), getThemeFgQueueSongNoColor(), getThemeFgQueueSongNoModifier())
                     // render artist/albumName
-                    Console.printXY(layout.artistX, index_screen_lines, song.artist, layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-                    Console.printXY(layout.artistX, index_screen_lines+1, song.albumName, layout.artistCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.artistX, index_screen_lines, song.artist, layout.artistCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+                    Console.printXY(layout.artistX, index_screen_lines+1, song.albumName, layout.artistCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
                     // render title/genre
-                    Console.printXY(layout.titleX, index_screen_lines, song.title, layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-                    Console.printXY(layout.titleX, index_screen_lines+1, song.genre, layout.titleCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.titleX, index_screen_lines, song.title, layout.titleCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+                    Console.printXY(layout.titleX, index_screen_lines+1, song.genre, layout.titleCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
                     // create a constant with song duration as time string
                     let timeString: String = itsRenderMsToFullString(song.duration, false)
                     // create a constant with last  part of timeString
                     let endTimePart: String = String(timeString[timeString.index(timeString.endIndex, offsetBy: -5)..<timeString.endIndex])
                     // render duration
-                    Console.printXY(layout.durationX, index_screen_lines, endTimePart, layout.durationCols, .ignore, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
-                    Console.printXY(layout.durationX, index_screen_lines+1, " ", layout.durationCols, .left, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+                    Console.printXY(layout.durationX, index_screen_lines, endTimePart, layout.durationCols, .ignore, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+                    Console.printXY(layout.durationX, index_screen_lines+1, " ", layout.durationCols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
                     // increase index_screen_lines by 2 for next round of loop
                     index_screen_lines += 2
                     // increase index_search by 1 for next round of loop
                     index_search += 1
                 }                
             }
+            // render the last of the lines empty
+            while index_screen_lines <= (g_rows-3) {
+                // render line
+                Console.printXY(1, index_screen_lines, " ", g_cols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())
+                // increase index_search by 1
+                index_screen_lines += 1
+            }
         }       
         // render forbidden area
         // render empty line
-        Console.printXY(1,g_rows-3," ", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold) 
+        Console.printXY(1,g_rows-2," ", g_cols, .center, " ", getThemeBgEmptySpaceColor(), getThemeBgEmptySpaceModifier(), getThemeFgEmptySpaceColor(), getThemeFgEmptySpaceModifier())
         // render information
-        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows-1,"PRESS ANY KEY TO EXIT", g_cols, .center, " ", getThemeBgStatusLineColor(), getThemeBgStatusLineModifier(), getThemeFgStatusLineColor(), getThemeFgStatusLineModifier())
         // render status line
-        Console.printXY(1,g_rows,"\(g_searchResult.count.itsToString()) Songs", g_cols, .center, " ", bgColor, ConsoleColorModifier.none, ConsoleColor.white, ConsoleColorModifier.bold)
+        Console.printXY(1,g_rows,"\(g_searchResult.count.itsToString()) Songs", g_cols, .center, " ", getThemeBgStatusLineColor(), getThemeBgStatusLineModifier(), getThemeFgStatusLineColor(), getThemeFgStatusLineModifier())
         // goto g_cols, 1
         Console.gotoXY(g_cols,1)
         // print nothing
