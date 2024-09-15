@@ -34,7 +34,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     /// default initializer
     ///
     init() {
-
+        
     }
     ///
     /// overriden initializer
@@ -46,7 +46,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
     init(backup: PlayerLibrary) {
         // set backup library        
         self.backup = backup        
-        g_library.setNextAvailableSongNo(self.backup!.nextAvailableSongNo())    
+        g_library.setNextAvailableSongNo(max(g_library.nextAvailableSongNo(),self.backup!.nextAvailableSongNo()))
     }    
     /// Shows this HelpWindow on screen.
     ///
