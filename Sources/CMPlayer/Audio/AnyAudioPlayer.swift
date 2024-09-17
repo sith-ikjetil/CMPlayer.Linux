@@ -47,6 +47,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
     ///
     /// variables
     ///
+    private var m_task: Any? = nil
     private var m_stopFlag: Bool = false        // true == we must stop playing
     private var m_isPlaying: Bool = false       // true == we are currently in playing process
     private var m_isPaused: Bool = false        // true == we are currently playing, but are paused
@@ -555,12 +556,12 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
                 // throw error                     
                 throw CmpError(message: msg)
             }
-        }
+        }        
         // run code async
-        DispatchQueue.global(qos: . userInitiated).async {
+        self.m_task = Task {
             // play audio
             self.playAsync()
-        }
+        };        
     }
     ///
     /// Performs the actual playback from play().

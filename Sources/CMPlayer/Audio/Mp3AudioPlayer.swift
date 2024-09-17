@@ -35,6 +35,7 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
     ///
     /// private variables
     /// 
+    private var m_task: Any? = nil
     private var mpg123Handle: OpaquePointer?    // libmpg123 handle    
     private var m_stopFlag: Bool = false        // should we stop playing
     private var m_isPlaying: Bool = false       // are we currently playing
@@ -349,10 +350,10 @@ internal final class Mp3AudioPlayer : CmpAudioPlayerProtocol {
             }
         }
         // run code async
-        DispatchQueue.global(qos: . userInitiated).async {
+        self.m_task = Task {
             // play audio
             self.playAsync()
-        }
+        };        
     }
     ///
     /// Performs the actual playback from play().
