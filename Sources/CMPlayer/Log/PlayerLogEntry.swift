@@ -45,9 +45,9 @@ internal class PlayerLogEntry {
     /// Converts entry into plain text for loggin purposes.
     /// 
     /// - Returns: 
-    func toPlainText() -> String {        
+    func toPlainText(n: Int) -> String {        
         // create a variable named text of type string with self.type
-        var text: String = "Type=\(self.type.rawValue.convertStringToLengthPaddedString(11,.left," ")) "
+        var text: String = "\(n)> Type=\(self.type.rawValue.convertStringToLengthPaddedString(11,.left," ")) "
         // append self.timeStamp
         text += "When=\(self.timeStamp.itsToString()) "
         // append self.title

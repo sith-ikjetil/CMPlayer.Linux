@@ -30,6 +30,7 @@ internal class PlayerLog {
     /// private variables
     /// 
     private var autoSave: Bool = true    // should the log save entries as soon as they heppen
+    private var logCounter: Int = 1      // start counting logs from 1 (1> ....)
     ///
     /// Overloaded initializer.
     ///
@@ -56,7 +57,7 @@ internal class PlayerLog {
             if PlayerPreferences.logMaxSizeReached == .StopLogging {
                 // then return
                 return;
-            }
+            }            
             // no it means we should clear log
             self.clear()
         }
@@ -123,7 +124,7 @@ internal class PlayerLog {
                 // then return
                 return;
             }
-            // no it means we should clear log
+            // no it means we should clear log            
             self.clear()
         }
         // create log entry
@@ -254,10 +255,14 @@ internal class PlayerLog {
     func toPlainText() -> String {
         // create variable of type string
         var text: String = ""
+        // setup a counter variable
+        var counter: Int = 1
         // loop throuh all entries in self.entries
         for entry in self.entries {
             // append entry as text to text variable
-            text += entry.toPlainText()
+            text += entry.toPlainText(n: counter)
+            // increase log counter
+            counter += 1
         }
         // return text variable
         return text
@@ -267,7 +272,9 @@ internal class PlayerLog {
     ///
     private func appendToPlainTextLog(logEntry: PlayerLogEntry) {
         // create a variable text of type string which contains the text version of logEntry
-        let text: String = logEntry.toPlainText()
+        let text: String = logEntry.toPlainText(n: logCounter)
+        // increase log counter
+        logCounter += 1
         // create a constant filePath that contains the filename + path to log file
         let filePath: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent(PlayerLog.filename, isDirectory: false)
 
