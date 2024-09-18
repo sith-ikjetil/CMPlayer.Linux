@@ -152,6 +152,9 @@ internal class PlayerPreferences {
                 if let aHistoryMaxEntries = xeGeneral.attribute(forName: "historyMaxEntries") {
                     PlayerPreferences.historyMaxEntries = Int(aHistoryMaxEntries.stringValue ?? "1000") ?? 1000
                 }
+                if let aMusicFormats = xeGeneral.attribute(forName: "musicFormats") {
+                    PlayerPreferences.musicFormats = aMusicFormats.stringValue ?? ".mp3;.m4a"
+                }
                 
                 
                 let xeMusicRootPaths = xeGeneral.elements(forName: "musicRootPath")

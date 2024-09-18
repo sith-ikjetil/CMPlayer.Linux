@@ -57,6 +57,9 @@ internal class CommandLineHandler {
             case "--get-max-log-n": return CommandLineHandler.execute__get_max_log_n()
             case "--set-max-history-n": return CommandLineHandler.execute__set_max_history_n()
             case "--get-max-history-n": return CommandLineHandler.execute__get_max_history_n()
+            case "--get-format": return CommandLineHandler.execute__get_format()
+            case "--add-format": return CommandLineHandler.execute__add_format()
+            case "--remove-format": return CommandLineHandler.execute__remove_format()
             default: return CommandLineHandler.execute__help();
         }
     }
@@ -375,6 +378,137 @@ internal class CommandLineHandler {
         // exit application
         exit(ExitCodes.SUCCESS.rawValue)
     }
+    //
+    // execute execute__get_formats()
+    //
+    private static func execute__get_format()
+    {
+        // ensure load preferences
+        PlayerPreferences.ensureLoadPreferences()
+        // print header
+        print("CMPlayer: --get-format")
+        // print separator
+        print("======================")        
+        let formats = PlayerPreferences.musicFormats.split(separator: ";")
+        for fmt in formats {
+            print(" \(fmt)")
+        }        
+        // exit application
+        exit(ExitCodes.SUCCESS.rawValue);
+    }
+    ///
+    /// execute --add-format
+    ///
+    private static func execute__add_format()
+    {
+        // if command line arguments count is less than 3
+        if CommandLine.argc < 3 {
+            // error then call execute__help handler
+            CommandLineHandler.execute__help()
+            // return
+            return
+        }                
+        // get new format from command line arguments
+        let newFormat: String = CommandLine.arguments[2]
+        // guard agains invalid format
+        guard newFormat.count > 1 && newFormat.first == "." && !newFormat.contains(";") else {
+            // error then call execute__help handler
+            CommandLineHandler.execute__help()
+            // return
+            return
+        }
+        // ensure load preferences
+        PlayerPreferences.ensureLoadPreferences()        
+        // print header
+        print("CMPlayer: --add-format")
+        // print separator
+        print("======================")
+        // split music formats to array
+        let formats = PlayerPreferences.musicFormats.split(separator: ";")
+        // check if newFormat already is in music formats
+        for fmt in formats {
+            if fmt == newFormat {
+                CommandLineHandler.execute__help()
+                return;
+            }
+        }
+        // for each of them
+        for fmt in formats {
+            // print the format out
+            print(" \(fmt)")
+        }
+        // add the new format to PlayerPreferences.musicFormats
+        PlayerPreferences.musicFormats = PlayerPreferences.musicFormats + ";" + newFormat
+        // save preferences
+        PlayerPreferences.savePreferences()
+        // print out new format, indicated by (new)
+        print(" \(newFormat) (new)")
+        // exit application
+        exit(ExitCodes.SUCCESS.rawValue);
+    }
+    ///
+    /// execute --remove-format
+    /// 
+    private static func execute__remove_format()
+    {
+         // if command line arguments count is less than 3
+        if CommandLine.argc < 3 {
+            // error then call execute__help handler
+            CommandLineHandler.execute__help()
+            // return
+            return
+        }           
+        // get command line argument     
+        let removeFormat: String = CommandLine.arguments[2]
+        // guard format is ok
+        guard removeFormat.count > 1 && removeFormat.first == "." && !removeFormat.contains(";") else {
+            // error then call execute__help handler
+            CommandLineHandler.execute__help()
+            // return
+            return
+        }
+        // ensure load preferences
+        PlayerPreferences.ensureLoadPreferences()        
+        // print header
+        print("CMPlayer: --remove-format")
+        // print separator
+        print("=========================")
+        // get musicformats as an array
+        var formats = PlayerPreferences.musicFormats.split(separator: ";")
+        // for each format in array
+        for i in 0..<formats.count  {
+            // if removeFormat found
+            if formats[i] == removeFormat {
+                // remove format
+                formats.remove(at: i)
+                // break for
+                break
+            }
+        }                
+        // create a new music format string
+        var modifiedFormats: String = "";
+        // for each format in formats
+        for fmt in formats {
+            // if we are at format #2++
+            if modifiedFormats.count > 0 {
+                // add format separator
+                modifiedFormats += ";"
+            }
+            // add current format to modifiedFormats
+            modifiedFormats += fmt
+        }
+        // set modifiedFormats as PlayerPreferences.musicFormats
+        PlayerPreferences.musicFormats = modifiedFormats
+        // save formats
+        PlayerPreferences.savePreferences()                
+        // loop through formats
+        for fmt in formats {
+            // print formats out
+            print(" \(fmt)")
+        }
+        // exit application
+        exit(ExitCodes.SUCCESS.rawValue);
+    }
     ///
     /// execute --help and default.
     /// 
@@ -395,6 +529,9 @@ internal class CommandLineHandler {
         print(" --get-max-log-n           = gets max log entries")
         print(" --set-max-history-n <max> = sets max history entries [25,1000]")
         print(" --get-max-history-n       = gets max history entries")
+        print(" --get-format              = gets music formats to try and play")
+        print(" --add-format <.ext>       = adds a format to music formats to play <extension>")
+        print(" --remove-format <.ext>    = removes a format from music formats <extension>")
         print("")        
         exit(ExitCodes.SUCCESS.rawValue)
     }    
