@@ -529,7 +529,7 @@ internal class CommandLineHandler {
         PlayerPreferences.savePreferences()
         print("CMPlayer: --log-information-on")
         print("==========================")
-        print(" Information : \(PlayerPreferences.logInformation)")
+        print("(i): Information   \(PlayerPreferences.logInformation)")
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
@@ -542,7 +542,7 @@ internal class CommandLineHandler {
         PlayerPreferences.savePreferences()
         print("CMPlayer: --log-information-off")
         print("==========================")
-        print(" Information : \(PlayerPreferences.logInformation)")
+        print("(i): Information   \(PlayerPreferences.logInformation)")
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
@@ -555,7 +555,7 @@ internal class CommandLineHandler {
         PlayerPreferences.savePreferences()
         print("CMPlayer: --log-warning-on")
         print("==========================")
-        print(" Warning     : \(PlayerPreferences.logWarning)")
+        print("(i): Warning       \(PlayerPreferences.logWarning)")
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
@@ -568,7 +568,7 @@ internal class CommandLineHandler {
         PlayerPreferences.savePreferences()
         print("CMPlayer: --log-warning-off")
         print("==========================")
-        print(" Warning     : \(PlayerPreferences.logWarning)")
+        print("(i): Warning       \(PlayerPreferences.logWarning)")
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
@@ -581,7 +581,7 @@ internal class CommandLineHandler {
         PlayerPreferences.savePreferences()
         print("CMPlayer: --log-error-on")
         print("==========================")
-        print(" Error       : \(PlayerPreferences.logError)")
+        print("(i): Error         \(PlayerPreferences.logError)")
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
@@ -594,7 +594,7 @@ internal class CommandLineHandler {
         PlayerPreferences.savePreferences()
         print("CMPlayer: --log-error-off")
         print("==========================")
-        print(" Error       : \(PlayerPreferences.logError)")
+        print("(i): Error         \(PlayerPreferences.logError)")
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
@@ -607,7 +607,7 @@ internal class CommandLineHandler {
         PlayerPreferences.savePreferences()
         print("CMPlayer: --log-debug-on")
         print("==========================")
-        print(" Debug       : \(PlayerPreferences.logDebug)")
+        print("(i): Debug         \(PlayerPreferences.logDebug)")
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
@@ -620,7 +620,7 @@ internal class CommandLineHandler {
         PlayerPreferences.savePreferences()
         print("CMPlayer: --log-debug-off")
         print("==========================")
-        print(" Debug       : \(PlayerPreferences.logDebug)")
+        print("(i): Debug         \(PlayerPreferences.logDebug)")
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
@@ -633,7 +633,7 @@ internal class CommandLineHandler {
         PlayerPreferences.savePreferences()
         print("CMPlayer: --log-other-on")
         print("==========================")
-        print(" Other       : \(PlayerPreferences.logOther)")
+        print("(i): Other         \(PlayerPreferences.logOther)")
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
@@ -646,7 +646,7 @@ internal class CommandLineHandler {
         PlayerPreferences.savePreferences()
         print("CMPlayer: --log-other-off")
         print("==========================")
-        print(" Other       : \(PlayerPreferences.logOther)")
+        print("(i): Other         \(PlayerPreferences.logOther)")
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
@@ -656,12 +656,13 @@ internal class CommandLineHandler {
     private static func execute__get_log_status() {
         PlayerPreferences.ensureLoadPreferences()
         print("CMPlayer: --get-log-status")
-        print("==========================")        
-        print(" Information : \(PlayerPreferences.logInformation)")
-        print(" Warning     : \(PlayerPreferences.logWarning)")
-        print(" Error       : \(PlayerPreferences.logError)")
-        print(" Debug       : \(PlayerPreferences.logDebug)")
-        print(" Other       : \(PlayerPreferences.logOther)")        
+        print("==========================")
+        print("Log Filters:")
+        print(" > Information     \(PlayerPreferences.logInformation)")
+        print(" > Warning         \(PlayerPreferences.logWarning)")
+        print(" > Error           \(PlayerPreferences.logError)")
+        print(" > Debug           \(PlayerPreferences.logDebug)")
+        print(" > Other           \(PlayerPreferences.logOther)")        
         print("")
         exit(ExitCodes.SUCCESS.rawValue)
     }
