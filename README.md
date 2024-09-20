@@ -7,17 +7,31 @@ This is a console music player for Linux.
 
 ## Application
 The applications name is **cmplayer** and the following arguments are supported:  
- - --help (shows usage screen)
- - --version (shows version number)
- - --integrity-check (does a quick integrity check of cmplayer)
- - --purge (remove all stored data)
- - --set-output-api-ao (sets audio output api to libao (ao))
- - --set-output-api-alsa (sets audio output api to libasound (alsa))
- - --get-output-api (gets audio output api)
- - --set-max-log-n max (sets max log entries [25,1000])
- - --get-max-log-n (gets max log entries)
- - --set-max-history-n max (sets max history entries [25,1000])
- - --get-max-history-n (gets max history entries)
+ - --help                    = shows this help screen  
+ - --version                 = show version number  
+ - --integrity-check         = does a quick integrity check of cmplayer  
+ - --purge                   = remove all stored data  
+ - --set-output-api-ao       = sets audio output api to libao (ao)  
+ - --set-output-api-alsa     = sets audio output api to libasound (alsa)  
+ - --get-output-api          = gets audio output api  
+ - --set-max-log-n max       = sets max log entries [25,1000]  
+ - --get-max-log-n           = gets max log entries
+ - --set-max-history-n max   = sets max history entries [25,1000]
+ - --get-max-history-n       = gets max history entries
+ - --get-format              = gets music formats to try and play
+ - --add-format <.ext>       = adds a format to music formats to play <extension>
+ - --remove-format <.ext>    = removes a format from music formats <extension>
+ - --log-information-on      = turn on information logging
+ - --log-information-off     = turn off information logging
+ - --log-warning-on          = turn on warning logging
+ - --log-warning-off         = turn off warning logging
+ - --log-error-on            = turn on error logging
+ - --log-error-off           = turn off error logging
+ - --log-debug-on            = turn on debug logging
+ - --log-debug-off           = turn off debug logging
+ - --log-other-on            = turn on other logging
+ - --log-other-off           = turn off other logging
+ - --get-log-status          = gets log status  
   
 ## Supported File Formats
 The following file formats are currently supported:
