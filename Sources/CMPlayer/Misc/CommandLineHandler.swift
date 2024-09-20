@@ -60,6 +60,17 @@ internal class CommandLineHandler {
             case "--get-format": return CommandLineHandler.execute__get_format()
             case "--add-format": return CommandLineHandler.execute__add_format()
             case "--remove-format": return CommandLineHandler.execute__remove_format()
+            case "--log-information-on": return CommandLineHandler.execute__log_information_on()
+            case "--log-information-off": return CommandLineHandler.execute__log_information_off()
+            case "--log-warning-on": return CommandLineHandler.execute__log_warning_on()
+            case "--log-warning-off": return CommandLineHandler.execute__log_warning_off()
+            case "--log-error-on": return CommandLineHandler.execute__log_error_on()
+            case "--log-error-off": return CommandLineHandler.execute__log_error_off()
+            case "--log-debug-on": return CommandLineHandler.execute__log_debug_on()
+            case "--log-debug-off": return CommandLineHandler.execute__log_debug_off()
+            case "--log-other-on": return CommandLineHandler.execute__log_other_on()
+            case "--log-other-off": return CommandLineHandler.execute__log_other_off()
+            case "--get-log-status": return CommandLineHandler.execute__get_log_status()
             default: return CommandLineHandler.execute__help();
         }
     }
@@ -510,6 +521,151 @@ internal class CommandLineHandler {
         exit(ExitCodes.SUCCESS.rawValue);
     }
     ///
+    /// execute --log-information-on
+    ///
+    private static func execute__log_information_on() {
+        PlayerPreferences.ensureLoadPreferences()
+        PlayerPreferences.logInformation = true
+        PlayerPreferences.savePreferences()
+        print("CMPlayer: --log-information-on")
+        print("==========================")
+        print(" Information : \(PlayerPreferences.logInformation)")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    ///
+    /// execute --log-information-off
+    ///
+    private static func execute__log_information_off() {
+        PlayerPreferences.ensureLoadPreferences()
+        PlayerPreferences.logInformation = false
+        PlayerPreferences.savePreferences()
+        print("CMPlayer: --log-information-off")
+        print("==========================")
+        print(" Information : \(PlayerPreferences.logInformation)")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    ///
+    /// execute --log-warning-on
+    ///
+    private static func execute__log_warning_on() {
+        PlayerPreferences.ensureLoadPreferences()
+        PlayerPreferences.logWarning = true
+        PlayerPreferences.savePreferences()
+        print("CMPlayer: --log-warning-on")
+        print("==========================")
+        print(" Warning     : \(PlayerPreferences.logWarning)")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    ///
+    /// execute --log-warning-off
+    ///
+    private static func execute__log_warning_off() {
+        PlayerPreferences.ensureLoadPreferences()
+        PlayerPreferences.logWarning = false
+        PlayerPreferences.savePreferences()
+        print("CMPlayer: --log-warning-off")
+        print("==========================")
+        print(" Warning     : \(PlayerPreferences.logWarning)")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    ///
+    /// execute --log-error-on
+    ///
+    private static func execute__log_error_on() {
+        PlayerPreferences.ensureLoadPreferences()
+        PlayerPreferences.logError = true
+        PlayerPreferences.savePreferences()
+        print("CMPlayer: --log-error-on")
+        print("==========================")
+        print(" Error       : \(PlayerPreferences.logError)")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    ///
+    /// execute --log-error-off
+    ///
+    private static func execute__log_error_off() {
+        PlayerPreferences.ensureLoadPreferences()
+        PlayerPreferences.logError = false
+        PlayerPreferences.savePreferences()
+        print("CMPlayer: --log-error-off")
+        print("==========================")
+        print(" Error       : \(PlayerPreferences.logError)")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    ///
+    /// execute --log-debug-on
+    ///
+    private static func execute__log_debug_on() {
+        PlayerPreferences.ensureLoadPreferences()
+        PlayerPreferences.logDebug = true
+        PlayerPreferences.savePreferences()
+        print("CMPlayer: --log-debug-on")
+        print("==========================")
+        print(" Debug       : \(PlayerPreferences.logDebug)")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    ///
+    /// execute --log-debug-off
+    ///
+    private static func execute__log_debug_off() {
+        PlayerPreferences.ensureLoadPreferences()
+        PlayerPreferences.logDebug = false
+        PlayerPreferences.savePreferences()
+        print("CMPlayer: --log-debug-off")
+        print("==========================")
+        print(" Debug       : \(PlayerPreferences.logDebug)")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    ///
+    /// execute --log-other-on
+    ///
+    private static func execute__log_other_on() {
+        PlayerPreferences.ensureLoadPreferences()
+        PlayerPreferences.logOther = true
+        PlayerPreferences.savePreferences()
+        print("CMPlayer: --log-other-on")
+        print("==========================")
+        print(" Other       : \(PlayerPreferences.logOther)")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    ///
+    /// execute --log-other-off
+    ///
+    private static func execute__log_other_off() {
+        PlayerPreferences.ensureLoadPreferences()
+        PlayerPreferences.logOther = false
+        PlayerPreferences.savePreferences()
+        print("CMPlayer: --log-other-off")
+        print("==========================")
+        print(" Other       : \(PlayerPreferences.logOther)")
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    ///
+    /// execute --get-log-status
+    ///
+    private static func execute__get_log_status() {
+        PlayerPreferences.ensureLoadPreferences()
+        print("CMPlayer: --get-log-status")
+        print("==========================")        
+        print(" Information : \(PlayerPreferences.logInformation)")
+        print(" Warning     : \(PlayerPreferences.logWarning)")
+        print(" Error       : \(PlayerPreferences.logError)")
+        print(" Debug       : \(PlayerPreferences.logDebug)")
+        print(" Other       : \(PlayerPreferences.logOther)")        
+        print("")
+        exit(ExitCodes.SUCCESS.rawValue)
+    }
+    ///
     /// execute --help and default.
     /// 
     private static func execute__help()
@@ -532,6 +688,17 @@ internal class CommandLineHandler {
         print(" --get-format              = gets music formats to try and play")
         print(" --add-format <.ext>       = adds a format to music formats to play <extension>")
         print(" --remove-format <.ext>    = removes a format from music formats <extension>")
+        print(" --log-information-on      = turn on information logging")
+        print(" --log-information-off     = turn off information logging")
+        print(" --log-warning-on          = turn on warning logging")
+        print(" --log-warning-off         = turn off warning logging")
+        print(" --log-error-on            = turn on error logging")
+        print(" --log-error-off           = turn off error logging")
+        print(" --log-debug-on            = turn on debug logging")
+        print(" --log-debug-off           = turn off debug logging")
+        print(" --log-other-on            = turn on other logging")
+        print(" --log-other-off           = turn off other logging")
+        print(" --get-log-status          = gets log status")
         print("")        
         exit(ExitCodes.SUCCESS.rawValue)
     }    
