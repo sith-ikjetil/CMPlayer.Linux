@@ -56,7 +56,7 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                                       " rebuild songno"," :: rebuilds song numbers",
                                       " goto <mm:ss>", " :: moves playback point to minutes (mm) and seconds (ss) of current song",
                                       " replay", " :: starts playing current song from beginning again",
-                                      " reinitialize", " :: reinitializes library and should be called after mrp paths are changed",
+                                      " reinitialize <1>", " :: reinitializes library (optional 1 = also rebuild song no)",
                                       " info", " :: shows information about first song in playlist",
                                       " info <song no>", " :: show information about song with given song number",
                                       //" update cmplayer", " :: updates cmplayer if new version is found online",

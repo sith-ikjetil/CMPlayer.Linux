@@ -1346,10 +1346,19 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }
         // set isShowingTopWindow flag to false
         self.isShowingTopWindow = false
-        // rebuild all data structures from newly loaded g_songs
-        g_library.rebuild()
-        // save library
-        g_library.save()
+        // get command arguments
+        let nparts = reparseCurrentCommandArguments(parts)
+        // if we have argument "1", rebuild song no from 1
+        if nparts.count == 1 && nparts[0] == "1" {            
+            // rebuild song numbers and rebuild library and save library
+            self.onCommandRebuildSongNo(parts: parts)        
+        }
+        else {
+            // rebuild all data structures from newly loaded g_songs
+            g_library.rebuild()
+            // save library
+            g_library.save()        
+        }
         // render this window
         self.renderWindow()
         // unlock
@@ -1374,8 +1383,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }
         // set next available song no
         g_library.setNextAvailableSongNo(i)
-        // set library to g_songs (updated now)
-        g_library.library = g_songs
+        // rebuild library
+        g_library.rebuild()
         // save library with updated song no
         g_library.save()
     }    
