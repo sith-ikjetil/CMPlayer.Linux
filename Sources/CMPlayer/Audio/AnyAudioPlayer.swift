@@ -131,14 +131,14 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if error
         if err != 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). avformat_open_input failed with value \(err) = '\(renderFfmpegError(error: err))'. Could not open file \(self.filePath.path)."
+            let msg = "[AnyAudioPlayer].play(). avformat_open_input failed with value \(err) = '\(renderFfmpegError(error: err))'. Could not open file \(self.filePath.path)."
             // throw error
             throw CmpError(message: msg)
         }
         // if formatCtx pointer is invalid
         if self.m_audioState.formatCtx == nil {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). m_audioState.formatCtx is nil."
+            let msg = "[AnyAudioPlayer].play(). m_audioState.formatCtx is nil."
             // throw error
             throw CmpError(message: msg)
         }        
@@ -147,7 +147,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if error
         if err < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). avformat_find_stream_info failed with value: \(err) = '\(renderFfmpegError(error: err))'. Could not find stream information."
+            let msg = "[AnyAudioPlayer].play(). avformat_find_stream_info failed with value: \(err) = '\(renderFfmpegError(error: err))'. Could not find stream information."
             // close opened input
             avformat_close_input(&m_audioState.formatCtx)
             // throw error
@@ -165,7 +165,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if not find audio stream then error
         if self.m_audioState.audioStreamIndex < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). m_audioState.audioStreamIndex invalid with value: \(self.m_audioState.audioStreamIndex)."
+            let msg = "[AnyAudioPlayer].play(). m_audioState.audioStreamIndex invalid with value: \(self.m_audioState.audioStreamIndex)."
             // close opened input
             avformat_close_input(&m_audioState.formatCtx)
             // throw error
@@ -178,7 +178,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
             // if invalid duration
             if durationInSeconds <= 0 {                    
                 // create error message
-                let msg = "[M4aAudioPlayer].play(). duration <= 0. \(durationInSeconds) seconds"
+                let msg = "[AnyAudioPlayer].play(). duration <= 0. \(durationInSeconds) seconds"
                 // close opened input
                 avformat_close_input(&self.m_audioState.formatCtx)
                 // throw error
@@ -190,7 +190,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // audioState invalid
         else {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). Cannot find duration."
+            let msg = "[AnyAudioPlayer].play(). Cannot find duration."
             // close opened input
             avformat_close_input(&self.m_audioState.formatCtx)
             // throw error
@@ -207,7 +207,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if audio codec is invalid
         if self.m_audioState.codec == nil {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). avcodec_find_decoder failed with value: nil. Unsupported codec: \(codecpar!.pointee.codec_id)."
+            let msg = "[AnyAudioPlayer].play(). avcodec_find_decoder failed with value: nil. Unsupported codec: \(codecpar!.pointee.codec_id)."
             // close opened input
             avformat_close_input(&self.m_audioState.formatCtx)            
             // throw error
@@ -218,7 +218,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if codec context is invalid
         if self.m_audioState.codecCtx == nil {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). avcodec_alloc_context3 failed with value: nil. Could not allocate codec context."
+            let msg = "[AnyAudioPlayer].play(). avcodec_alloc_context3 failed with value: nil. Could not allocate codec context."
             // close opened input
             avformat_close_input(&self.m_audioState.formatCtx)            
             // throw error
@@ -228,7 +228,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         err = avcodec_parameters_to_context(self.m_audioState.codecCtx, codecpar)
         if err < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). avcodec_parameters_to_context failed with value: \(err) = '\(renderFfmpegError(error: err))'. Could not copy codec context."
+            let msg = "[AnyAudioPlayer].play(). avcodec_parameters_to_context failed with value: \(err) = '\(renderFfmpegError(error: err))'. Could not copy codec context."
             // free codec context
             avcodec_free_context(&self.m_audioState.codecCtx)
             // close opened input
@@ -241,7 +241,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if error
         if err < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). avcodec_open2 failed with value: \(err) = '\(renderFfmpegError(error: err))'. Could not open codec."
+            let msg = "[AnyAudioPlayer].play(). avcodec_open2 failed with value: \(err) = '\(renderFfmpegError(error: err))'. Could not open codec."
             // free codec context
             avcodec_free_context(&self.m_audioState.codecCtx)
             // close opened input
@@ -254,7 +254,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if frame invalid
         if self.m_audioState.frame == nil {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). av_frame_alloc failed with value: nil. Could not allocate audio frame."
+            let msg = "[AnyAudioPlayer].play(). av_frame_alloc failed with value: nil. Could not allocate audio frame."
             // free codec context
             avcodec_free_context(&self.m_audioState.codecCtx)
             // free opened input
@@ -272,7 +272,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if error
         if err < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). av_channel_layout_copy failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            let msg = "[AnyAudioPlayer].play(). av_channel_layout_copy failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // free swrCtx
             swr_free(&self.m_audioState.swrCtx)
             // free frame
@@ -289,7 +289,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if error
         if err < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout IN failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            let msg = "[AnyAudioPlayer].play(). av_opt_set_chlayout IN failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // free swrCtx
             swr_free(&self.m_audioState.swrCtx)
             // free frame
@@ -307,7 +307,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         err = av_opt_set_chlayout(rawSwrCtxPtr, "out_chlayout", &self.m_audioState.chLayoutOut, 0)
         if err < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_chlayout OUT failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            let msg = "[AnyAudioPlayer].play(). av_opt_set_chlayout OUT failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // free swrCtx
             swr_free(&self.m_audioState.swrCtx)
             // free frame
@@ -325,7 +325,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if error
         if err < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_int for 'in_channel_layout' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            let msg = "[AnyAudioPlayer].play(). av_opt_set_int for 'in_channel_layout' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // free swrCtx
             swr_free(&self.m_audioState.swrCtx)
             // free frame
@@ -342,7 +342,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if error
         if err < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_int for 'out_channel_layout' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            let msg = "[AnyAudioPlayer].play(). av_opt_set_int for 'out_channel_layout' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // free swrCtx
             swr_free(&self.m_audioState.swrCtx)
             // free frame
@@ -360,7 +360,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if error
         if err < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_int for 'in_sample_rate' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            let msg = "[AnyAudioPlayer].play(). av_opt_set_int for 'in_sample_rate' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // free swrCtx
             swr_free(&self.m_audioState.swrCtx)
             // free frame
@@ -377,7 +377,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if error
         if err < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_int for 'out_sample_rate' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            let msg = "[AnyAudioPlayer].play(). av_opt_set_int for 'out_sample_rate' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // free swrCtx
             swr_free(&self.m_audioState.swrCtx)
             // free frame
@@ -394,7 +394,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if error
         if err < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_int for 'in_sample_fmt' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            let msg = "[AnyAudioPlayer].play(). av_opt_set_int for 'in_sample_fmt' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // free swrCtx
             swr_free(&self.m_audioState.swrCtx)
             // free frame
@@ -411,7 +411,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if error
         if err < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). av_opt_set_int for 'out_sample_fmt' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            let msg = "[AnyAudioPlayer].play(). av_opt_set_int for 'out_sample_fmt' failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // free swrCtx
             swr_free(&self.m_audioState.swrCtx)
             // free frame
@@ -428,7 +428,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if error
         if err < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].play(). swr_init failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            let msg = "[AnyAudioPlayer].play(). swr_init failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // free swrCtx
             swr_free(&self.m_audioState.swrCtx)
             // free frame
@@ -465,7 +465,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
             // if device returned is invalid
             if self.m_audioState.device == nil {
                 // create error message
-                let msg = "[M4aAudioPlayer].play(). ao_open_live failed with value: nil. Error opening audio device."
+                let msg = "[AnyAudioPlayer].play(). ao_open_live failed with value: nil. Error opening audio device."
     #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
                 // uninitialize ch layout in
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
@@ -491,7 +491,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
             // if error
             guard err >= 0 else {
                 // create error message
-                let msg = "[M4aAudioPlayer].play(). alsa. snd_pcm_open failed with value: \(err) = '\(renderAlsaError(error: err))'"
+                let msg = "[AnyAudioPlayer].play(). alsa. snd_pcm_open failed with value: \(err) = '\(renderAlsaError(error: err))'"
     #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
                 // uninitialize ch layout in
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
@@ -514,7 +514,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
             // if error
             guard err >= 0 else {
                 // create error message
-                let msg = "[M4aAudioPlayer].play(). alsa. snd_pcm_set_params failed with value: \(err) = '\(renderAlsaError(error: err))'"
+                let msg = "[AnyAudioPlayer].play(). alsa. snd_pcm_set_params failed with value: \(err) = '\(renderAlsaError(error: err))'"
     #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
                 // uninitialize ch layout in
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
@@ -538,7 +538,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
             guard err == 0 else {
                 // else we have an error
                 // create error message
-                let msg = "[M4aAudioPlayer].play(). alsa. snd_pcm_prepare failed with value: \(err) = '\(renderAlsaError(error: err))'"
+                let msg = "[AnyAudioPlayer].play(). alsa. snd_pcm_prepare failed with value: \(err) = '\(renderAlsaError(error: err))'"
     #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
                 // uninitialize ch layout in
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
@@ -571,7 +571,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // Set flags
         self.m_isPlaying = true
         // Log that we have started to play
-        PlayerLog.ApplicationLog?.logInformation(title: "[M4aAudioPlayer].playAsync()", text: "Started playing: \(self.filePath.lastPathComponent)")
+        PlayerLog.ApplicationLog?.logInformation(title: "[AnyAudioPlayer].playAsync()", text: "Started playing: \(self.filePath.lastPathComponent)")
         // Clean up using defer
         defer {                        
 #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
@@ -611,7 +611,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
             // set m_stopFlag to true
             self.m_stopFlag = true      
             // log debug
-            PlayerLog.ApplicationLog?.logDebug(title: "[M4aAudioPlayer].playAsync()@defer", text: self.filePath.path)      
+            PlayerLog.ApplicationLog?.logDebug(title: "[AnyAudioPlayer].playAsync()@defer", text: self.filePath.path)      
         }
         // should we do crossfade now or not
         var timeToStartCrossfade: Bool = false
@@ -656,7 +656,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
                 // create log messsge
                 let msg = "av_read_frame failed with value: \(retVal) = '\(renderFfmpegError(error: retVal))'."
                 // log message
-                PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
+                PlayerLog.ApplicationLog?.logError(title: "[AnyAudioPlayer].playAsync()", text: msg)
                 // return
                 return
             }
@@ -669,7 +669,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
                 // create log messsge
                 let msg = "Codec context or frame is nil."
                 // log message
-                PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
+                PlayerLog.ApplicationLog?.logError(title: "[AnyAudioPlayer].playAsync()", text: msg)
                 // return
                 return
             }
@@ -683,7 +683,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
                     // create error message
                     let msg = "avcodec_send_packet failed with value: \(retVal) = '\(renderFfmpegError(error: retVal))'."
                     // log error
-                    PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
+                    PlayerLog.ApplicationLog?.logError(title: "[AnyAudioPlayer].playAsync()", text: msg)
                     // return
                     return
                 }                                
@@ -703,7 +703,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
                         // create error message
                         let msg = "avcodec_receive_frame EOF with value: \(retVal) = '\(renderFfmpegError(error: retVal))'."
                         // log error
-                        PlayerLog.ApplicationLog?.logDebug(title: "[M4aAudioPlayer].playAsync()", text: msg)
+                        PlayerLog.ApplicationLog?.logDebug(title: "[AnyAudioPlayer].playAsync()", text: msg)
                         // return
                         return
                     }
@@ -713,7 +713,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
                         // create error message
                         let msg = "avcodec_receive_frame failed with value: \(retVal) = '\(renderFfmpegError(error: retVal))'."
                         // log error
-                        PlayerLog.ApplicationLog?.logDebug(title: "[M4aAudioPlayer].playAsync()", text: msg)
+                        PlayerLog.ApplicationLog?.logDebug(title: "[AnyAudioPlayer].playAsync()", text: msg)
                         // return
                         return
                     }
@@ -729,7 +729,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
                     // Ensure the buffer is allocated properly
                     guard retVal >= 0 else {
                         let msg = "av_samples_alloc failed with value: \(retVal) = '\(renderFfmpegError(error: retVal))'."
-                        PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
+                        PlayerLog.ApplicationLog?.logError(title: "[AnyAudioPlayer].playAsync()", text: msg)
                         return
                     }
                     // ensure cleanup by defer
@@ -758,7 +758,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
                             // create error message
                             let msg = "swr_convert returned with value: \(samples) = '\(renderFfmpegError(error: samples))'."
                             // log message
-                            PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)
+                            PlayerLog.ApplicationLog?.logError(title: "[AnyAudioPlayer].playAsync()", text: msg)
                             // return
                             return
                         }
@@ -802,7 +802,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
                                 // create an error message                                
                                 let msg = "ao_player failed with value: \(err). System errno had value: \(errno) = '\(errorDescription ?? "?")'."
                                 // log error
-                                PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)                        
+                                PlayerLog.ApplicationLog?.logError(title: "[AnyAudioPlayer].playAsync()", text: msg)                        
                                 // return
                                 return
                             }
@@ -827,7 +827,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
                                     // create error message
                                     let msg = "snd_pcm_writei failed with value: \(writtenFrames) = '\(renderAlsaError(error: Int32(writtenFrames)))'."
                                     // log error
-                                    PlayerLog.ApplicationLog?.logError(title: "[M4aAudioPlayer].playAsync()", text: msg)                        
+                                    PlayerLog.ApplicationLog?.logError(title: "[AnyAudioPlayer].playAsync()", text: msg)                        
                                     // return
                                     return                            
                                 } 
@@ -945,7 +945,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if error
         if err != 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].gatherMetadata(). avformat_open_input failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            let msg = "[AnyAudioPlayer].gatherMetadata(). avformat_open_input failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // throw error
             throw CmpError(message: msg)
         }
@@ -959,7 +959,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if error
         if err < 0 {
             // create error message
-            let msg = "[M4aAudioPlayer].gatherMetadata(). avformat_find_stream_info failed with value: \(err) = '\(renderFfmpegError(error: err))'."
+            let msg = "[AnyAudioPlayer].gatherMetadata(). avformat_find_stream_info failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // close opened input
             avformat_close_input(&formatContext)
             // throw error                
@@ -972,7 +972,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
             // if duration in seconds is negative or 0
             if durationInSeconds <= 0 {               
                 // create error message     
-                let msg = "[M4aAudioPlayer].gatherMetadata(). duration <= 0. \(durationInSeconds) seconds"
+                let msg = "[AnyAudioPlayer].gatherMetadata(). duration <= 0. \(durationInSeconds) seconds"
                 // close opened input
                 avformat_close_input(&formatContext)
                 // throw error
@@ -983,7 +983,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // else formatCtx is invalid or duration is 0
         else {
             // create error message
-            let msg = "[M4aAudioPlayer].gatherMetadata(). Cannot find duration."
+            let msg = "[AnyAudioPlayer].gatherMetadata(). Cannot find duration."
             // close opened input
             avformat_close_input(&formatContext)
             // throw error
@@ -992,7 +992,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if formatContext is invalid or formatContext metadata is invalid
         if formatContext == nil || formatContext?.pointee.metadata == nil {
             // create error message
-            let msg = "[M4aAudioPlayer].gatherMetadata(). formatContext/metadata is nil."
+            let msg = "[AnyAudioPlayer].gatherMetadata(). formatContext/metadata is nil."
             // close opened input
             avformat_close_input(&formatContext)
             // throw error
