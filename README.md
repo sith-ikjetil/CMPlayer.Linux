@@ -19,8 +19,8 @@ The applications name is **cmplayer** and the following arguments are supported:
  - --set-max-history-n max   = sets max history entries [25,1000]
  - --get-max-history-n       = gets max history entries
  - --get-format              = gets music formats to try and play
- - --add-format <.ext>       = adds a format to music formats to play <extension>
- - --remove-format <.ext>    = removes a format from music formats <extension>
+ - --add-format <.ext>       = adds a format to music formats to play
+ - --remove-format <.ext>    = removes a format from music formats
  - --log-information-on      = turn on information logging
  - --log-information-off     = turn off information logging
  - --log-warning-on          = turn on warning logging
@@ -34,9 +34,11 @@ The applications name is **cmplayer** and the following arguments are supported:
  - --get-log-status          = gets log status  
   
 ## Supported File Formats
-The following file formats are currently supported:
+The following file formats are default supported:
  - .mp3
  - .m4a
+You can add more file types by using the --add-format/--remove-format  
+and --get-format command line arguments.  
   
 ## Libraries
 The player uses the following tools and libraries:  
@@ -109,8 +111,10 @@ There are the following preprocessor flags defined in Package.swift:
  - CMP_TARGET_UBUNTU_V24_04 (Ubuntu 24.04)
  - CMP_TARGET_FEDORA_V40    (Fedora 40)
  - CMP_TARGET_MANJARO_V24   (Manjaro 24)
+ - CMP_PLATFORM_AMD64       (AMD64 distro)
+ - CMP_PLATFORM_ARM64       (ARM64 distro)
   
-Uncomment any flag that is not your version of ffmpeg or target distro.  
+Uncomment any flag that is not appropriate.  
   
 ## Header Files
 The following are the location of include header files to the  
