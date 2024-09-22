@@ -35,8 +35,9 @@ The applications name is **cmplayer** and the following arguments are supported:
   
 ## Supported File Formats
 The following file formats are default supported:
- - .mp3
- - .m4a
+ - .mp3  
+ - .m4a  
+  
 You can add more file types by using the --add-format/--remove-format  
 and --get-format command line arguments.  
   
