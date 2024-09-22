@@ -1712,18 +1712,22 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // add all script items
             script.addStatement("set viewtype \(PlayerPreferences.viewType.rawValue)")
             script.addStatement("set theme \(PlayerPreferences.colorTheme.rawValue)")            
-            for ms in g_modeSearch {
+            // create a index variable i
+            var i: Int = 0
+            // loop through all SearchType in g_searchType
+            for type in g_searchType {
                 var modeStatement: String = ""
-                var bAddSpace: Bool = false
-                for ns in ms {
-                    if bAddSpace {
-                        modeStatement += " "
-                    }
-                    modeStatement += ns
-                    bAddSpace = true
+                // append search type name to modeText
+                modeStatement = "search \(type.rawValue)"
+                // loop through g_modeSearch
+                for j in 0..<g_modeSearch[i].count {
+                    // append mode search and search songs count
+                    modeStatement += " \"\(g_modeSearch[i][j])\""
                 }
-                script.addStatement("search \(modeStatement)")
-            }
+                // increase index variable by 1
+                i += 1
+                script.addStatement(modeStatement)
+            }            
             if PlayerPreferences.colorTheme == ColorTheme.Custom {
                 script.addStatement("set custom-theme fgHeaderColor \(PlayerPreferences.fgHeaderColor.itsToString()) \(PlayerPreferences.fgHeaderModifier.itsToString())")
                 script.addStatement("set custom-theme bgHeaderColor \(PlayerPreferences.bgHeaderColor.itsToString()) \(PlayerPreferences.bgHeaderModifier.itsToString())")                
@@ -1767,6 +1771,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             return;
         }
 
+        g_assumeSearchMode = true
         do {
             let script: ScriptModule = try ScriptModule(filename: parts[0])
             try script.load()
@@ -1776,7 +1781,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 // process command
                 self.processCommand(command: s)  
             }
-        } 
+        }         
         catch let error as CmpError {
             // create error message
             let msg = "Error loading script. Message: \(error.message)"
@@ -1789,5 +1794,6 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // log error message
             PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onLoadScript(parts)", text: msg)
         }
+        g_assumeSearchMode = false
     }
 }// MainWindow

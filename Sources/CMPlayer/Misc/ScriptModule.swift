@@ -36,7 +36,7 @@ internal class ScriptModule {
     }
 
     func load() throws {
-        var filePath: URL = PlayerDirectories.consoleMusicPlayerScriptDirectory
+        var filePath: URL = PlayerDirectories.consoleMusicPlayerScriptsDirectory
         filePath.appendPathComponent(self.m_filename)
 
         if !FileManager.default.fileExists(atPath: filePath.path) {
@@ -55,7 +55,7 @@ internal class ScriptModule {
     }
 
     func save() throws {
-        var filePath: URL = PlayerDirectories.consoleMusicPlayerScriptDirectory
+        var filePath: URL = PlayerDirectories.consoleMusicPlayerScriptsDirectory
         filePath.appendPathComponent(self.m_filename)
 
         if FileManager.default.fileExists(atPath: filePath.path) {

@@ -582,6 +582,13 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         self.searchIndex = 0
         // do search
         self.performSearch(terms: self.parts, type: self.type)
+        // if the g_assumeSearchMode flag is set
+        if g_assumeSearchMode {
+            // set mode
+            onModeSet();
+            // return
+            return;
+        }
         // clear screen current theme
         Console.clearScreenCurrentTheme()
         // render this window
@@ -713,49 +720,8 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         })
         // add key handler for spacebar (set mode and exit screen back to mainwindow)
         keyHandler.addKeyHandler(key: ConsoleKey.KEY_SPACEBAR.rawValue, closure: { () -> Bool in
-            // if we have a search result
-            if self.searchResult.count > 0 {
-                // if we are not in a mode
-                if g_searchResult.count == 0 {
-                    // lock
-                    g_lock.lock()
-                    // clear g_searchType
-                    g_searchType.removeAll()
-                    // clear g_searchResult
-                    g_searchResult.removeAll()
-                    // clear g_search
-                    g_modeSearch.removeAll()
-                    // clear g_searchStats
-                    g_modeSearchStats.removeAll()
-                    // unlock
-                    g_lock.unlock()
-                }
-                // if search type = artist/title/albumName                
-                if  self.type == SearchType.ArtistOrTitle ||
-                    self.type == SearchType.Artist ||
-                    self.type == SearchType.Title ||
-                    self.type == SearchType.Album
-                {
-                    // append result from search
-                    g_modeSearch.append(self.parts)
-                }
-                // else if search type = genre
-                else if self.type == SearchType.Genre {
-                    // append result from search
-                    g_modeSearch.append(self.parts)
-                }
-                // else if search type = recorded year
-                else if self.type == SearchType.RecordedYear {
-                    // append result from search
-                    g_modeSearch.append(self.partsYear)
-                }
-                // set global search result to self search result
-                g_searchResult = self.searchResult
-                // set global search stats to self search stats
-                g_modeSearchStats.append(self.stats)
-                // set global search type to self search type
-                g_searchType.append(self.type)
-            }
+            // run code for handling setting of mode
+            self.onModeSet();
             // return from run()
             return true
         })
@@ -767,4 +733,51 @@ internal class SearchWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         // execute run(), modal call
         keyHandler.run()
     }// run
+
+    private func onModeSet()
+    {
+        // if we have a search result
+        if self.searchResult.count > 0 {
+            // if we are not in a mode
+            if g_searchResult.count == 0 {
+                // lock
+                g_lock.lock()
+                // clear g_searchType
+                g_searchType.removeAll()
+                // clear g_searchResult
+                g_searchResult.removeAll()
+                // clear g_search
+                g_modeSearch.removeAll()
+                // clear g_searchStats
+                g_modeSearchStats.removeAll()
+                // unlock
+                g_lock.unlock()
+            }
+            // if search type = artist/title/albumName                
+            if  self.type == SearchType.ArtistOrTitle ||
+                self.type == SearchType.Artist ||
+                self.type == SearchType.Title ||
+                self.type == SearchType.Album
+            {
+                // append result from search
+                g_modeSearch.append(self.parts)
+            }
+            // else if search type = genre
+            else if self.type == SearchType.Genre {
+                // append result from search
+                g_modeSearch.append(self.parts)
+            }
+            // else if search type = recorded year
+            else if self.type == SearchType.RecordedYear {
+                // append result from search
+                g_modeSearch.append(self.partsYear)
+            }
+            // set global search result to self search result
+            g_searchResult = self.searchResult
+            // set global search stats to self search stats
+            g_modeSearchStats.append(self.stats)
+            // set global search type to self search type
+            g_searchType.append(self.type)
+        }
+    }
 }// SearchWindow

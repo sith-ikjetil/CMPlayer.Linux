@@ -49,6 +49,7 @@ internal var g_rows: Int = -1                           // current terminal size
 internal var g_cols: Int = -1                           // current terminal size columns
 internal var g_quit: Bool = false                       // are we quitting?
 internal var g_doNotPaint: Bool = false                 // do no repaint mainwindow during this flag
+internal var g_assumeSearchMode: Bool = false           // assume search will give mode (used for load script)
 //======================================
 // Startup code
 //======================================
