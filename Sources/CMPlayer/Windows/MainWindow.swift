@@ -398,7 +398,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                          PlayerCommand(commands: [["prev"]], closure: self.onCommandPrev),
                          PlayerCommand(commands: [["#"]], closure: self.onCommandAddSongToPlaylist),                         
                          PlayerCommand(commands: [["clear", "history"]], closure: self.onCommandClearHistory),
-                         PlayerCommand(commands: [["set", "custom-theme"]], closure: self.onSetColor),]
+                         PlayerCommand(commands: [["set", "custom-theme"]], closure: self.onSetColor),
+                         PlayerCommand(commands: [["save", "script"]], closure: self.onSaveScript),
+                         PlayerCommand(commands: [["load", "script"]], closure: self.onLoadScript),]
     
         // Count down and render songs        
         concurrentQueue1.async {
@@ -1696,5 +1698,96 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }
         // save preferences
         PlayerPreferences.savePreferences()
+    }
+
+    func onSaveScript(parts: [String]) -> Void {
+        // command is:> save script <name>
+        if parts.count != 1 {
+            return;
+        }        
+
+        do {
+            // create constant script module
+            let script: ScriptModule = try ScriptModule(filename: parts[0])
+            // add all script items
+            script.addStatement("set viewtype \(PlayerPreferences.viewType.rawValue)")
+            script.addStatement("set theme \(PlayerPreferences.colorTheme.rawValue)")            
+            for ms in g_modeSearch {
+                var modeStatement: String = ""
+                var bAddSpace: Bool = false
+                for ns in ms {
+                    if bAddSpace {
+                        modeStatement += " "
+                    }
+                    modeStatement += ns
+                    bAddSpace = true
+                }
+                script.addStatement("search \(modeStatement)")
+            }
+            if PlayerPreferences.colorTheme == ColorTheme.Custom {
+                script.addStatement("set custom-theme fgHeaderColor \(PlayerPreferences.fgHeaderColor.itsToString()) \(PlayerPreferences.fgHeaderModifier.itsToString())")
+                script.addStatement("set custom-theme bgHeaderColor \(PlayerPreferences.bgHeaderColor.itsToString()) \(PlayerPreferences.bgHeaderModifier.itsToString())")                
+                script.addStatement("set custom-theme fgTitleColor \(PlayerPreferences.fgTitleColor.itsToString()) \(PlayerPreferences.fgTitleModifier.itsToString())")
+                script.addStatement("set custom-theme bgTitleColor \(PlayerPreferences.bgTitleColor.itsToString()) \(PlayerPreferences.bgTitleModifier.itsToString())")                
+                script.addStatement("set custom-theme fgSeparatorColor \(PlayerPreferences.fgSeparatorColor.itsToString()) \(PlayerPreferences.fgSeparatorModifier.itsToString())")
+                script.addStatement("set custom-theme bgSeparatorColor \(PlayerPreferences.bgSeparatorColor.itsToString()) \(PlayerPreferences.bgSeparatorModifier.itsToString())")
+                script.addStatement("set custom-theme fgQueueColor \(PlayerPreferences.fgQueueColor.itsToString()) \(PlayerPreferences.fgQueueModifier.itsToString())")
+                script.addStatement("set custom-theme bgQueueColor \(PlayerPreferences.bgQueueColor.itsToString()) \(PlayerPreferences.bgQueueModifier.itsToString())")
+                script.addStatement("set custom-theme fgQueueSongNoColor \(PlayerPreferences.fgQueueSongNoColor.itsToString()) \(PlayerPreferences.fgQueueSongNoModifier.itsToString())")
+                script.addStatement("set custom-theme bgQueueSongNoColor \(PlayerPreferences.bgQueueSongNoColor.itsToString()) \(PlayerPreferences.bgQueueSongNoModifier.itsToString())")
+                script.addStatement("set custom-theme fgCommandLineColor \(PlayerPreferences.fgCommandLineColor.itsToString()) \(PlayerPreferences.fgCommandLineModifier.itsToString())")
+                script.addStatement("set custom-theme bgCommandLineColor \(PlayerPreferences.bgCommandLineColor.itsToString()) \(PlayerPreferences.bgCommandLineModifier.itsToString())")
+                script.addStatement("set custom-theme fgStatusLineColor \(PlayerPreferences.fgStatusLineColor.itsToString()) \(PlayerPreferences.fgStatusLineModifier.itsToString())")
+                script.addStatement("set custom-theme bgStatusLineColor \(PlayerPreferences.bgStatusLineColor.itsToString()) \(PlayerPreferences.bgStatusLineModifier.itsToString())")
+                script.addStatement("set custom-theme fgAddendumColor \(PlayerPreferences.fgAddendumColor.itsToString()) \(PlayerPreferences.fgAddendumModifier.itsToString())")
+                script.addStatement("set custom-theme bgAddendumColor \(PlayerPreferences.bgAddendumColor.itsToString()) \(PlayerPreferences.bgAddendumModifier.itsToString())")
+                script.addStatement("set custom-theme fgEmptySpaceColor \(PlayerPreferences.fgEmptySpaceColor.itsToString()) \(PlayerPreferences.fgEmptySpaceModifier.itsToString())")
+                script.addStatement("set custom-theme bgEmptySpaceColor \(PlayerPreferences.bgEmptySpaceColor.itsToString()) \(PlayerPreferences.bgEmptySpaceModifier.itsToString())")
+            }
+            // save script
+            try script.save()
+        } 
+        catch let error as CmpError {
+            // create error message
+            let msg = "Error loading script. Message: \(error.message)"
+            // log error message
+            PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onLoadScript(parts)", text: msg)
+        }
+        catch {
+            // create error message
+            let msg = "Unknown error loading script. Message: \(error)"
+            // log error message
+            PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onLoadScript(parts)", text: msg)
+        }
+    }
+
+    func onLoadScript(parts: [String]) -> Void {    
+        // command is:> load script <name>
+        if parts.count != 1 {
+            return;
+        }
+
+        do {
+            let script: ScriptModule = try ScriptModule(filename: parts[0])
+            try script.load()
+
+            // for each statement in script module
+            for s in script.statements {
+                // process command
+                self.processCommand(command: s)  
+            }
+        } 
+        catch let error as CmpError {
+            // create error message
+            let msg = "Error loading script. Message: \(error.message)"
+            // log error message
+            PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onLoadScript(parts)", text: msg)
+        }
+        catch {
+            // create error message
+            let msg = "Unknown error loading script. Message: \(error)"
+            // log error message
+            PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onLoadScript(parts)", text: msg)
+        }
     }
 }// MainWindow

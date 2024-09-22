@@ -24,6 +24,9 @@ internal class PlayerDirectories {
     internal static var consoleMusicPlayerDirectory: URL {
         return PlayerDirectories.homeDirectory.appendingPathComponent(".cmplayer", isDirectory: true)
     }    
+    internal static var consoleMusicPlayerScriptDirectory: URL {
+        return PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent("script", isDirectory: true)
+    }    
     ///
     /// Ensures that directories needed exists. Is called upon application startup.
     ///
@@ -36,7 +39,16 @@ internal class PlayerDirectories {
             catch {
                 
             }
-        }                
+        }
+        let scriptDir: URL = PlayerDirectories.consoleMusicPlayerScriptDirectory
+        if FileManager.default.fileExists(atPath: scriptDir.path) == false {
+            do {
+                try FileManager.default.createDirectory(at: scriptDir, withIntermediateDirectories: true, attributes: nil)
+            }
+            catch {
+                
+            }
+        }
     }// enusreDirectoriesExistence
     internal static func purge() -> Bool {
         let cmpDir: URL = PlayerDirectories.consoleMusicPlayerDirectory
