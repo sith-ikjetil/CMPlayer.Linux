@@ -1709,9 +1709,10 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         do {
             // create constant script module
             let script: ScriptModule = try ScriptModule(filename: parts[0])
-            // add all script items
+            // add all script items            
+            script.addStatement("mode off")
             script.addStatement("set viewtype \(PlayerPreferences.viewType.rawValue)")
-            script.addStatement("set theme \(PlayerPreferences.colorTheme.rawValue)")            
+            script.addStatement("set theme \(PlayerPreferences.colorTheme.rawValue)")                        
             // create a index variable i
             var i: Int = 0
             // loop through all SearchType in g_searchType
@@ -1771,11 +1772,14 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             return;
         }
 
+        // assume searches become mode (spacebar) automatically
         g_assumeSearchMode = true
         do {
             let script: ScriptModule = try ScriptModule(filename: parts[0])
             try script.load()
 
+            // must always start by turning existing mode off to ensure mode integrity
+            self.processCommand(command: "mode off")  
             // for each statement in script module
             for s in script.statements {
                 // process command
@@ -1794,6 +1798,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // log error message
             PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onLoadScript(parts)", text: msg)
         }
+        // assume searches don't become mode (spacebar) automatically
         g_assumeSearchMode = false
     }
 }// MainWindow
