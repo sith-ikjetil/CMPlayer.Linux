@@ -82,7 +82,10 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                                       " set custom-theme fgEmptySpaceColor <color> <bold/none>", " :: sets foreground color of empty text",
                                       " set custom-theme bgEmptySpaceColor <color> <bold/none>", " :: sets background color of empty text",
                                       " set custom-theme separatorChar <char>", " :: sets char for separator line",
-                                      " custom-theme colors", " :: 'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan' or 'white'"]
+                                      " (custom-theme colors)", " :: 'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan' or 'white'",
+                                      " save script <name>", " :: saves current state as script name",
+                                      " load script <name>", " :: loads state from script name",
+                                      " load script .", " :: loads default state"]
                                       //" restart", " :: restarts the application. picks up changes when files are removed or added"]    
     ///
     /// Shows this HelpWindow on screen.q

@@ -36,6 +36,10 @@ internal class ScriptModule {
     }
 
     func load() throws {
+        if self.filename == "." {
+            return setDefaultStatements()
+        }
+        
         var filePath: URL = PlayerDirectories.consoleMusicPlayerScriptsDirectory
         filePath.appendPathComponent(self.m_filename)
 
@@ -55,6 +59,10 @@ internal class ScriptModule {
     }
 
     func save() throws {
+        if self.m_filename == "." {
+            return
+        }
+
         var filePath: URL = PlayerDirectories.consoleMusicPlayerScriptsDirectory
         filePath.appendPathComponent(self.m_filename)
 
@@ -80,5 +88,12 @@ internal class ScriptModule {
 
     func clearStatement() {
         self.m_statements.removeAll()
+    }
+
+    private func setDefaultStatements() {
+        self.clearStatement()
+        self.addStatement("mode off")
+        self.addStatement("set viewtype details")
+        self.addStatement("set theme default")        
     }
 }
