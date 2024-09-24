@@ -32,9 +32,11 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     private var isTooSmall: Bool = false          // true == screen size is invalid too small, false == supported and valid size
     private var showCursor: Bool = false          // true == should cursor be visible, false == should not be visible
     private var cursorTimeout: UInt64 = 0         // cursor time in ms counted from 0 to target. used to set showCursor
+    private var m_responseTextShownDate: Date = Date()     
     ///
     /// priate constants
     /// 
+    private let m_limitResponseTextShownTimeInSeconds: Int = 2
     private let concurrentQueue1 = DispatchQueue(label: "dqueue.cmp.linux.main-window.1", attributes: .concurrent)
     private let concurrentQueue2 = DispatchQueue(label: "dqueue.cmp.linux.main-window.2", attributes: .concurrent)         
     ///
@@ -408,14 +410,25 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             while !g_quit {
                 // if no windows on top of this window
                 if !self.isShowingTopWindow {
+                    if self.addendumText.count > 0 {                        
+                        // get difference between response text shown and now
+                        let diff = self.getResponseTextDifference()
+                        // if difference is greater than limit
+                        if diff > self.m_limitResponseTextShownTimeInSeconds {
+                            // clear addendum text
+                            self.addendumText = ""
+                        }
+                    }                    
                     // if this window is not too small
                     if !self.isTooSmall {
                         // if we are not in terminal change size and not g_doNotPain flag is set
                         if !g_termSizeIsChanging && !g_doNotPaint {
                             // render header
-                            MainWindow.renderHeader(showTime: true)
+                            MainWindow.renderHeader(showTime: true)                            
                             // render window
                             self.renderWindow()
+                            // render addendum text (response text)
+                            self.renderAddendumText()
                         }
                     }  
                     // window is too small
@@ -618,7 +631,33 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         // run key handler, do not return from this function until one 
         // - of the key handlers return true
         keyHandler.run()
-    }       
+    }      
+    /// 
+    /// gets the difference between the time response text was shown and now
+    /// 
+    /// - Returns: number of seconds difference
+    private func getResponseTextDifference() -> Int {        
+        // set end date to now
+        let endDate: Date = Date()
+        // Use Calendar to calculate the difference
+        let calendar: Calendar = Calendar.current
+        // Get the difference in seconds, minutes, hours, days, etc.
+        let components: DateComponents = calendar.dateComponents([.second, .minute, .hour, .day], from: m_responseTextShownDate, to: endDate)
+        // Get the seconds
+        let hours: Int = components.hour ?? 0
+        let minutes: Int = components.minute ?? 0
+        let seconds: Int = components.second ?? 0
+        return (hours*3600)+(minutes*60)+seconds
+    }
+    ///
+    /// sets response text to text
+    /// 
+    private func setResponseText(text: String) -> Void {
+        // set response text to text
+        self.addendumText = text.convertStringToLengthPaddedString(g_cols, .center, " ")
+        // set response text shown date to now
+        m_responseTextShownDate = Date()
+    }
     ///
     /// Processes commands
     ///
@@ -864,6 +903,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         PlayerPreferences.crossfadeSongs = true
         // save PlayerPreferences
         PlayerPreferences.savePreferences()
+        // set response text                
+        self.setResponseText(text: "enable crossfade command completed successfully.")
     }    
     ///
     /// Disable crossfade.
@@ -875,6 +916,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         PlayerPreferences.crossfadeSongs = false
         // save PlayerPreferences
         PlayerPreferences.savePreferences()
+        // set response text                
+        self.setResponseText(text: "disable crossafade command completed successfully.")
     }    
     ///
     /// Enable audoplay on startup and after reinitialize.
@@ -886,6 +929,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         PlayerPreferences.autoplayOnStartup = true
         // save PlayerPreferences
         PlayerPreferences.savePreferences()
+        // set response text                
+        self.setResponseText(text: "enable aos command completed successfully.")
     }    
     ///
     /// Disable autoplay on startup and after reinitialize.
@@ -897,6 +942,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         PlayerPreferences.autoplayOnStartup = false
         // save PlayerPreferences
         PlayerPreferences.savePreferences()
+        // set response text                
+        self.setResponseText(text: "disable aos command completed successfully.")
     }    
     ///
     /// Add path to root paths.
@@ -918,7 +965,17 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 PlayerPreferences.musicRootPath.append(nparts[0])
                 // save PlayerPreferences
                 PlayerPreferences.savePreferences()
+                // set response text                
+                self.setResponseText(text: "add mrp command completed successfully.")
             }
+            else {
+                // set response text
+                self.setResponseText(text: "add mrp command completed with error: path not a directory.")
+            }
+        }
+        else {
+            // set response text
+            self.setResponseText(text: "add mrp command completed with error: path not found.")
         }
     }    
     ///
@@ -930,7 +987,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         // get arguments to command
         let nparts = reparseCurrentCommandArguments(parts)
         // create a variable for if argument is a directory
-        var isDir: ObjCBool = false
+        var isDir: ObjCBool = false        
         // check if path exists and is a directory
         // nparts[0] == path
         if FileManager.default.fileExists(atPath: nparts[0], isDirectory: &isDir) {
@@ -941,7 +998,17 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 PlayerPreferences.exclusionPaths.append(nparts[0])
                 // save PlayerPreferences
                 PlayerPreferences.savePreferences()
+                // set response text                
+                self.setResponseText(text: "add exp command completed successfully.")                
             }
+            else {
+                // set response text
+                self.setResponseText(text: "add exp command completed with error: path not a directory.")                 
+            }
+        }
+        else {
+            // set response text
+            self.setResponseText(text: "add exp command completed with error: path not found.")
         }
     }    
     ///
@@ -953,7 +1020,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         // get arguments to command
         let nparts = reparseCurrentCommandArguments(parts)
         // create a variable i (index) into PlayerPreferenes.musicRootPath
-        var i: Int = 0
+        var i: Int = 0        
+        var b: Bool = false
         // loop through all PlayerPreferences.musicRootPath
         while i < PlayerPreferences.musicRootPath.count {
             // if we find nparts[0] = path
@@ -962,11 +1030,19 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 PlayerPreferences.musicRootPath.remove(at: i)
                 // save PlayerPreferences
                 PlayerPreferences.savePreferences()
+                // set response text
+                self.setResponseText(text: "remove mrp command completed successfully.")
+                // set b to true
+                b = true
                 // discontinue loop
                 break
             }
             // add one to index
-            i += 1
+            i += 1            
+        }
+        if !b {
+            // set response text
+            self.setResponseText(text: "remove mrp command completed with error: music root path not found.")
         }
     }    
     ///
@@ -979,6 +1055,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         let nparts = reparseCurrentCommandArguments(parts)
         // create a variable i (index) into PlayerPreferenes.exclutionPaths
         var i: Int = 0
+        var b: Bool = false
         // loop through all PlayerPreferences.exclutionPaths
         while i < PlayerPreferences.exclusionPaths.count {
             // if we find nparts[0] = path
@@ -987,11 +1064,20 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 PlayerPreferences.exclusionPaths.remove(at: i)
                 // save PlayerPreferences
                 PlayerPreferences.savePreferences()
+                // set response text
+                self.setResponseText(text: "remove exp command completed successfully.")
+                // set b to true
+                b = true
                 // discontinue loop
                 break
             }
             // add one to index
             i += 1
+        }
+
+        if !b {
+            // set response text
+            self.setResponseText(text: "remove exp command completed with error: exclusion path not found.")
         }
     }    
     ///
@@ -1008,7 +1094,17 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 PlayerPreferences.crossfadeTimeInSeconds = ctis
                 // save PlayerPreferences
                 PlayerPreferences.savePreferences()
+                // set response text
+                self.setResponseText(text: "set cft command completed successfully")
             }
+            else {
+                // set response text
+                self.setResponseText(text: "set cft command completed with error: Invalid number of seconds.")
+            }
+        }
+        else {
+            // set response text
+            self.setResponseText(text: "set cft command completed with error: time not a number")
         }
     }    
     ///
@@ -1085,6 +1181,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         g_modeSearchStats.removeAll()
         // unlock
         g_lock.unlock()
+        // set response text
+        self.setResponseText(text: "mode off command completed successfully")
     }
     ///
     /// Show info on given song number.
@@ -1150,6 +1248,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         PlayerPreferences.musicRootPath.removeAll()
         // save PlayerPreferences
         PlayerPreferences.savePreferences()
+        // set response text
+        self.setResponseText(text: "clear mrp command completed successfully")
     }    
     ///
     /// Clear music root paths.
@@ -1161,6 +1261,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         PlayerPreferences.exclusionPaths.removeAll()
         // save PlayerPreferences
         PlayerPreferences.savePreferences()
+        // set response text
+        self.setResponseText(text: "clear exp command completed successfully")
     }    
     ///
     /// Show about window.
@@ -1367,6 +1469,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         g_lock.unlock()
         // start playing again if PlayerPreferences.autoPlayOnStartup is true
         g_player.skip(play: PlayerPreferences.autoplayOnStartup)
+        // set response text to reinitialize completed successfully
+        self.setResponseText(text: "reinitialize command completed successfully")
     }    
     ///
     /// Rebuild song numbers.
@@ -1389,6 +1493,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         g_library.rebuild()
         // save library with updated song no
         g_library.save()
+        // set response text
+        self.setResponseText(text: "rebuild songno command completed successfully")
     }    
     ///
     /// Show preferences window.
@@ -1613,9 +1719,10 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         do {
             // try to clear command history
             try PlayerCommandHistory.default.clear()
+            self.setResponseText(text: "clear history command completed successfully")
         }
         catch {
-
+            self.setResponseText(text: "clear history command completed with error: Unknown error.")
         }
     }
 
@@ -1751,18 +1858,24 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             }
             // save script
             try script.save()
+
+            self.setResponseText(text: "script saved successfully")
         } 
         catch let error as CmpError {
             // create error message
             let msg = "Error loading script. Message: \(error.message)"
             // log error message
             PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onLoadScript(parts)", text: msg)
+            // set response text
+            self.setResponseText(text: "script save error: \(error.message)")
         }
         catch {
             // create error message
             let msg = "Unknown error loading script. Message: \(error)"
             // log error message
             PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onLoadScript(parts)", text: msg)
+            // set response text
+            self.setResponseText(text: "script loading error: Unknown error.")
         }
     }
 
@@ -1785,18 +1898,23 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 // process command
                 self.processCommand(command: s)  
             }
+            self.setResponseText(text: "script loaded successfully")
         }         
         catch let error as CmpError {
             // create error message
             let msg = "Error loading script. Message: \(error.message)"
             // log error message
             PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onLoadScript(parts)", text: msg)
+            // set response text
+            self.setResponseText(text: "script loading error: \(error.message)")
         }
         catch {
             // create error message
             let msg = "Unknown error loading script. Message: \(error)"
             // log error message
             PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onLoadScript(parts)", text: msg)
+            // set response text
+            self.setResponseText(text: "script loading error: Unknown error.")
         }
         // assume searches don't become mode (spacebar) automatically
         g_assumeSearchMode = false
