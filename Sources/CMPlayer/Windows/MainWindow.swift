@@ -28,7 +28,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     private var currentCommand: String = ""       // current command typing in
     private var commands: [PlayerCommand] = []    // array of PlayerCommandObjects set in run()
     private var isShowingTopWindow = false  // true == window on top of this window, false == this is top window
-    private var addendumText: String = ""         // text added to screen over command line if info needs to be outputted    
+    private var responseText: String = ""         // text added to screen over command line if info needs to be outputted    
     private var isTooSmall: Bool = false          // true == screen size is invalid too small, false == supported and valid size
     private var showCursor: Bool = false          // true == should cursor be visible, false == should not be visible
     private var cursorTimeout: UInt64 = 0         // cursor time in ms counted from 0 to target. used to set showCursor
@@ -186,9 +186,9 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// 
     /// renders addendum text at g_rows-2
     ///     
-    func renderAddendumText() -> Void {
+    func renderResponseText() -> Void {
         // render addendum text from self.addendumText
-        Console.printXY(1,g_rows-2, (self.addendumText.count > 0) ? self.addendumText : " ", g_cols, .left, " ", getThemeBgAddendumColor(), getThemeBgAddendumModifier(), getThemeFgAddendumColor(), getThemeFgAddendumModifier())
+        Console.printXY(1,g_rows-2, (self.responseText.count > 0) ? self.responseText : " ", g_cols, .left, " ", getThemeBgResponseColor(), getThemeBgResponseModifier(), getThemeFgResponseColor(), getThemeFgResponseModifier())
     }    
     ///
     /// Renders the command line on screen
@@ -335,7 +335,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         // render songs
         renderSongs()
         // render addendum text
-        renderAddendumText()
+        renderResponseText()
         // render command line
         renderCommandLine()
         // render status line
@@ -410,13 +410,13 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             while !g_quit {
                 // if no windows on top of this window
                 if !self.isShowingTopWindow {
-                    if self.addendumText.count > 0 {                        
+                    if self.responseText.count > 0 {                        
                         // get difference between response text shown and now
                         let diff = self.getResponseTextDifference()
                         // if difference is greater than limit
                         if diff > self.m_limitResponseTextShownTimeInSeconds {
                             // clear addendum text
-                            self.addendumText = ""
+                            self.responseText = ""
                         }
                     }                    
                     // if this window is not too small
@@ -428,7 +428,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                             // render window
                             self.renderWindow()
                             // render addendum text (response text)
-                            self.renderAddendumText()
+                            self.renderResponseText()
                         }
                     }  
                     // window is too small
@@ -653,10 +653,10 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     /// sets response text to text
     /// 
     private func setResponseText(text: String) -> Void {
-        // set response text to text
-        self.addendumText = text.convertStringToLengthPaddedString(g_cols, .center, " ")
         // set response text shown date to now
         m_responseTextShownDate = Date()
+        // set response text to text
+        self.responseText = text.convertStringToLengthPaddedString(g_cols, .center, " ")
     }
     ///
     /// Processes commands
@@ -1788,12 +1788,12 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             case "bgStatusLineColor":
                 PlayerPreferences.bgStatusLineColor = ConsoleColor.itsFromString(parts[1], .black)
                 PlayerPreferences.bgStatusLineModifier = ConsoleColorModifier.itsFromString(parts[2], .none)
-            case "fgAddendumColor":
-                PlayerPreferences.fgAddendumColor = ConsoleColor.itsFromString(parts[1], .white)
-                PlayerPreferences.fgAddendumModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)            
-            case "bgAddendumColor":
-                PlayerPreferences.bgAddendumColor = ConsoleColor.itsFromString(parts[1], .black)
-                PlayerPreferences.bgAddendumModifier = ConsoleColorModifier.itsFromString(parts[2], .none)
+            case "fgResponseColor":
+                PlayerPreferences.fgResponseColor = ConsoleColor.itsFromString(parts[1], .white)
+                PlayerPreferences.fgResponseModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)            
+            case "bgResponseColor":
+                PlayerPreferences.bgResponseColor = ConsoleColor.itsFromString(parts[1], .black)
+                PlayerPreferences.bgResponseModifier = ConsoleColorModifier.itsFromString(parts[2], .none)
             case "fgEmptySpaceColor":
                 PlayerPreferences.fgEmptySpaceColor = ConsoleColor.itsFromString(parts[1], .white)
                 PlayerPreferences.fgEmptySpaceModifier = ConsoleColorModifier.itsFromString(parts[2], .bold)                        
@@ -1851,8 +1851,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 script.addStatement("set custom-theme bgCommandLineColor \(PlayerPreferences.bgCommandLineColor.itsToString()) \(PlayerPreferences.bgCommandLineModifier.itsToString())")
                 script.addStatement("set custom-theme fgStatusLineColor \(PlayerPreferences.fgStatusLineColor.itsToString()) \(PlayerPreferences.fgStatusLineModifier.itsToString())")
                 script.addStatement("set custom-theme bgStatusLineColor \(PlayerPreferences.bgStatusLineColor.itsToString()) \(PlayerPreferences.bgStatusLineModifier.itsToString())")
-                script.addStatement("set custom-theme fgAddendumColor \(PlayerPreferences.fgAddendumColor.itsToString()) \(PlayerPreferences.fgAddendumModifier.itsToString())")
-                script.addStatement("set custom-theme bgAddendumColor \(PlayerPreferences.bgAddendumColor.itsToString()) \(PlayerPreferences.bgAddendumModifier.itsToString())")
+                script.addStatement("set custom-theme fgResponseColor \(PlayerPreferences.fgResponseColor.itsToString()) \(PlayerPreferences.fgResponseModifier.itsToString())")
+                script.addStatement("set custom-theme bgResponseColor \(PlayerPreferences.bgResponseColor.itsToString()) \(PlayerPreferences.bgResponseModifier.itsToString())")
                 script.addStatement("set custom-theme fgEmptySpaceColor \(PlayerPreferences.fgEmptySpaceColor.itsToString()) \(PlayerPreferences.fgEmptySpaceModifier.itsToString())")
                 script.addStatement("set custom-theme bgEmptySpaceColor \(PlayerPreferences.bgEmptySpaceColor.itsToString()) \(PlayerPreferences.bgEmptySpaceModifier.itsToString())")
             }

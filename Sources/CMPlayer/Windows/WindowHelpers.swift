@@ -435,48 +435,48 @@ internal func getThemeFgStatusLineModifier() -> ConsoleColorModifier {
 /// getThemeBgAddendumColor
 /// 
 /// - Returns: addendum bg color
-internal func getThemeBgAddendumColor() -> ConsoleColor {
+internal func getThemeBgResponseColor() -> ConsoleColor {
     switch PlayerPreferences.colorTheme {
         case .Default: return ConsoleColor.black
         case .Blue: return ConsoleColor.blue
         case .Black: return ConsoleColor.black
-        case .Custom: return PlayerPreferences.bgAddendumColor
+        case .Custom: return PlayerPreferences.bgResponseColor
     }
 }
 /// 
 /// getThemeBgAddendumModifier
 /// 
 /// - Returns: addendum bg color modifier
-internal func getThemeBgAddendumModifier() -> ConsoleColorModifier {
+internal func getThemeBgResponseModifier() -> ConsoleColorModifier {
     switch PlayerPreferences.colorTheme {
         case .Default: return ConsoleColorModifier.none
         case .Blue: return ConsoleColorModifier.bold
         case .Black: return ConsoleColorModifier.none
-        case .Custom: return PlayerPreferences.bgAddendumModifier
+        case .Custom: return PlayerPreferences.bgResponseModifier
     }
 }
 /// 
 /// getThemeFgAddendumColor
 /// 
 /// - Returns: addendum fg color
-internal func getThemeFgAddendumColor() -> ConsoleColor {
+internal func getThemeFgResponseColor() -> ConsoleColor {
     switch PlayerPreferences.colorTheme {
         case .Default: return ConsoleColor.white
         case .Blue: return ConsoleColor.white
         case .Black: return ConsoleColor.white
-        case .Custom: return PlayerPreferences.fgAddendumColor
+        case .Custom: return PlayerPreferences.fgResponseColor
     }
 }
 /// 
 /// getThemeFgAddendumModifier
 /// 
 /// - Returns: addendum fg color modifier
-internal func getThemeFgAddendumModifier() -> ConsoleColorModifier {
+internal func getThemeFgResponseModifier() -> ConsoleColorModifier {
     switch PlayerPreferences.colorTheme {
         case .Default: return ConsoleColorModifier.bold
         case .Blue: return ConsoleColorModifier.bold
         case .Black: return ConsoleColorModifier.bold
-        case .Custom: return PlayerPreferences.fgAddendumModifier
+        case .Custom: return PlayerPreferences.fgResponseModifier
     }
 }
 /// 
