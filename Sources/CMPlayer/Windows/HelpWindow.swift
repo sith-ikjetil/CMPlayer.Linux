@@ -85,7 +85,9 @@ internal class HelpWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                                       " (custom-theme colors)", " :: 'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan' or 'white'",
                                       " save script <name>", " :: saves current state as script name",
                                       " load script <name>", " :: loads state from script name",
-                                      " load script .", " :: loads default state"]
+                                      " load script .", " :: loads default state",
+                                      " rm script <name>", " :: removes script name",
+                                      " script", " :: show all scripts saved"]
                                       //" restart", " :: restarts the application. picks up changes when files are removed or added"]    
     ///
     /// Shows this HelpWindow on screen.q

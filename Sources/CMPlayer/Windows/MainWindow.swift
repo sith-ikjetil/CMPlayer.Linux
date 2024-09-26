@@ -361,6 +361,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                          PlayerCommand(commands: [["set", "theme"]], closure: self.onCommandSetColorTheme),
                          PlayerCommand(commands: [["next"], ["skip"], ["n"], ["s"]], closure: self.onCommandNextSong),
                          PlayerCommand(commands: [["help"], ["?"]], closure: self.onCommandHelp),
+                         PlayerCommand(commands: [["script"], ["scripts"]], closure: self.onCommandScripts),
                          PlayerCommand(commands: [["replay"]], closure: self.onCommandReplay),
                          PlayerCommand(commands: [["play"]], closure: self.onCommandPlay),
                          PlayerCommand(commands: [["pause"]], closure: self.onCommandPause),
@@ -402,7 +403,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                          PlayerCommand(commands: [["clear", "history"]], closure: self.onCommandClearHistory),
                          PlayerCommand(commands: [["set", "custom-theme"]], closure: self.onSetColor),
                          PlayerCommand(commands: [["save", "script"]], closure: self.onSaveScript),
-                         PlayerCommand(commands: [["load", "script"]], closure: self.onLoadScript),]
+                         PlayerCommand(commands: [["load", "script"]], closure: self.onLoadScript),
+                         PlayerCommand(commands: [["rm", "script"]], closure: self.onRemoveScript),]
     
         // Count down and render songs        
         concurrentQueue1.async {
@@ -1239,6 +1241,25 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         self.isShowingTopWindow = false
     }    
     ///
+    /// Show script files window.
+    ///
+    /// parameter parts: command array.
+    ///
+    func onCommandScripts(parts: [String]) -> Void {
+        // set isShowingTopWindow flag to true
+        self.isShowingTopWindow = true
+        // create a HelpWindow
+        let wnd: ScriptWindow = ScriptWindow()
+        // show the help window, modal call
+        wnd.showWindow()
+        // clear screen current theme
+        Console.clearScreenCurrentTheme()
+        // render this window
+        self.renderWindow()
+        // set isShowingTopWindow flag to false
+        self.isShowingTopWindow = false
+    }  
+    ///
     /// Clear music root paths.
     ///
     /// parameter parts: command array.
@@ -1810,6 +1831,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     func onSaveScript(parts: [String]) -> Void {
         // command is:> save script <name>
         if parts.count != 1 {
+            self.setResponseText(text: "invalid command")
             return;
         }        
 
@@ -1819,7 +1841,14 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // add all script items            
             script.addStatement("mode off")
             script.addStatement("set viewtype \(PlayerPreferences.viewType.rawValue)")
-            script.addStatement("set theme \(PlayerPreferences.colorTheme.rawValue)")                        
+            script.addStatement("set theme \(PlayerPreferences.colorTheme.rawValue)")
+            if PlayerPreferences.crossfadeSongs {
+                script.addStatement("enable crossfade")
+            }
+            else {
+                script.addStatement("disable crossfade")
+            }
+            script.addStatement("set cft \(PlayerPreferences.crossfadeTimeInSeconds)")                        
             // create a index variable i
             var i: Int = 0
             // loop through all SearchType in g_searchType
@@ -1882,6 +1911,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
     func onLoadScript(parts: [String]) -> Void {    
         // command is:> load script <name>
         if parts.count != 1 {
+            self.setResponseText(text: "invalid command")
             return;
         }
 
@@ -1918,5 +1948,40 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }
         // assume searches don't become mode (spacebar) automatically
         g_assumeSearchMode = false
+    }
+
+    func onRemoveScript(parts: [String]) -> Void {    
+        // command is:> load script <name>
+        if parts.count != 1 {
+            self.setResponseText(text: "invalid command")
+            return;
+        }
+        
+        do {
+            let filePath: String = PlayerDirectories.consoleMusicPlayerScriptsDirectory.path + "/" + parts[0]
+            if FileManager.default.fileExists(atPath: filePath) {
+                try FileManager.default.removeItem(atPath: filePath)
+                self.setResponseText(text: "script removed successfully")
+            }
+            else {
+                self.setResponseText(text: "script not found")
+            }
+        }         
+        catch let error as CmpError {
+            // create error message
+            let msg = "Error removing script. Message: \(error.message)"
+            // log error message
+            PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onRemoveScript(parts)", text: msg)
+            // set response text
+            self.setResponseText(text: "script remove error: \(error.message)")
+        }
+        catch {
+            // create error message
+            let msg = "Unknown error removing script. Message: \(error)"
+            // log error message
+            PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onRemoveScript(parts)", text: msg)
+            // set response text
+            self.setResponseText(text: "remove script error: unknown error.")
+        }        
     }
 }// MainWindow
