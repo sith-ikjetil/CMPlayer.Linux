@@ -69,11 +69,11 @@ internal class ScriptWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
         // sort scriptText alphabetically
         let sorted = self.scriptText.sorted { $0 < $1 }
         // remove all items first
-        self.scriptText.removeAll()
+        self.scriptText.removeAll()        
         // loop through all filenames in sorted
         for g in sorted {            
             // append to scriptText alphabetically sorted
-            self.scriptText.append(g)
+            self.scriptText.append(g)            
         }
     }
     ///
@@ -116,7 +116,7 @@ internal class ScriptWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtoc
             // set se to genreText item
             let se = scriptText[index_search]
             // render row (script file)
-            Console.printXY(1, index_screen_lines, se, g_cols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())            
+            Console.printXY(1, index_screen_lines, " \(se)", g_cols, .left, " ", getThemeBgQueueColor(), getThemeBgQueueModifier(), getThemeFgQueueColor(), getThemeFgQueueModifier())            
             // increase index_screen_lines by 1 for next round of loop
             index_screen_lines += 1
             // increase index_search by 1 for next round of loop
