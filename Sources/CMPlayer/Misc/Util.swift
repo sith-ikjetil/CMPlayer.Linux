@@ -285,4 +285,19 @@ func restore_stderr(_ stderr_copy: Int32) {
     dup2(stderr_copy, fileno(stderr)) // Restore stderr
     close(stderr_copy) // Close the backup
 }
-
+/// 
+/// Function to normalize a filename
+/// - Parameter filename: input 
+/// - Returns: new normalized filename
+func normalizeFilename(_ filename: String) -> String {
+    var filename = filename
+    filename = filename.replacingOccurrences(of: "/", with: "_")
+    filename = filename.replacingOccurrences(of: ":", with: "_")
+    filename = filename.replacingOccurrences(of: "*", with: "_")
+    filename = filename.replacingOccurrences(of: "?", with: "_")
+    filename = filename.replacingOccurrences(of: "\"", with: "_")
+    filename = filename.replacingOccurrences(of: "<", with: "_")
+    filename = filename.replacingOccurrences(of: ">", with: "_")
+    filename = filename.replacingOccurrences(of: "|", with: "_")
+    return filename
+}

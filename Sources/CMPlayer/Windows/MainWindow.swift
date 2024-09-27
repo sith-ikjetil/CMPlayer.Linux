@@ -1828,6 +1828,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         PlayerPreferences.savePreferences()
     }
 
+
+
     func onSaveScript(parts: [String]) -> Void {
         // command is:> save script <name>
         if parts.count != 1 {
@@ -1837,7 +1839,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
 
         do {
             // create constant script module
-            let script: ScriptModule = try ScriptModule(filename: parts[0])
+            let script: ScriptModule = try ScriptModule(filename: normalizeFilename(parts[0]))
             // add all script items            
             script.addStatement("mode off")
             script.addStatement("set viewtype \(PlayerPreferences.viewType.rawValue)")
@@ -1918,7 +1920,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         // assume searches become mode (spacebar) automatically
         g_assumeSearchMode = true
         do {
-            let script: ScriptModule = try ScriptModule(filename: parts[0])
+            let script: ScriptModule = try ScriptModule(filename: normalizeFilename(parts[0]))
             try script.load()
 
             // must always start by turning existing mode off to ensure mode integrity
@@ -1958,7 +1960,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         }
         
         do {
-            let filePath: String = PlayerDirectories.consoleMusicPlayerScriptsDirectory.path + "/" + parts[0]
+            let filePath: String = PlayerDirectories.consoleMusicPlayerScriptsDirectory.path + "/" + normalizeFilename(parts[0])
             if FileManager.default.fileExists(atPath: filePath) {
                 try FileManager.default.removeItem(atPath: filePath)
                 self.setResponseText(text: "remove script completed successfully")
