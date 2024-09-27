@@ -1888,23 +1888,23 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // save script
             try script.save()
 
-            self.setResponseText(text: "script saved successfully")
+            self.setResponseText(text: "save script completed successfully")
         } 
         catch let error as CmpError {
             // create error message
-            let msg = "Error loading script. Message: \(error.message)"
+            let msg = "Error saving script. Message: \(error.message)"
             // log error message
             PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onLoadScript(parts)", text: msg)
             // set response text
-            self.setResponseText(text: "script save error: \(error.message)")
+            self.setResponseText(text: "save script error: \(error.message)")
         }
         catch {
             // create error message
-            let msg = "Unknown error loading script. Message: \(error)"
+            let msg = "Unknown error saving script. Message: \(error)"
             // log error message
             PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onLoadScript(parts)", text: msg)
             // set response text
-            self.setResponseText(text: "script loading error: Unknown error.")
+            self.setResponseText(text: "save script error: Unknown error.")
         }
     }
 
@@ -1928,7 +1928,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                 // process command
                 self.processCommand(command: s)  
             }
-            self.setResponseText(text: "script loaded successfully")
+            self.setResponseText(text: "script loaded completed successfully")
         }         
         catch let error as CmpError {
             // create error message
@@ -1961,7 +1961,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             let filePath: String = PlayerDirectories.consoleMusicPlayerScriptsDirectory.path + "/" + parts[0]
             if FileManager.default.fileExists(atPath: filePath) {
                 try FileManager.default.removeItem(atPath: filePath)
-                self.setResponseText(text: "script removed successfully")
+                self.setResponseText(text: "remove script completed successfully")
             }
             else {
                 self.setResponseText(text: "script not found")
@@ -1973,7 +1973,7 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // log error message
             PlayerLog.ApplicationLog?.logError(title: "[MainWindow].onRemoveScript(parts)", text: msg)
             // set response text
-            self.setResponseText(text: "script remove error: \(error.message)")
+            self.setResponseText(text: "remove script error: \(error.message)")
         }
         catch {
             // create error message
