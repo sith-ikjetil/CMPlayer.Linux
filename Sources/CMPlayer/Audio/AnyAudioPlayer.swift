@@ -589,7 +589,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
             // close an opened input AVFormatContext.
             avformat_close_input(&self.m_audioState.formatCtx)
             // if we use ao
-            if PlayerPreferences.outputSoundLibrary == .ao {
+            if PlayerPreferences.outputSoundLibrary == .ao && g_quit == false{
                 // close ao device
                 ao_close(self.m_audioState.device)
             }
