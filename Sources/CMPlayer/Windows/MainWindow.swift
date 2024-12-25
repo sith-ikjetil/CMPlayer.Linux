@@ -405,7 +405,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
                          PlayerCommand(commands: [["save", "script"]], closure: self.onSaveScript),
                          PlayerCommand(commands: [["load", "script"]], closure: self.onLoadScript),
                          PlayerCommand(commands: [["rm", "script"]], closure: self.onRemoveScript),]
-    
+        // if autoexec exists, execute it   
+        self.executeAutoexec()
         // Count down and render songs        
         concurrentQueue1.async {
             // while g_quit flag is false
@@ -674,8 +675,8 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
         let parts = command.components(separatedBy: " ")
         // create and set a flag isHandled to false, true if we have a command handler for the command
         var isHandled = false
-        // for each command handler setup
-        for cmd in self.commands {
+        // for each command handler setup        
+        for cmd in self.commands {            
             // try execute command, returns true if current command has handler for the command
             if cmd.execute(command: parts) {
                 // we have handled the command, set isHandled flag to true
@@ -1985,5 +1986,46 @@ internal class MainWindow : TerminalSizeHasChangedProtocol, PlayerWindowProtocol
             // set response text
             self.setResponseText(text: "remove script error: unknown error.")
         }        
+    }
+
+    func executeAutoexec() -> Void {
+        do 
+        {
+            // declare autoexec file path
+            let filePath: URL = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent("autoexec", isDirectory: false)
+            if !FileManager.default.fileExists(atPath: filePath.path) {
+                try "".write(to: filePath, atomically: true, encoding: .utf8)
+                return
+            }                
+            // read autoexec file
+            let fileContents = try String(contentsOfFile: filePath.path)
+            var statements: [String] = []
+            fileContents.enumerateLines { line, _ in
+                if line.count > 0  {
+                    statements.append(line)                 
+                }                
+            }
+            // for each statement in autoexec file
+            for s in statements {
+                // process command
+                self.processCommand(command: s)                
+            }
+        }         
+        catch let error as CmpError {
+            // create error message
+            let msg = "Error executing autoexec. Message: \(error.message)"
+            // log error message
+            PlayerLog.ApplicationLog?.logError(title: "[MainWindow].executeAutoexec", text: msg)
+            // set response text
+            self.setResponseText(text: "autoexec script error: \(error.message)")
+        }
+        catch {
+            // create error message
+            let msg = "Unknown error executing autoexec script. Message: \(error)"
+            // log error message
+            PlayerLog.ApplicationLog?.logError(title: "[MainWindow].executeAutoexec", text: msg)
+            // set response text
+            self.setResponseText(text: "autoexec script error: unknown error.")
+        }   
     }
 }// MainWindow

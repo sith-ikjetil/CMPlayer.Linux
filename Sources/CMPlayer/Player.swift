@@ -73,13 +73,13 @@ internal class Player {
         // - from g_songs which is populated after InitializeWindow
         g_library.rebuild()
         // save library      
-        g_library.save()
+        g_library.save()                
         // if autoplay on startup, start playing
         if PlayerPreferences.autoplayOnStartup && g_playlist.count > 0 {
             self.play(player: 1, playlistIndex: 0)            
-        }
+        }        
         // clear screen with current theme color
-        Console.clearScreenCurrentTheme()           
+        Console.clearScreenCurrentTheme()                   
     }        
     ///
     /// Plays audio.
