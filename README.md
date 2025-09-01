@@ -2,8 +2,8 @@
 License: **GPL-3.0-or-later**  
 This is a console music player for Linux.  
   
-<img src="https://www.ikjetil.no/images/CMPlayerUbuntuWSL2.png" alt="CMPlayer.Linux" style="width:50%">  
-<img src="https://www.ikjetil.no/images/CMPlayerUbuntuWSL.png" alt="CMPlayer.Linux" style="width:70%;">  
+<img src="https://www.ikjetil.no/content/images/CMPlayerUbuntuWSL2.png" alt="CMPlayer.Linux" style="width:50%">  
+<img src="https://www.ikjetil.no/content/images/CMPlayerUbuntuWSL.png" alt="CMPlayer.Linux" style="width:70%;">  
 
 ## Application
 The applications name is **cmplayer** and the following arguments are supported:  
