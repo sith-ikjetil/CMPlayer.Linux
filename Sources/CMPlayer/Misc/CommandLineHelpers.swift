@@ -183,6 +183,18 @@ func PrintAndExecutePlayerHomeDirectory() {
             // print not found message
             print(" > \(PlayerCommandHistory.filename.convertStringToLengthPaddedString(20, .left, " ")) NOT found")
         }
+        // create constant that set path to history file
+        let pathAutoexec = PlayerDirectories.consoleMusicPlayerDirectory.appendingPathComponent("autoexec", isDirectory: false)
+        // if pathHistory exists
+        if FileManager.default.fileExists(atPath: pathAutoexec.path) {
+            // print found message
+            print(" > \("autoexec".convertStringToLengthPaddedString(20, .left, " ")) found")
+        }
+        // else pathHistory did not exist
+        else {
+            // print not found message
+            print(" > \("autoexec".convertStringToLengthPaddedString(20, .left, " ")) NOT found")
+        }
     }
     // path did not exists
     else {
