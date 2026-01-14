@@ -25,26 +25,31 @@ import PackageDescription
                 cSettings: [
                     .define("CMP_PLATFORM_AMD64"),
                     //.define("CMP_PLATFORM_ARM64"),
-                    .define("CMP_TARGET_UBUNTU_V22_04"),
+                    //.define("CMP_TARGET_UBUNTU_V22_04"),
                     //.define("CMP_TARGET_UBUNTU_V24_04"),
                     //.define("CMP_TARGET_FEDORA_V40"),
+                    .define("CMP_TARGET_FEDORA_V43"),
                     //.define("CMP_TARGET_MANJARO_V24"),
-                    .define("CMP_FFMPEG_V4"),
+                    //.define("CMP_FFMPEG_V4"),
                     //.define("CMP_FFMPEG_V5"),
                     //.define("CMP_FFMPEG_V6"),
-                    //.define("CMP_FFMPEG_V7"),
+                    .define("CMP_FFMPEG_V7"),
                 ],
                 swiftSettings: [
+                    // for Cffmpeg CMP_TARGET_FEDORA_V43
+                    .unsafeFlags(["-Xcc", "-I/usr/include/ffmpeg"]),
+                    //
                     .define("CMP_PLATFORM_AMD64"),
                     //.define("CMP_PLATFORM_ARM64"),
-                    .define("CMP_TARGET_UBUNTU_V22_04"),
+                    //.define("CMP_TARGET_UBUNTU_V22_04"),
                     //.define("CMP_TARGET_UBUNTU_V24_04"),
                     //.define("CMP_TARGET_FEDORA_V40"),
+                    .define("CMP_TARGET_FEDORA_V43"),
                     //.define("CMP_TARGET_MANJARO_V24"),
-                    .define("CMP_FFMPEG_V4"),
+                    //.define("CMP_FFMPEG_V4"),
                     //.define("CMP_FFMPEG_V5"),
                     //.define("CMP_FFMPEG_V6"),
-                    //.define("CMP_FFMPEG_V7"),
+                    .define("CMP_FFMPEG_V7"),
                 ]
             ),
             .target(
@@ -71,7 +76,8 @@ import PackageDescription
                 name: "Cffmpeg",
                 dependencies: [],
                 cSettings: [
-                    .headerSearchPath("include"),                    
+                    .headerSearchPath("include"),   
+                    .unsafeFlags(["-I/usr/include/ffmpeg"]),                 
                 ],
                 linkerSettings: [
                     .linkedLibrary("avcodec"),

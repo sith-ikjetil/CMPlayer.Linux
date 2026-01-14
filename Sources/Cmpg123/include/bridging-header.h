@@ -12,6 +12,9 @@
 #elif CMP_TARGET_FEDORA_V40
     #include </usr/include/mpg123.h>
     #include </usr/include/fmt123.h>
+#elif CMP_TARGET_FEDORA_V43
+    #include </usr/include/mpg123.h>
+    #include </usr/include/fmt123.h>
 #elif CMP_TARGET_MANJARO_V24
     #include </usr/include/mpg123.h>
     #include </usr/include/fmt123.h>
