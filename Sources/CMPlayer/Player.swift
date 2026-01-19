@@ -286,12 +286,24 @@ internal class Player {
             // if we are in a mode, add from g_searchResult
             if g_modeSearch.count > 0 && g_searchResult.count > 0 {
                 let s = g_searchResult.randomElement()!
-                g_playlist.append(s)
+                if (s.songNo == g_playlist.first!.songNo) {
+                    let s2 = g_searchResult.randomElement()!;
+                    g_playlist.append(s2)
+                }
+                else {
+                    g_playlist.append(s)
+                }
             }
             // else add from g_songs
             else {
                 let s = g_songs.randomElement()!
-                g_playlist.append(s)
+                if (s.songNo == g_playlist.first!.songNo) {
+                    let s2 = g_songs.randomElement()!;
+                    g_playlist.append(s2)
+                }
+                else {
+                    g_playlist.append(s)
+                }                
             }
         }
         // if self.audioPlayerActive is not set or it is set to 2
