@@ -1,9 +1,14 @@
 # CMPlayer.Linux
 License: **GPL-3.0-or-later**  
 This is a console music player for Linux.  
-  
-<img src="https://www.ikjetil.no/content/images/CMPlayerOnUbuntu26-04.png" alt="CMPlayer.Linux" style="width:50%">  
+
+### Ubuntu 26-04 
+<img src="https://www.ikjetil.no/content/images/CMPlayerOnUbuntu26-04.png" alt="CMPlayer.Linux" style="width:50%">
+ 
+### Ubuntu 24-04 
 <img src="https://www.ikjetil.no/content/images/CMPlayerUbuntuWSL2.png" alt="CMPlayer.Linux" style="width:50%">  
+ 
+### Ubuntu 24-04 
 <img src="https://www.ikjetil.no/content/images/CMPlayerUbuntuWSL.png" alt="CMPlayer.Linux" style="width:70%;">  
 
 ## Application
