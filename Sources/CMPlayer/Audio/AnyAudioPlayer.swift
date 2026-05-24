@@ -17,7 +17,7 @@ import Casound
 internal struct AnyAudioState {
     var formatCtx: UnsafeMutablePointer<AVFormatContext>?
     var codecCtx: UnsafeMutablePointer<AVCodecContext>?   
-#if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+#if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7 || CMP_FFMPEG_V8
     var codec: UnsafePointer<AVCodec>?          // ffmpeg version 6    
     var chLayoutIn: AVChannelLayout = AVChannelLayout()
     var chLayoutOut: AVChannelLayout = AVChannelLayout()
@@ -199,7 +199,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // get codec parameters
         let codecpar = self.m_audioState.formatCtx!.pointee.streams![Int(self.m_audioState.audioStreamIndex)]!.pointee.codecpar
         // find the decoder for the audio stream 
-#if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+#if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7 || CMP_FFMPEG_V8
         self.m_audioState.codec = avcodec_find_decoder(codecpar!.pointee.codec_id)
 #elseif CMP_FFMPEG_V4
         self.m_audioState.codec = UnsafeMutablePointer(mutating: avcodec_find_decoder(codecpar!.pointee.codec_id))
@@ -266,7 +266,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         self.m_audioState.swrCtx = swr_alloc()
         // create a mutable raw pointer
         let rawSwrCtxPtr: UnsafeMutableRawPointer? = UnsafeMutableRawPointer(self.m_audioState.swrCtx)
-#if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7     
+#if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7 || CMP_FFMPEG_V8
         // copy channel layout from ch_layout to chLayoutIn
         err = av_channel_layout_copy(&self.m_audioState.chLayoutIn, &self.m_audioState.codecCtx!.pointee.ch_layout)        
         // if error
@@ -466,7 +466,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
             if self.m_audioState.device == nil {
                 // create error message
                 let msg = "[AnyAudioPlayer].play(). ao_open_live failed with value: nil. Error opening audio device."
-    #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+    #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7 || CMP_FFMPEG_V8
                 // uninitialize ch layout in
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
                 // uninitialize ch layout out
@@ -492,7 +492,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
             guard err >= 0 else {
                 // create error message
                 let msg = "[AnyAudioPlayer].play(). alsa. snd_pcm_open failed with value: \(err) = '\(renderAlsaError(error: err))'"
-    #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+    #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7 || CMP_FFMPEG_V8
                 // uninitialize ch layout in
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
                 // uninitialize ch layout out
@@ -515,7 +515,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
             guard err >= 0 else {
                 // create error message
                 let msg = "[AnyAudioPlayer].play(). alsa. snd_pcm_set_params failed with value: \(err) = '\(renderAlsaError(error: err))'"
-    #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+    #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7 || CMP_FFMPEG_V8
                 // uninitialize ch layout in
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
                 // uninitialize ch layout out
@@ -539,7 +539,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
                 // else we have an error
                 // create error message
                 let msg = "[AnyAudioPlayer].play(). alsa. snd_pcm_prepare failed with value: \(err) = '\(renderAlsaError(error: err))'"
-    #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+    #if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7 || CMP_FFMPEG_V8
                 // uninitialize ch layout in
                 av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
                 // uninitialize ch layout out
@@ -574,7 +574,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         PlayerLog.ApplicationLog?.logInformation(title: "[AnyAudioPlayer].playAsync()", text: "Started playing: \(self.filePath.lastPathComponent)")
         // Clean up using defer
         defer {                        
-#if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7
+#if CMP_FFMPEG_V5 || CMP_FFMPEG_V6 || CMP_FFMPEG_V7 || CMP_FFMPEG_V8
             // uninit chLayoutIn
             av_channel_layout_uninit(&self.m_audioState.chLayoutIn)
             // uninit chLayoutOut

@@ -44,6 +44,13 @@
 #include <libavutil/opt.h>
 #include <libavutil/dict.h>
 #include <libavutil/error.h>
+#elif CMP_TARGET_FEDORA_V44
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libswresample/swresample.h>
+#include <libavutil/opt.h>
+#include <libavutil/dict.h>
+#include <libavutil/error.h>
 #elif CMP_TARGET_MANJARO_V24
 #include </usr/include/libavformat/avformat.h>
 #include </usr/include/libavcodec/avcodec.h>
