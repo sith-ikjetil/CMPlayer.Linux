@@ -39,6 +39,25 @@ and have a queue of music. All music is expected to be locally available music f
 **-\-log-other-off**           = turn off other logging  
 **-\-get-log-status**          = gets log status  
 
+# IN APP COMMANDS
+**\<song no\>** adds song no to playlist.  
+**exit, quit, q** exits application.  
+**next, skip, n, s, TAB-key** plays next song.  
+**play, p** plays music.  
+**pause, p** pauses music.  
+**resume** resumes music playback.  
+**search [\<words\>]** searches artist and title for a match. Case insensitive.  
+**search artist [\<words\>]** searches artist for a match. Case insensitive.  
+**search title [\<words\>]** searches title for a match. Case insensitive.  
+**search album [\<words\>]** searches album name for a match. Case insensitive.  
+**search genre [\<words\>]** searches all music in genre for matches. Case insensitive.  
+**search year [\<year\>]** searches all music in release years for matches.  
+**mode off** clears mode playback. Playback now from entire music library.  
+**help** shows help information.  
+**pref** shows preferences information.  
+**about** shows about information.  
+**genre** shows all genre information and statistics.  
+
 # BUGS
 All software have bugs :)
 
