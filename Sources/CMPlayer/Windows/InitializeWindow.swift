@@ -95,8 +95,9 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
             self.libraryLoadedCompleted = 0
             // create variable i that keeps tab on file number
             var i: Int = 1
+            
             // loop through all songs (file paths)
-            for r in result {
+            for r in result {                
                 // set currentPath = current music root path
                 self.currentPath = mrpath
                 // set libraryLoadedCompleted % completion of loading of library
@@ -114,13 +115,13 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
                     g_songs.append(se)                                        
                 }
                 // no this is a new file (song)
-                else {
+                else {                    
                     // create a constant of next available song no.
                     let nasno = g_library.nextAvailableSongNo()
                     do {
                         // Attempt to create a song entry object
-                        // gathers metadata
-                        let songEntry = try SongEntry(path: URL(fileURLWithPath: r),songNo: nasno)
+                        // gathers metadata                        
+                        let songEntry = try SongEntry(path: URL(fileURLWithPath: r),songNo: nasno)                        
                         // increase countFoundMetadata by 1. number of files metadata gathered
                         self.countFoundMetadata += 1
                         // add to g_songs
@@ -132,7 +133,7 @@ internal class InitializeWindow : TerminalSizeHasChangedProtocol, PlayerWindowPr
                         g_library.setNextAvailableSongNo(nasno)
                     }
                     // an unknown error occurred
-                    catch  {
+                    catch {
                         // set next availble song no
                         g_library.setNextAvailableSongNo(nasno)
                     }

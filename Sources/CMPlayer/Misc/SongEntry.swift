@@ -117,13 +117,13 @@ internal class SongEntry {
             let msg = "[SongEntry].init(path,songNo). url in exclusion path:\(path!.path)"
             throw CmpError(message: msg)
         }
-                
+        
         self.songNo = songNo
         self.fileURL = path!
         
         // gather metadata        
         do {            
-            let metadata = try CmpAudioPlayer.gatherMetadata(path: path!)                
+            let metadata = try CmpAudioPlayer.gatherMetadata(path: path!)                                   
             self.title = metadata.title
             self.artist = metadata.artist
             self.albumName = metadata.albumName

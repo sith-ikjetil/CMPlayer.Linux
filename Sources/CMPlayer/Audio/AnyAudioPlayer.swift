@@ -940,15 +940,15 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         let filename = path.path
         // create a pointer read/write variable
         var formatContext: UnsafeMutablePointer<AVFormatContext>? = nil                        
-        // open input stream
-        var err = avformat_open_input(&formatContext, filename, nil, nil)
+        // open input stream        
+        var err = avformat_open_input(&formatContext, filename, nil, nil)        
         // if error
         if err != 0 {
             // create error message
             let msg = "[AnyAudioPlayer].gatherMetadata(). avformat_open_input failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // throw error
             throw CmpError(message: msg)
-        }
+        }        
         // ensure cleanup by defer
         defer {
             // close opened input
@@ -957,7 +957,7 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // Retrieve stream information
         err = avformat_find_stream_info(formatContext, nil)
         // if error
-        if err < 0 {
+        if err < 0 {            
             // create error message
             let msg = "[AnyAudioPlayer].gatherMetadata(). avformat_find_stream_info failed with value: \(err) = '\(renderFfmpegError(error: err))'."
             // close opened input
@@ -992,11 +992,12 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if formatContext is invalid or formatContext metadata is invalid
         if formatContext == nil || formatContext?.pointee.metadata == nil {
             // create error message
-            let msg = "[AnyAudioPlayer].gatherMetadata(). formatContext/metadata is nil."
+            //let msg = "[AnyAudioPlayer].gatherMetadata(). formatContext/metadata is nil."
             // close opened input
             avformat_close_input(&formatContext)
             // throw error
-            throw CmpError(message: msg)
+            //throw CmpError(message: msg)
+            return metadata;// TODO: IF NO METADATA FOUND STILL ADD.
         }
         // create a read/write pointer
         var tag: UnsafeMutablePointer<AVDictionaryEntry>? = nil
