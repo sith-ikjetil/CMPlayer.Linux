@@ -992,12 +992,11 @@ internal final class AnyAudioPlayer : CmpAudioPlayerProtocol {
         // if formatContext is invalid or formatContext metadata is invalid
         if formatContext == nil || formatContext?.pointee.metadata == nil {
             // create error message
-            //let msg = "[AnyAudioPlayer].gatherMetadata(). formatContext/metadata is nil."
+            let msg = "[AnyAudioPlayer].gatherMetadata(). formatContext/metadata is nil."
             // close opened input
             avformat_close_input(&formatContext)
             // throw error
-            //throw CmpError(message: msg)
-            return metadata;// TODO: IF NO METADATA FOUND STILL ADD.
+            throw CmpError(message: msg)            
         }
         // create a read/write pointer
         var tag: UnsafeMutablePointer<AVDictionaryEntry>? = nil
